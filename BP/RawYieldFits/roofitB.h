@@ -116,10 +116,13 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
   RooGaussian sig1MC(Form("sig1MC%d_%s",_count,pdf.Data()),"",*mass,meanMC,sigma1MC);  
   RooGaussian sig2MC(Form("sig2MC%d_%s",_count, pdf.Data()),"",*mass,meanMC,sigma2MC);  
   RooGaussian sig3MC(Form("sig3MC%d_%s",_count, pdf.Data()),"",*mass,meanMC,sigma3MC);  
-  RooRealVar sig1fracMC(Form("sig1fracMC%d_%s",_count, pdf.Data()),"",0.5,0.,1.);
+//  RooRealVar sig1fracMC(Form("sig1fracMC%d_%s",_count, pdf.Data()),"",0.5,0.,1.);
+RooRealVar sig1fracMC(Form("sig1fracMC%d_%s",_count, pdf.Data()),"",0.5,0.2,0.8);
+
+ 
   RooRealVar sig2fracMC(Form("sig2fracMC%d_%s",_count, pdf.Data()),"",0.,0.,1.);
 	//RooRealVar sig3fracMC(Form("sig3fracMC%d_%s",_count, pdf.Data()),"",0.5,0.,1.);
- 
+
   RooAddPdf* sigMC;
   
   if((variation=="" && pdf=="") || variation== "background"|| (variation=="signal" &&(pdf=="fixed" || pdf=="scal" || pdf=="merr" || pdf == "perr"|| pdf=="scal+" || pdf== "scal-"))) sigMC = new RooAddPdf(Form("sigMC%d_%s",_count,pdf.Data()),"",RooArgList(sig1MC,sig2MC),sig1fracMC);
