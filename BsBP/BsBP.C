@@ -46,7 +46,9 @@ void BsBP(){
 	TH1D * BsBPRatio =  (TH1D * ) BsCross->Clone("BsBPRatio");
 
 	BsBPRatio->GetXaxis()->SetTitle("B p_{T} (GeV/c)");
-	BsBPRatio->GetYaxis()->SetTitle("B_s^{0}/B^{+}");
+	BsBPRatio->GetYaxis()->SetTitle("B_{s}^{0}/B^{+}");
+	BsBPRatio->SetTitle("B_{s}^{0}/B^{+} vs B p_{T}");
+
 	BsBPRatio->SetMarkerStyle(20);
 	BsBPRatio->SetMarkerSize(1);
 	BsBPRatio->SetMarkerColor(kBlack);
