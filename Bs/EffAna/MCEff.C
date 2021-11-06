@@ -30,7 +30,7 @@ void  MCEff(){
 
 	//TString infile = "/data/szhaozho/2017ppSamplesNew/BDTOutput/AllMerge/BPMCAllBDT.root";
 //	TString infile = "../../UnskimmedSamples/BsMC.root";
-	TString infile = "/data/szhaozho/ppNewTMVA/CMSSW_10_3_2/src/Bs/SamplesNew/BsMCAllBDT.root";
+	TString infile = "../../UnskimmedSamples/BsMC.root";
 	TFile * fin = new TFile(infile.Data());
 
 	fin->cd();
@@ -607,7 +607,7 @@ void  MCEff(){
 	
 
 	const int NPtBins1D = 10;
-	double  PtBin1D[NPtBins1D + 1] = {1,2,3,5,7,10,15,20,30,50,100};
+	double  PtBin1D[NPtBins1D + 1] = {0,2,3,5,7,10,15,20,30,50,100};
 
 
 
