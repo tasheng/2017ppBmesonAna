@@ -503,7 +503,7 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 
 //    if(ptmax < 8)frame->SetMaximum(nsig.getVal()*1.25);
 //  if(ptmax < 6)frame->SetMaximum(nsig.getVal()*10.0);
-	if(ptmax < 7.1) frame->SetMaximum(nsig.getVal()*1.1);
+	if(ptmax  < 15.1) frame->SetMaximum(nsig.getVal()*2.2);
 
 	if(ptmax < 5.1) frame->SetMaximum(nsig.getVal()*2.6);
 //	if(ptmax < 2.1 && ptmin > 0.9) frame->SetMaximum(nsig.getVal()*1.3);

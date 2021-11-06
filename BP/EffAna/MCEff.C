@@ -597,9 +597,10 @@ void  MCEff(){
 	double PtBin[NPtBins + 1] = {0,1,2,3,5,7,10,15,20,50,100};
 	
 
-	const int NPtBins1D = 11;
-	double  PtBin1D[NPtBins1D + 1] = {0,1,2,3,5,7,10,15,20,30,50,100};
-
+//	const int NPtBins1D = 11;
+	//double  PtBin1D[NPtBins1D + 1] = {0,1,2,3,5,7,10,15,20,30,50,100};
+	const int NPtBins1D = 10;
+	double  PtBin1D[NPtBins1D + 1] = {1,2,3,5,7,10,15,20,30,50,100};
 
 //	TH1D * Eff1DRECOHis = new TH1D("Eff1DRECOHis","",NPtBins,PtBin);
 	TH1D * Eff1DRECOHis = new TH1D("Eff1DRECOHis","",NPtBins1D,PtBin1D);
