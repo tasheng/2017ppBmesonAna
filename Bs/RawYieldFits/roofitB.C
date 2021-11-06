@@ -75,11 +75,11 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 	else
 	{
 		std::cout<<"DEBUG 4 else"<<std::endl;
-		seldata = Form("%s&&%s&&BsizeNew>0",trgselection.Data(),cut.Data());
+		seldata = Form("%s&&%s&&Bsize>0",trgselection.Data(),cut.Data());
 		std::cout<<"DEBUG 5"<<std::endl;
-		selmc = Form("%s&&BsizeNew>0",cut.Data());
+		selmc = Form("%s&&Bsize>0",cut.Data());
 		std::cout<<"DEBUG 6"<<std::endl;
-		selmcgen = Form("%s&&BsizeNew>0",cutmcgen.Data());
+		selmcgen = Form("%s&&Bsize>0",cutmcgen.Data());
 		std::cout<<"DEBUG 7"<<std::endl;
 		std::cout<<"cut = "<<cut<<std::endl;
 		std::cout<<"seldata= "<<seldata<<std::endl;
