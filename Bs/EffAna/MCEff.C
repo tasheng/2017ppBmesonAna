@@ -30,7 +30,7 @@ void  MCEff(){
 
 	//TString infile = "/data/szhaozho/2017ppSamplesNew/BDTOutput/AllMerge/BPMCAllBDT.root";
 //	TString infile = "../../UnskimmedSamples/BsMC.root";
-	TString infile = "../../UnskimmedSamples/BsMC.root";
+	TString infile = "/data/szhaozho/2017ppSamples/UnSkimmed/OfficialMC/BsMC.root";
 	TFile * fin = new TFile(infile.Data());
 
 	fin->cd();

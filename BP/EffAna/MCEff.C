@@ -29,7 +29,8 @@ void  MCEff(){
 	int ptmax = 50;
 
 	//TString infile = "/data/szhaozho/2017ppSamplesNew/BDTOutput/AllMerge/BPMCAllBDT.root";
-	TString infile = "../../UnskimmedSamples/BPMC.root";
+	//TString infile = "../../UnskimmedSamples/OfficialMC/BPMC.root";
+	TString infile = "/data/szhaozho/2017ppSamples/UnSkimmed/OfficialMC/BPMC.root";
 
 	TFile * fin = new TFile(infile.Data());
 
@@ -50,8 +51,8 @@ void  MCEff(){
 	TTree * BDT5 = (TTree *) fin->Get("BDT_pt_15_20");
 	TTree * BDT6 = (TTree *) fin->Get("BDT_pt_20_50");
 //	TTree * BDT7 = (TTree *) fin->Get("BDT_pt_2_3");
-	TTree * BDT7 = (TTree *) fin->Get("BDT_pt_0_3");
-	TTree * BDT8 = (TTree *) fin->Get("BDT_pt_0_2");
+	TTree * BDT7 = (TTree *) fin->Get("BDT_pt_2_3");
+	TTree * BDT8 = (TTree *) fin->Get("BDT_pt_1_2");
 	TTree * root = (TTree * ) fin->Get("Bfinder/root");
 
 	Int_t nMult;
@@ -168,8 +169,8 @@ void  MCEff(){
 	Double_t BDT_pt_15_20[NCand];
 	Double_t BDT_pt_20_50[NCand];
 //	Double_t BDT_pt_2_3[NCand];
-	Double_t BDT_pt_0_3[NCand];
-	Double_t BDT_pt_0_2[NCand];
+	Double_t BDT_pt_2_3[NCand];
+	Double_t BDT_pt_1_2[NCand];
 	
 	/*
 
@@ -177,7 +178,7 @@ void  MCEff(){
 	   BDT->SetBranchAddress("BDT_7_10",BDT_pt_7_10);
 	   BDT->SetBranchAddress("BDT_10_15",BDT_pt_10_15);
 	   BDT->SetBranchAddress("BDT_15_20",BDT_pt_15_20);
-	   BDT->SetBranchAddress("BDT_20_30",BDT_pt_20_30);
+	   BDT->SetBranchAddress("BDT_22_30",BDT_pt_22_30);
 	   BDT->SetBranchAddress("BDT_30_40",BDT_pt_30_40);
 	   BDT->SetBranchAddress("BDT_40_50",BDT_pt_40_50);
 	   BDT->SetBranchAddress("BDT_50_60",BDT_pt_50_60);
@@ -295,8 +296,8 @@ void  MCEff(){
 	BDT6->SetBranchAddress("BDT_pt_20_50",BDT_pt_20_50);
 //	BDT7->SetBranchAddress("BDT_pt_2_3",BDT_pt_2_3);
 
-	BDT7->SetBranchAddress("BDT_pt_0_3",BDT_pt_0_3);
-	BDT8->SetBranchAddress("BDT_pt_0_2",BDT_pt_0_2);
+	BDT7->SetBranchAddress("BDT_pt_2_3",BDT_pt_2_3);
+	BDT8->SetBranchAddress("BDT_pt_1_2",BDT_pt_1_2);
 
 	Bool_t Bmu1SoftMuID[NCand];
 	Bool_t Bmu2SoftMuID[NCand];
@@ -599,8 +600,14 @@ void  MCEff(){
 
 //	const int NPtBins1D = 11;
 	//double  PtBin1D[NPtBins1D + 1] = {0,1,2,3,5,7,10,15,20,30,50,100};
+	/*
+
 	const int NPtBins1D = 10;
 	double  PtBin1D[NPtBins1D + 1] = {1,2,3,5,7,10,15,20,30,50,100};
+	*/
+	
+	const int NPtBins1D = 4;
+	double  PtBin1D[NPtBins1D + 1] = {7,10,15,20,50};
 
 //	TH1D * Eff1DRECOHis = new TH1D("Eff1DRECOHis","",NPtBins,PtBin);
 	TH1D * Eff1DRECOHis = new TH1D("Eff1DRECOHis","",NPtBins1D,PtBin1D);
@@ -768,7 +775,7 @@ void  MCEff(){
 
 		for(int j = 0; j < Bsize; j++){
 			//cout << "j = " << j << endl;
-				if( (Bgen[j] == 23333)  && (((BDT_pt_0_2[j]>0.04 && BsvpvDistance[j]/BsvpvDisErr[j] > 5 && Bchi2cl[j] > 0.05 && Bpt[j] > 1.0 && Bpt[j] < 2.0) || (BDT_pt_0_2[j]>0.04 && BsvpvDistance[j]/BsvpvDisErr[j] > 5 && Bchi2cl[j] > 0.05 && Bpt[j] > 0.0 && Bpt[j] < 1.0) )   || (((HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1)  &&  (Bmu1isTriggered[j] == 1 && Bmu2isTriggered[j] == 1 ) &&  (Btrk1Pt[j] > 0.2 && Bchi2cl[j] > 0.05 && BsvpvDistance[j]/BsvpvDisErr[j] > 2.0 && Bpt[j] > 2 && abs(Btrk1Eta[j]-0.0) < 2.4  && (TMath::Abs(By[j])<2.4&&TMath::Abs(Bmumumass[j]-3.096916)<0.15&&((abs(Bmu1eta[j])<1.2&&Bmu1pt[j]>3.5)||(abs(Bmu1eta[j])>1.2&&abs(Bmu1eta[j])<2.1&&Bmu1pt[j]>(5.47-1.89*abs(Bmu1eta[j])))||(abs(Bmu1eta[j])>2.1&&abs(Bmu1eta[j])<2.4&&Bmu1pt[j]>1.5))&&((abs(Bmu2eta[j])<1.2&&Bmu2pt[j]>3.5)||(abs(Bmu2eta[j])>1.2&&abs(Bmu2eta[j])<2.1&&Bmu2pt[j]>(5.47-1.89*abs(Bmu2eta[j])))||(abs(Bmu2eta[j])>2.1&&abs(Bmu2eta[j])<2.4&&Bmu2pt[j]>1.5))&&Bmu1TMOneStationTight[j]&&Bmu2TMOneStationTight[j]&&Bmu1InPixelLayer[j]>0&&(Bmu1InPixelLayer[j]+Bmu1InStripLayer[j])>5&&Bmu2InPixelLayer[j]>0&&(Bmu2InPixelLayer[j]+Bmu2InStripLayer[j])>5&&Bmu1dxyPV[j]<0.3&&Bmu2dxyPV[j]<0.3&&Bmu1dzPV[j]<20&&Bmu2dzPV[j]<20&&Bmu1isTrackerMuon[j]&&Bmu2isTrackerMuon[j]&&Bmu1isGlobalMuon[j]&&Bmu2isGlobalMuon[j]&&Btrk1highPurity[j]&&abs(Btrk1Eta[j])<2.4&&Btrk1Pt[j]>0.2)  && (Btrk1PixelHit[j] + Btrk1StripHit[j] > 10) &&  (Btrk1PtErr[j]/Btrk1Pt[j] < 0.1)&& Btrk1Chi2ndf[j]/(Btrk1nStripLayer[j]+Btrk1nPixelLayer[j]) < 0.18   && (abs(PVz)<15))  &&( (Bpt[j] > 3 && Bpt[j] < 5 && BDT_pt_3_5[j] > 0.08) || (Bpt[j] > 5 && Bpt[j] < 7 && BDT_pt_5_7[j] > 0.06) || (Bpt[j] > 7 && Bpt[j] < 10 && BDT_pt_7_10[j] > 0.07) || (Bpt[j] > 10 && Bpt[j] < 15 && BDT_pt_10_15[j] > 0.08) || (Bpt[j] > 15 && Bpt[j] < 20 && BDT_pt_15_20[j] > 0.12)  || (Bpt[j] > 20 && Bpt[j] < 50 && BDT_pt_20_50[j] > 0.12) || (Bpt[j] > 50 && Bpt[j] < 100))) || ((HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1) &&  (Bpt[j] > 2 && Bpt[j] < 3 && BDT_pt_0_3[j] > -0.12) ) ))){
+				if( (Bgen[j] == 23333)  && (((BDT_pt_1_2[j]>0.04 && BsvpvDistance[j]/BsvpvDisErr[j] > 5 && Bchi2cl[j] > 0.05 && Bpt[j] > 1.0 && Bpt[j] < 2.0) || (BDT_pt_1_2[j]>0.04 && BsvpvDistance[j]/BsvpvDisErr[j] > 5 && Bchi2cl[j] > 0.05 && Bpt[j] > 0.0 && Bpt[j] < 1.0) )   || (((HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1)  &&  (Bmu1isTriggered[j] == 1 && Bmu2isTriggered[j] == 1 ) &&  (Btrk1Pt[j] > 0.2 && Bchi2cl[j] > 0.05 && BsvpvDistance[j]/BsvpvDisErr[j] > 2.0 && Bpt[j] > 2 && abs(Btrk1Eta[j]-0.0) < 2.4  && (TMath::Abs(By[j])<2.4&&TMath::Abs(Bmumumass[j]-3.096916)<0.15&&((abs(Bmu1eta[j])<1.2&&Bmu1pt[j]>3.5)||(abs(Bmu1eta[j])>1.2&&abs(Bmu1eta[j])<2.1&&Bmu1pt[j]>(5.47-1.89*abs(Bmu1eta[j])))||(abs(Bmu1eta[j])>2.1&&abs(Bmu1eta[j])<2.4&&Bmu1pt[j]>1.5))&&((abs(Bmu2eta[j])<1.2&&Bmu2pt[j]>3.5)||(abs(Bmu2eta[j])>1.2&&abs(Bmu2eta[j])<2.1&&Bmu2pt[j]>(5.47-1.89*abs(Bmu2eta[j])))||(abs(Bmu2eta[j])>2.1&&abs(Bmu2eta[j])<2.4&&Bmu2pt[j]>1.5))&&Bmu1TMOneStationTight[j]&&Bmu2TMOneStationTight[j]&&Bmu1InPixelLayer[j]>0&&(Bmu1InPixelLayer[j]+Bmu1InStripLayer[j])>5&&Bmu2InPixelLayer[j]>0&&(Bmu2InPixelLayer[j]+Bmu2InStripLayer[j])>5&&Bmu1dxyPV[j]<0.3&&Bmu2dxyPV[j]<0.3&&Bmu1dzPV[j]<20&&Bmu2dzPV[j]<20&&Bmu1isTrackerMuon[j]&&Bmu2isTrackerMuon[j]&&Bmu1isGlobalMuon[j]&&Bmu2isGlobalMuon[j]&&Btrk1highPurity[j]&&abs(Btrk1Eta[j])<2.4&&Btrk1Pt[j]>0.2)  && (Btrk1PixelHit[j] + Btrk1StripHit[j] > 10) &&  (Btrk1PtErr[j]/Btrk1Pt[j] < 0.1)&& Btrk1Chi2ndf[j]/(Btrk1nStripLayer[j]+Btrk1nPixelLayer[j]) < 0.18   && (abs(PVz)<15))  &&( (Bpt[j] > 3 && Bpt[j] < 5 && BDT_pt_3_5[j] > 0.08) || (Bpt[j] > 5 && Bpt[j] < 7 && BDT_pt_5_7[j] > 0.06) || (Bpt[j] > 7 && Bpt[j] < 10 && BDT_pt_7_10[j] > 0.07 && abs(By[j]) > 1.5) || (Bpt[j] > 10 && Bpt[j] < 15 && BDT_pt_10_15[j] > 0.08) || (Bpt[j] > 15 && Bpt[j] < 20 && BDT_pt_15_20[j] > 0.12)  || (Bpt[j] > 20 && Bpt[j] < 50 && BDT_pt_20_50[j] > 0.12) || (Bpt[j] > 50 && Bpt[j] < 100))) || ((HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1) &&  (Bpt[j] > 2 && Bpt[j] < 3 && BDT_pt_2_3[j] > -0.12) ) ))){
 
 				PVzWeight = 1;
 				//EventWeight = pthat * weight;
@@ -976,7 +983,9 @@ void  MCEff(){
 
 
 
-				if((TMath::Abs(Gy[j])<2.4 && TMath::Abs(GpdgId[j])==521 && GisSignal[j]==1 && GcollisionId[j]==0 ) ){
+	//			if((TMath::Abs(Gy[j])<2.4 && TMath::Abs(GpdgId[j])==521 && GisSignal[j]==1 && GcollisionId[j]==0 ) ){
+				if( (TMath::Abs(Gy[j])<2.4 && TMath::Abs(GpdgId[j])==521 && GisSignal[j]==1 && GcollisionId[j]==0 )  && ((Gpt[j]>5 && Gpt[j]<10 && TMath::Abs(Gy[j])>1.5) || (Gpt[j]>10))  ){
+
 
 					NoWeightGenHis->Fill(Gpt[j],abs(Gy[j]),1);
 					EvtWeightGenHis->Fill(Gpt[j],abs(Gy[j]),EventWeight);

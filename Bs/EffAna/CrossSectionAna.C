@@ -24,7 +24,7 @@ using std::endl;
 
 void CrossSectionAna(){
 
-	const int NBins = 10;
+	const int NBins = 9;
 	//const int NBins = 6;
 
 	int TnP = 1;
@@ -82,6 +82,9 @@ void CrossSectionAna(){
 	EffInfoTree->SetBranchAddress("Bmass",BmassNew);
 	EffInfoTree->SetBranchAddress("By",ByNew);
 	EffInfoTree->SetBranchAddress("Bpt",BptNew);
+	
+
+/*
 	EffInfoTree->SetBranchAddress("BEffInv",BEffInv);
 	EffInfoTree->SetBranchAddress("BEffInvErr",BEffInvErr);
 	EffInfoTree->SetBranchAddress("BEff",BEff);
@@ -104,7 +107,7 @@ void CrossSectionAna(){
 
 	EffInfoTree->SetBranchAddress("BEffInvDown",BEffInvDown);
 	EffInfoTree->SetBranchAddress("BEffInvErrDown",BEffInvErrDown);
-
+*/
 
 	/*
 	   Int_t Bmu1Type[NCand];
@@ -236,12 +239,13 @@ void CrossSectionAna(){
 	if(NBins == 7){
 
 
-		ptbinsvec.push_back(3);
+		//ptbinsvec.push_back(3);
 		ptbinsvec.push_back(5);
 		ptbinsvec.push_back(7);		
 		ptbinsvec.push_back(10);
 		ptbinsvec.push_back(15);
 		ptbinsvec.push_back(20);
+		ptbinsvec.push_back(30);		
 		ptbinsvec.push_back(50);
 		ptbinsvec.push_back(100);
 
@@ -413,7 +417,7 @@ void CrossSectionAna(){
 	TFile * fin1DEff = new TFile("NewEff2DMaps/EffFineBDT.root");
 	fin1DEff->cd();
 
-	TH2D * invAcc2D = (TH2D *) fin1DEff->Get("invAcc2D");
+	TH2D * invAcc2D = (TH2D *) fin1DEff->Get("invEff2D");
 
 	int XBin;
 	int YBin;
@@ -430,7 +434,7 @@ void CrossSectionAna(){
 			for(int k = 0; k < NBins; k++){
 
 				//	if((BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08  && ((BptNew[j] > 7 && BptNew[j] < 10 && ByNew[j] > 1.5 )||(BptNew[j] > 10)) && (Bmu1Type > -0.1 && Bmu2Type > -0.1)))
-				if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.3663) < 0.08 && ByNew[j] < 2.4)
+				if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.3663) < 0.08 && TMath::Abs(ByNew[j]) < 2.4)
 				{
 
 

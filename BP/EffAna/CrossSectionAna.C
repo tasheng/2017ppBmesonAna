@@ -24,8 +24,10 @@ using std::endl;
 
 void CrossSectionAna(){
 
-	const int NBins = 10;
+	//const int NBins = 9;
 	//const int NBins = 6;
+
+	const int NBins = 4;
 
 	int TnP = 1;
 
@@ -242,12 +244,14 @@ void CrossSectionAna(){
 	if(NBins == 7){
 
 
-		ptbinsvec.push_back(3);
+	//	ptbinsvec.push_back(3);
 		ptbinsvec.push_back(5);
 		ptbinsvec.push_back(7);		
 		ptbinsvec.push_back(10);
 		ptbinsvec.push_back(15);
 		ptbinsvec.push_back(20);
+		ptbinsvec.push_back(30);
+		
 		ptbinsvec.push_back(50);
 		ptbinsvec.push_back(100);
 
@@ -417,7 +421,7 @@ void CrossSectionAna(){
 	TFile * fin1DEff = new TFile("NewEff2DMaps/EffFineBDT.root");
 	fin1DEff->cd();
 
-	TH2D * invAcc2D = (TH2D *) fin1DEff->Get("invAcc2D");
+	TH2D * invAcc2D = (TH2D *) fin1DEff->Get("invEff2D");
 
 
 	int XBin;
@@ -439,7 +443,7 @@ void CrossSectionAna(){
 				if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08 &&  TMath::Abs(ByNew[j]) < 2.4)
 				{
 
-/*
+
 					XBin = invAcc2D->GetXaxis()->FindBin( BptNew[j]);
 					YBin = invAcc2D->GetYaxis()->FindBin( TMath::Abs(ByNew[j]));
 					BEffInv[j] = invAcc2D->GetBinContent(XBin,YBin);
@@ -448,7 +452,7 @@ void CrossSectionAna(){
 					BEff[j] = 1.0/invAcc2D->GetBinContent(XBin,YBin);
 
 					BEffErr[j] = BEffInvErr[j]/(BEffInv[j] * BEffInv[j]);
-	*/
+	
 					if(BEffInv[j] > 0){
 						SumCounts[k] = SumCounts[k] + BEffInv[j];
 						SumCountsErr[k] = SumCountsErr[k] + BEffInvErr[j] * BEffInvErr[j];

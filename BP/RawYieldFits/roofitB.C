@@ -197,15 +197,17 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 		}
 
 	}
-	if(_varExp=="HiBin"){
+	if(_varExp=="nMult"){
 		if(full==0) {
-			nBins_check = nBinshi;
-			ptBins_check = Binshi;
+			nBins_check = nBins_Mult;
+			ptBins_check = MultBins;
+			_nBins = nBins_Mult;
+			_ptBins = MultBins;
 
 		}
 		else if(full==1){
 			nBins_check = nBins_full;
-			ptBins_check = hiBins_full;
+			ptBins_check = nMults_full;
 
 		}
 
@@ -218,7 +220,7 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 		}
 		else if(full==1){
 			nBins_check = nBins_full;
-			ptBins_check = hiBins_full;
+			ptBins_check = nMults_full;
 
 		}
 
@@ -238,7 +240,7 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 	RooRealVar* mass = new RooRealVar("Bmass","Bmass",minhisto,maxhisto);
 	RooRealVar* pt = new RooRealVar("Bpt","Bpt",0,200);
 	RooRealVar* y = new RooRealVar("By","By",-2.4, 2.4);
-//	RooRealVar* HiBin = new RooRealVar("HiBin","HiBin",0.,90.*2);
+	RooRealVar* nMult = new RooRealVar("nMult","nMult",0,200);
 //	RooRealVar* w = new RooRealVar("Pthatweight","Pthatweight",0.,12.) ;
 	RooDataSet* ds = new RooDataSet();
 	RooDataSet* dsMC = new RooDataSet();   
@@ -284,11 +286,11 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 
 	std::cout<<"varExp= "<<_varExp<<std::endl;
 
-	ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new, RooArgSet(*mass, *pt, *y));
+	ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new, RooArgSet(*mass, *pt, *y, *nMult));
 	
 	cout << "ds Pass = " << endl;
 
-	dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,RooArgSet(*mass, *pt, *y));
+	dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,RooArgSet(*mass, *pt, *y, *nMult));
 	//    TString ptbinning;
 
 	
@@ -319,8 +321,8 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 	//		c->cd();
 		//	if(fitOnSaved == 0){
 		drawOpt = 0;
-		_ptBins[i] = 3;
-		_ptBins[i+1] = 7;
+	//	_ptBins[i] = 3;
+	//	_ptBins[i+1] = 7;
 
 				// tree with selecitons applied, create RooDataSet
 			/*	if(isMC==1) {
@@ -338,22 +340,40 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 		std::cout<<_varExp<<" bin = "<<ptBins_check[i]<<" "<<ptBins_check[i+1]<<std::endl;
 	//      return;
 		RooDataSet* ds_cut;
-		if(doubly==0)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y), Form("Bpt>%f && Bpt < %f",ptBins_check[i] , ptBins_check[i+1])); 
-		if(doubly==1)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto)); 
+		if(doubly==0)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y), Form("(Bpt>%f && Bpt < %f)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))",ptBins_check[i] , ptBins_check[i+1])); 
+		if(doubly==1)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y, *nMult), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto)); 
 		if(doubly==2)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto)); 
 
+
 	    //  RooRealVar* w = (RooRealVar*) data->addColumn(wFunc) ;
-	//      RooDataSet wdata(data->GetName(),data->GetTitle(),data,*data->get(),0,w->GetName()) ;
+	//      RooDataSet wdata(data->GetName(),data->GetTitle(),data,*data->get(),0,w->GetName()) ;tex_nMult
 				//dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,RooArgSet(*mass, *pt));
 		RooDataSet* dsMC_cut;
-		if(doubly==0) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1"); 
+//		if(doubly==0) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1"); 
 //		if(doubly==1) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1"); 
+	
+		if(doubly==0) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y), Form("(%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1"); 
 
-		if(doubly==1) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1"); 
+
+
+		if(doubly==1) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y, *nMult), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1"); 
 
 
 		if(doubly==2) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1"); 
-	     // return;
+	
+
+/*
+		if(_varExp=="nMult"){
+		   
+			ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y, *nMult), Form("nMult>%f && nMult < %f",ptBins_check[i] , ptBins_check[i+1])); 
+			dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y, *nMult), Form("nMult>%f && nMult < %f && Bmass > 5 && Bmass < 6",ptBins_check[i] , ptBins_check[i+1])); 
+
+		}
+
+*/
+
+
+		// return;
 		std::cout<<"Really created datasets"<<std::endl;
 				// create RooDataHist
 		if(ptBins_check[i+1]<1.5) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y), Form("Bmass>%f&&Bmass<%f",minhisto, maxhisto), "1"); 
@@ -424,7 +444,7 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 		std::cout<<"pt bin = "<<ptBins_check[i]<<" "<<ptBins_check[i+1]<<std::endl;
 		std::cout<<"count= "<<i<<std::endl;
 
-		if(_varExp!="HiBin"){
+		if(_varExp!="nMult"){
 			hPt->SetBinContent(i+1,yield/(ptBins_check[i+1]-ptBins_check[i]));
 			hPt->SetBinError(i+1,yieldErr/(ptBins_check[i+1]-ptBins_check[i]));
 		}
@@ -449,15 +469,15 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 
 
 		TLatex* tex_pt;
-	//	TLatex* tex_hibin;
+		TLatex* tex_nMult;
 		TLatex* tex_y;
 		    //tex = new TLatex(0.55,0.85,Form("%.0f < p_{T} < %.0f GeV/c",_ptBins[i],_ptBins[i+1]));
 			//if(varExp=="abs(By)") tex = new TLatex(0.55,0.85,Form("%.1f < y < %.1f",_ptBins[i],_ptBins[i+1]));
 		if(varExp=="Bpt"){
 			tex_pt = new TLatex(0.21,0.75,Form("%d < p_{T} < %d GeV/c",(int)ptBins_check[i],(int)ptBins_check[i+1]));
-	//		if(centmin==0&&centmax==90)tex_hibin = new TLatex(0.21,0.62,"Cent. 0-90%");
-	//		if(centmin==0&&centmax==30)tex_hibin = new TLatex(0.21,0.62,"Cent. 0-30%");
-	//		if(centmin==30&&centmax==90)tex_hibin = new TLatex(0.21,0.62,"Cent. 30-90%");
+	//		if(centmin==0&&centmax==90)tex_nMult = new TLatex(0.21,0.62,"Cent. 0-90%");
+	//		if(centmin==0&&centmax==30)tex_nMult = new TLatex(0.21,0.62,"Cent. 0-30%");
+	//		if(centmin==30&&centmax==90)tex_nMult = new TLatex(0.21,0.62,"Cent. 30-90%");
 			tex_y = new TLatex(0.21,0.69,"|y| < 2.4"); 
 	//	    tex = new TLatex(0.21,0.72,Form("%.0f < p_{T} < %.0f GeV/c",_ptBins[i],_ptBins[i+1]));
 
@@ -465,9 +485,9 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 
 		std::cout<<"CHEGUEI AQUI"<<std::endl;
 
-		if(varExp=="HiBin"){
-			tex_pt = new TLatex(0.21,0.75,"5 < p_{T} < 50 GeV/c");
-		//	tex_hibin = new TLatex(0.21,0.62,Form("Cent. %d-%d%%",(int)ptBins_check[i]/2,(int)ptBins_check[i+1]/2));
+		if(varExp=="nMult"){
+			tex_pt = new TLatex(0.21,0.75,"0 < p_{T} < 100 GeV/c");
+			tex_nMult = new TLatex(0.21,0.62,Form("%d < nTrks < %d%%",(int)ptBins_check[i],(int)ptBins_check[i+1]));
 			tex_y = new TLatex(0.21,0.69,"|y| < 2.4");
 
 	//	    tex = new TLatex(0.21,0.72,Form("%.0f < p_{T} < %.0f GeV/c",_ptBins[i],_ptBins[i+1]));
