@@ -9,7 +9,7 @@ CENTPbPbMIN=0
 CENTPbPbMAX=90
 
 INPUTDATAPbPbCANDWISE_BS="../../SkimmedSamples/BsData.root"
-INPUTMCPbPbCANDWISE_BS="../../SkimmedSamples/BsMC.root"
+INPUTMCPbPbCANDWISE_BS="../../SkimmedSamples/OfficialMC/BsMC.root"
 
 LABELPbPb="PbPb"
 #LUMIPbPb=13.1983052423 #paper 20170227

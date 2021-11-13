@@ -43,7 +43,7 @@ void BsBP(){
 	
 	BsCross->Draw("ep");
 
-	c->SaveAs("BsCross.png");
+	c->SaveAs("Pt/BsCross.png");
 
 	TFile * FileBP = new TFile(InfileBP.Data());
 	TH1D * BPCross = (TH1D *) FileBP->Get("CorrDiffHisBin");
@@ -54,7 +54,7 @@ void BsBP(){
 	
 	BPCross->Draw("ep");
 
-	c->SaveAs("BPCross.png");
+	c->SaveAs("Pt/BPCross.png");
 
 	
 	BsCross->SetLineColor(kBlue+2);
@@ -77,7 +77,7 @@ void BsBP(){
 	leg2->Draw("same");
 
 
-	c->SaveAs("BsBPCross.png");
+	c->SaveAs("Pt/BsBPCross.png");
 
 
 	TH1D * BsBPRatio =  (TH1D * ) BsCross->Clone("BsBPRatio");
@@ -120,7 +120,7 @@ void BsBP(){
 	leg->Draw("same");
 
 
-	c->SaveAs("BsBPRatio.png");
+	c->SaveAs("Pt/BsBPRatio.png");
 
 
 	TH1D * BsCross2D = (TH1D *) FileBs->Get("hPtSigma");
@@ -151,7 +151,7 @@ void BsBP(){
 
 
 
-	c->SaveAs("BsBPRatio2D.png");
+	c->SaveAs("Pt/BsBPRatio2D.png");
 
 
 	c->SetLogy();
@@ -160,8 +160,8 @@ void BsBP(){
 	BsCross->Draw("epSAME");
 	leg2->Draw("SAME");
 
+
 	
-	
-	c->SaveAs("BsBPCrossLog.png");
+	c->SaveAs("Pt/BsBPCrossLog.png");
 
 }

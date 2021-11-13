@@ -178,7 +178,7 @@ void BPRAA(){
 	leg->Draw("same");
 
 
-	c->SaveAs("BPPbPbPPCross.png");
+	c->SaveAs("BPRAA/BPPbPbPPCross.png");
 
 
 	TCanvas * c2 = new TCanvas("c","c",600,600);
@@ -291,8 +291,9 @@ void BPRAA(){
 
 
 
-	c2->SaveAs("BPRAA.png");
+	c2->SaveAs("BPRAA/BPRAA.png");
 	
+
 
 
 

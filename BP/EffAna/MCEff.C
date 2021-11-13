@@ -29,8 +29,8 @@ void  MCEff(){
 	int ptmax = 50;
 
 	//TString infile = "/data/szhaozho/2017ppSamplesNew/BDTOutput/AllMerge/BPMCAllBDT.root";
-	//TString infile = "../../UnskimmedSamples/OfficialMC/BPMC.root";
-	TString infile = "/data/szhaozho/2017ppSamples/UnSkimmed/OfficialMC/BPMC.root";
+	TString infile = "../../UnskimmedSamples/OfficialMC/BPMC.root";
+	//TString infile = "/data/szhaozho/2017ppSamples/UnSkimmed/OfficialMC/BPMC.root";
 
 	TFile * fin = new TFile(infile.Data());
 
