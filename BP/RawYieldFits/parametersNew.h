@@ -64,8 +64,12 @@ double hiBins_full[nBins_full+1] = {0,90.*2};
 //const int nBins_bp = 10;
 //double ptBins_bp[nBins_bp+1] = {1.0,2.0,3.0,5.0,7,10,15,20,30,50,100};
 
-const int nBins_bp = 4;
-double ptBins_bp[nBins_bp+1] = {7,10,15,20,50};
+//const int nBins_bp = 4;
+//double ptBins_bp[nBins_bp+1] = {7,10,15,20,50};
+
+const int nBins_bp = 7;
+double ptBins_bp[nBins_bp+1] = {5,7,10,15,20,30,50,60};
+
 
 //const int nBins_bp = 12;
 //double ptBins_bp[nBins_bp+1] = {0.0,1.0,1.5,2.0,3.0,5.0,7,10,15,20,30,50,100};

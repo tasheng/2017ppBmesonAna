@@ -8,8 +8,11 @@ DOANALYSISPbPb_ROOFIT_FULL_BS=0
 CENTPbPbMIN=0
 CENTPbPbMAX=90
 
-INPUTDATAPbPbCANDWISE_BS="../../SkimmedSamples/BsData.root"
-INPUTMCPbPbCANDWISE_BS="../../SkimmedSamples/OfficialMC/BsMC.root"
+#INPUTDATAPbPbCANDWISE_BS="../../SkimmedSamples/BsData.root"
+#INPUTMCPbPbCANDWISE_BS="../../SkimmedSamples/OfficialMC/BsMC.root"
+
+INPUTDATAPbPbCANDWISE_BS="/data/szhaozho/ppNewTMVA/CMSSW_10_3_2/src/Bs/NewCut/BsData.root"
+INPUTMCPbPbCANDWISE_BS="/data/szhaozho/ppNewTMVA/CMSSW_10_3_2/src/Bs/NewCut/BsMC.root"
 
 LABELPbPb="PbPb"
 #LUMIPbPb=13.1983052423 #paper 20170227

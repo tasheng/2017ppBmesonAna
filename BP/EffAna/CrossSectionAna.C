@@ -24,10 +24,8 @@ using std::endl;
 
 void CrossSectionAna(){
 
-	//const int NBins = 9;
+	const int NBins = 7;
 	//const int NBins = 6;
-
-	const int NBins = 4;
 
 	int TnP = 1;
 
@@ -244,7 +242,7 @@ void CrossSectionAna(){
 	if(NBins == 7){
 
 
-	//	ptbinsvec.push_back(3);
+//		ptbinsvec.push_back(3);
 		ptbinsvec.push_back(5);
 		ptbinsvec.push_back(7);		
 		ptbinsvec.push_back(10);
@@ -253,7 +251,7 @@ void CrossSectionAna(){
 		ptbinsvec.push_back(30);
 		
 		ptbinsvec.push_back(50);
-		ptbinsvec.push_back(100);
+		ptbinsvec.push_back(60);
 
 
 
@@ -648,152 +646,6 @@ void CrossSectionAna(){
 	c->SaveAs(Form("EffFinal/ReAnaEffReal_%dBins.png",NBins));
 	c->SaveAs(Form("EffFinal/pdf/ReAnaEffReal_%dBins.pdf",NBins));
 
-
-	/*
-
-	   hInvEff->SetMarkerColor(2);
-	   hInvEff->SetLineColor(2);
-	   hInvEffSyst->SetMarkerColor(3);
-	   hInvEffSyst->SetLineColor(3);
-
-
-
-	   TLegend *leg = new TLegend(0.19,0.60,0.39,0.87,NULL,"brNDC");
-	   leg->SetBorderSize(0);
-	   leg->SetTextSize(0.04);
-	   leg->SetTextFont(42);
-	   leg->SetFillStyle(0);
-
-	   leg->AddEntry(hInvEff,"Nominal Correction","pl");
-	   leg->AddEntry(hInvEffSyst,"BDT MC-Data Weighted Correction","pl");
-
-	   hInvEffSyst->SetMinimum(0);
-
-	   hInvEffSyst->Draw("ep");
-	   hInvEff->Draw("epSAME");
-	   leg->Draw("SAME");
-
-	   c->SaveAs(Form("EBDTWeightedComp_%dBins.png",NBins));
-
-	   TH1D * SelEffSystRatio =  (TH1D * ) hInvEffSyst->Clone("SelEffSystRatio");
-	   SelEffSystRatio->GetYaxis()->SetTitle("Syst Variation/Nominal");
-	   SelEffSystRatio->Sumw2();
-	   hInvEff->Sumw2();
-	   SelEffSystRatio->Divide(hInvEff);
-
-	   SelEffSystRatio->SetMaximum(3);
-
-	   SelEffSystRatio->SetMinimum(0);
-
-
-	   TLatex	*texChi = new TLatex(0.20,0.95, "BDT Weighted/Nominal");
-	   texChi->SetNDC();
-	   texChi->SetTextAlign(12);
-	   texChi->SetTextSize(0.04);
-	   texChi->SetTextFont(42);
-	   texChi->SetTextColor(1);
-
-	   SelEffSystRatio->GetYaxis()->SetTitleOffset(1.2);
-	   SelEffSystRatio->SetMarkerColor(1);
-	   SelEffSystRatio->SetLineColor(1);
-	   SelEffSystRatio->Draw("ep");
-
-
-
-	   TLine *l5 = new TLine(7,1,50,1);
-	   l5->SetLineStyle(2);
-	   l5->SetLineWidth(2);
-	   l5->SetLineColor(2);
-
-	   l5->Draw("SAME");
-	   texChi->Draw("SAME");
-	   c->SaveAs(Form("SystEffRatio_%dBins.png",NBins));
-
-
-	//TnP Comparison//
-
-	hInvEff->SetMinimum(5);
-	hInvEff->SetMaximum(25);
-
-
-
-	hInvEff->SetMarkerColor(1);
-	hInvEff->SetLineColor(1);
-	hInvEff->Draw("ep");
-
-
-	hInvEffUp->SetMarkerColor(2);
-	hInvEffUp->SetLineColor(2);
-	hInvEffDown->SetMarkerColor(3);
-	hInvEffDown->SetLineColor(3);
-
-
-	hInvEffUp->Draw("epSAME");
-	hInvEffDown->Draw("epSAME");
-
-	TLegend *legTnP = new TLegend(0.17,0.20,0.44,0.47,NULL,"brNDC");
-	legTnP->SetBorderSize(0);
-	legTnP->SetTextSize(0.04);
-	legTnP->SetTextFont(42);
-	legTnP->SetFillStyle(0);
-
-	legTnP->AddEntry(hInvEff,"TnP - Total: Nominal Correction","pl");
-	legTnP->AddEntry(hInvEffUp,"TnP - Total: Upper Bound of Scale Factor","pl");
-	legTnP->AddEntry(hInvEffDown,"TnP - Total: Lower Bound of Scale Factor","pl");
-	legTnP->Draw("SAME");
-
-
-
-	c->SaveAs(Form("CheckSystNuno/%s/TnPFinal/TnPEffComp_%dBins_%d_%d.png",WeightName.Data(),NBins,CentMin,CentMax));
-
-
-
-	TH1D * hInvUpRatio =	(TH1D *) hInvEffUp->Clone("hInvUpRatio");
-	TH1D * hInvDownRatio =	(TH1D *) hInvEffDown->Clone("hInvDownRatio");
-
-	hInvUpRatio->Sumw2();
-	hInvEff->Sumw2();
-	hInvUpRatio->Divide(hInvEff);
-
-	hInvDownRatio->Sumw2();
-	hInvEff->Sumw2();
-	hInvDownRatio->Divide(hInvEff);
-
-	hInvUpRatio->Draw("ep");
-	hInvDownRatio->Draw("epSAME");
-
-
-	TLegend *legTnPRatio = new TLegend(0.49,0.30,0.69,0.45,NULL,"brNDC");
-	legTnPRatio->SetBorderSize(0);
-	legTnPRatio->SetTextSize(0.04);
-	legTnPRatio->SetTextFont(42);
-	legTnPRatio->SetFillStyle(0);
-
-	legTnPRatio->AddEntry(hInvUpRatio,"TnP - Total Up/Nominal","pl");
-	legTnPRatio->AddEntry(hInvDownRatio,"TnP - Total Down/Nominal","pl");
-	legTnPRatio->Draw("SAME");
-
-	TLine *l6 = new TLine(7,1,50,1);
-	l6->SetLineStyle(2);
-	l6->SetLineWidth(1);
-	l6->SetLineColor(1);
-
-	l6->Draw("SAME");
-
-
-
-	c->SaveAs(Form("CheckSystNuno/%s/TnPFinal/SystTnPRatio_%dBins_%d_%d.png",WeightName.Data(),NBins,CentMin,CentMax));
-
-
-
-	for(int i = 0; i < hInvEffUp->GetNbinsX();i++){
-
-		cout << "i = " << i << "   Upper TnP Syst = " << hInvUpRatio->GetBinContent(i+1) - 1 << endl;
-		cout << "i = " << i << "   Lower TnP Syst = " << 1 - hInvDownRatio->GetBinContent(i+1)  << endl;
-
-	}
-
-	*/
 
 		//TnP Syst DONE//
 

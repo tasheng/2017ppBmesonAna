@@ -24,7 +24,7 @@ using std::endl;
 
 void CrossSectionAna(){
 
-	const int NBins = 9;
+	const int NBins = 4;
 	//const int NBins = 6;
 
 	int TnP = 1;
@@ -203,7 +203,7 @@ void CrossSectionAna(){
 
 	if(NBins == 4){
 
-		ptbinsvec.push_back(5);
+		ptbinsvec.push_back(7);
 		ptbinsvec.push_back(10);
 		ptbinsvec.push_back(15);
 		ptbinsvec.push_back(20);
@@ -246,8 +246,10 @@ void CrossSectionAna(){
 		ptbinsvec.push_back(15);
 		ptbinsvec.push_back(20);
 		ptbinsvec.push_back(30);		
+
 		ptbinsvec.push_back(50);
-		ptbinsvec.push_back(100);
+	//	ptbinsvec.push_back(100);
+		ptbinsvec.push_back(60);
 
 
 
@@ -773,7 +775,7 @@ void CrossSectionAna(){
 	l6->SetLineColor(1);
 
 	l6->Draw("SAME");
-
+CorrDiffHisBin
 
 
 	c->SaveAs(Form("CheckSystNuno/%s/TnPFinal/SystTnPRatio_%dBins_%d_%d.png",WeightName.Data(),NBins,CentMin,CentMax));
@@ -810,7 +812,7 @@ void CrossSectionAna(){
 		RawCount = hPt->GetBinContent(i+1);
 		RawCountErr = hPt->GetBinError(i+1);
 
-		cout << "RawCount = " << RawCount << "  RawCountErr = " << RawCountErr << " NewEff[i] =   " << NewEff[i] << "  NewEffErr[i] =  " << NewEffErr[i] << endl; 
+	//	cout << "RawCount = " << RawCount << "  RawCountErr = " << RawCountErr << " NewEff[i] =   " << NewEff[i] << "  NewEffErr[i] =  " << NewEffErr[i] << endl; 
 
 		cout << "CORR YIELD PT:  " <<  RawCount *   NewEff[i]/(BRchain*2 * lumi) << endl;
 		CorrYield = RawCount * (ptBins[i+1] - ptBins[i]) *  NewEff[i]  + CorrYield;
@@ -878,7 +880,10 @@ void CrossSectionAna(){
 		RawCountErr = hPt->GetBinError(i+1);
 		Eff1D[i] = Eff1DHis->GetBinContent(i+1);
 		Eff1DErr[i] = Eff1DHis->GetBinError(i+1);
-	
+
+		cout << "RawCount = " << RawCount << "  RawCountErr = " << RawCountErr << " Eff1D[i] =   " << Eff1D[i] << "  Eff1DErr[i] =  " << Eff1DErr[i] << endl; 
+
+
 //		CorrYieldDiff[i] = (RawCount *  Eff1D[i])/(BRchain*2* lumi);
 //		CorrYieldDiffErr[i] = TMath::Sqrt((RawCountErr *  Eff1D[i]) *(RawCountErr  *  Eff1D[i]) + (RawCount *  Eff1DErr[i]) * (RawCount  *  Eff1DErr[i]))/(BRchain*2* lumi);
 		CorrYieldDiff[i] = (RawCount /  Eff1D[i])/(BRchain*2* lumi);

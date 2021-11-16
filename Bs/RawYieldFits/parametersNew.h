@@ -18,10 +18,15 @@
 //const int nBins=10;
 //double ptBins[nBins+1] = {1,2,3,5,7,10,15,20,30,50,100};
 
-const int nBins=9;
-double ptBins[nBins+1] = {2,3,5,7,10,15,20,30,50,100};
+//const int nBins=9;
+//double ptBins[nBins+1] = {2,3,5,7,10,15,20,30,50,100};
 
 
+//const int nBins=7;
+//double ptBins[nBins+1] = {5,7,10,15,20,30,50,60};
+
+const int nBins=4;
+double ptBins[nBins+1] = {7,10,15,20,50};
 //const int nBins=6;
 //double ptBins[nBins+1] = {5,7,10,15,20,50,100};
 
