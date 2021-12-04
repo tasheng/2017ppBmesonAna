@@ -22,7 +22,7 @@ using namespace std;
 using std::cout;
 using std::endl;
 
-void CrossSectionAna(){
+void CrossSectionAna(int DoTnP){
 
 	const int NBins = 4;
 	//const int NBins = 6;
@@ -413,10 +413,17 @@ void CrossSectionAna(){
 
 
 
+
+
+
 	double tnpabssystup;
 	double tnpabssystdown;
 
-	TFile * fin1DEff = new TFile("NewEff2DMaps/EffFineBDT.root");
+	TFile * fin1DEff;
+
+	if(DoTnP == 0) fin1DEff = new TFile("NewEff2DMaps/EffFineNoTnP.root");
+	if(DoTnP == 1) fin1DEff = new TFile("NewEff2DMaps/EffFineBDT.root");
+
 	fin1DEff->cd();
 
 	TH2D * invAcc2D = (TH2D *) fin1DEff->Get("invEff2D");
@@ -436,7 +443,7 @@ void CrossSectionAna(){
 			for(int k = 0; k < NBins; k++){
 
 				//	if((BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08  && ((BptNew[j] > 7 && BptNew[j] < 10 && ByNew[j] > 1.5 )||(BptNew[j] > 10)) && (Bmu1Type > -0.1 && Bmu2Type > -0.1)))
-				if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.3663) < 0.08 && TMath::Abs(ByNew[j]) < 2.4)
+				if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.3663) < 0.08 && TMath::Abs(ByNew[j]) < 2.4 && ((BptNew[j] > 5 && BptNew[j] < 10 && ByNew[j] > 1.5 )||(BptNew[j] > 10)) )
 				{
 
 
@@ -824,8 +831,11 @@ CorrDiffHisBin
 
 
 
-	TFile * foutCorr = new TFile("FinalFiles/BsPPCorrYieldPT.root","RECREATE");
-	foutCorr->cd();
+	TFile * foutCorr;
+	if(DoTnP == 0)	foutCorr = new TFile("FinalFiles/BPPPCorrYieldPTNoTnP.root","RECREATE");
+	if(DoTnP == 1)	foutCorr = new TFile("FinalFiles/BPPPCorrYieldPT.root","RECREATE");
+
+
 	TH1D * CorrDiffHis = new TH1D("hPtSigma","",NBins,ptBins);
 	CorrDiffHis->GetXaxis()->SetTitle("p_{T} (GeV/c)");
 	CorrDiffHis->GetYaxis()->SetTitle("d #sigma/d p_{T} (pb GeV^{-1} c)");

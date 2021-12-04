@@ -79,7 +79,7 @@ void PlotGen(int Opt){
 	JPsiPt->SetLineColor(1);
 
 
-	TH1D * pthat = new TH1D("pthat","",100,0,1);
+	TH1D * pthat = new TH1D("pthat","",100,0,100);
 	pthat->GetXaxis()->SetTitle("pthat");
 	pthat->GetYaxis()->SetTitle("Normalized Counts");
 	pthat->GetYaxis()->SetTitleOffset(1.4);
@@ -111,18 +111,20 @@ void PlotGen(int Opt){
 	ntGen->Project("JPsiPt","Gpt",TCut(Weight) * TCut(JPsiGenCut));
 	ntGen->Project("pthat","pthat",TCut(Weight));
 
+	c->SetLogy();
+
+
 	pthat->Scale(1.0/pthat->Integral());
 	pthat->Draw("ep");
 	c->SaveAs(Form("MCPlots/%spthat.png",Part.Data()));	
 
-	c->SetLogy();
 
 	Gpt->Scale(1.0/Gpt->Integral());
 	Gpt->Draw("ep");
 	c->SaveAs(Form("MCPlots/%sGpt.png",Part.Data()));	
 
 
-	JPsiPt->Scale(1.0/pthat->Integral());
+	JPsiPt->Scale(1.0/JPsiPt->Integral());
 	JPsiPt->Draw("ep");
 	c->SaveAs(Form("MCPlots/%sJPsiPt.png",Part.Data()));	
 	
