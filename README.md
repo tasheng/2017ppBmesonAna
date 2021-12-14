@@ -1,4 +1,4 @@
-# CMS 2017 Bs and B+ Analysis Codes
+# CMS 2017 pp Bs and B+ Analysis Codes
 
 ## Basic Organization of the Analysis Codes
 
@@ -9,19 +9,72 @@ To obtain the codes, do:
 git clone https://github.com/MYOMAO/2017ppBmesonAna.git
 
 
-## Input Data and MC Samples
+## Input Data and MC Samples (Ntuplized)
 
-Here we assume you already have the data and official MC samples. You could find the samples on lxplus EOS:
+Here we assume we already have the data and official MC samples as well as the non-prompt J/psi samples. The detailed information to obtain the ntuplized data from CMS DAS (AOD data format) is documented on the data processing github:
 
-/eos/cms/store/group/phys_heavyions/zshi/ForHenrique/
+
+### On EOS
+
+You could find the samples on lxplus EOS (lxplus7.cern.ch):
+
+/eos/cms/store/group/phys_heavyions/zshi/ForHenrique/FinalSamples/
 
 You should copy the entire folder to your working directory
 
-if you do ls /eos/cms/store/group/phys_heavyions/zshi/ForHenrique/, you will see two folders
+If you do 
+
+ls /eos/cms/store/group/phys_heavyions/zshi/ForHenrique/FinalSamples/
+
+you will see two folders
 
 Skimmed  UnSkimmed
 
 So basically, copy the files in Skimmed to SkimmedSamples and UnSkimmed to UnskimmedSamples. Then you will have all the files in the right place and ready to perform the analysis.
+
+### On Grendel
+
+Same as before on EOS, on grendel01.mit.edu
+
+/data/szhaozho/2017ppSamplesFinal/
+
+Do the same to copy to the folders to run the codes.
+
+
+## Cuts Information
+
+These cuts are presented as a string. There 2 ways to apply cuts. One is simply apply it as a string to project to a histogram. 
+
+In this analysis codes, I apply them as along with the candidate ID: [j].  
+
+The details of the cuts can be found at Section 5 of the analysis notes: AN-21-091.
+
+### Quality Cuts - (Save as Pre-Filter)
+
+B+: (((BDT_pt_1_2>0.04 && BsvpvDistance/BsvpvDisErr > 5 && Bchi2cl > 0.05 && Bpt > 1.0 && Bpt < 2.0) || (BDT_pt_1_2>0.04 && BsvpvDistance/BsvpvDisErr > 5 && Bchi2cl > 0.05 && Bpt > 0.0 && Bpt < 1.0) || (((HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1) &&  (Bpt > 2 && Bpt < 3 && BDT_pt_2_3 > -0.12) )) ) ||  ( Bpt > 3 && ((HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1 && HLT_HIL1DoubleMu0_v1 == 1)  &&  (Bmu1isTriggered == 1 && Bmu2isTriggered == 1 ) &&  (Btrk1Pt > 0.2 && Bchi2cl > 0.05 && BsvpvDistance/BsvpvDisErr > 2.0  && abs(Btrk1Eta-0.0) < 2.4  && (TMath::Abs(By)<2.4&&TMath::Abs(Bmumumass-3.096916)<0.15&&((abs(Bmu1eta)<1.2&&Bmu1pt>3.5)||(abs(Bmu1eta)>1.2&&abs(Bmu1eta)<2.1&&Bmu1pt>(5.47-1.89*abs(Bmu1eta)))||(abs(Bmu1eta)>2.1&&abs(Bmu1eta)<2.4&&Bmu1pt>1.5))&&((abs(Bmu2eta)<1.2&&Bmu2pt>3.5)||(abs(Bmu2eta)>1.2&&abs(Bmu2eta)<2.1&&Bmu2pt>(5.47-1.89*abs(Bmu2eta)))||(abs(Bmu2eta)>2.1&&abs(Bmu2eta)<2.4&&Bmu2pt>1.5))&&Bmu1InPixelLayer>0&&(Bmu1InPixelLayer+Bmu1InStripLayer)>5&&Bmu2InPixelLayer>0&&(Bmu2InPixelLayer+Bmu2InStripLayer)>5&&Bmu1dxyPV<0.3&&Bmu2dxyPV<0.3&&Bmu1dzPV<20&&Bmu2dzPV<20&&Bmu1isTrackerMuon&&Bmu2isTrackerMuon&&Bmu1isGlobalMuon&&Bmu2isGlobalMuon&&Btrk1highPurity&&abs(Btrk1Eta)<2.4&&Btrk1Pt>0.2)  && (Btrk1PixelHit + Btrk1StripHit > 10) &&  (Btrk1PtErr/Btrk1Pt < 0.1)&& Btrk1Chi2ndf/(Btrk1nStripLayer+Btrk1nPixelLayer) < 0.18   && (abs(PVz)<15)))))
+
+
+Bs: ((((abs(Btktkmass-1.019455)<0.015)&& BDT_pt_2_3 > -0.10 && TMath::Abs(Bmumumass-3.096916)<0.15 && Bpt > 0 && Bpt < 5 && (abs(Btrk1Eta)<2.4 && abs(Btrk2Eta)<2.4 && Btrk1Pt>0.0 && Btrk2Pt>0.0) && Btrk1Pt > 0.2 && Btrk2Pt > 0.2  && Bchi2cl > 0.05 && BsvpvDistance/BsvpvDisErr > 2.0)  && ( (Bpt < 2 && Bpt > 0 && BDT_pt_1_2 > -0.38 ) || (Bpt < 3 && Bpt > 2 && BDT_pt_2_3 > -0.05 ) || (Bpt < 5 && Bpt > 3 && BDT_pt_3_5 > -0.40)  )))  ||  ( Bpt > 3 && ((HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1 && HLT_HIL1DoubleMu0_v1 == 1 && (abs(PVz)<15))  &&  (Bmu1isTriggered == 1 && Bmu2isTriggered == 1 ) &&  (Bchi2cl > 0.05 && BsvpvDistance/BsvpvDisErr > 2.0)    && (TMath::Abs(By)<2.4&&TMath::Abs(Bmumumass-3.096916)<0.15&&((abs(Bmu1eta)<1.2&&Bmu1pt>3.5)||(abs(Bmu1eta)>1.2&&abs(Bmu1eta)<2.1&&Bmu1pt>(5.47-1.89*abs(Bmu1eta)))||(abs(Bmu1eta)>2.1&&abs(Bmu1eta)<2.4&&Bmu1pt>1.5))&&((abs(Bmu2eta)<1.2&&Bmu2pt>3.5)||(abs(Bmu2eta)>1.2&&abs(Bmu2eta)<2.1&&Bmu2pt>(5.47-1.89*abs(Bmu2eta)))||(abs(Bmu2eta)>2.1&&abs(Bmu2eta)<2.4&&Bmu2pt>1.5))&&Bmu1InPixelLayer>0&&(Bmu1InPixelLayer+Bmu1InStripLayer)>5&&Bmu2InPixelLayer>0&&(Bmu2InPixelLayer+Bmu2InStripLayer)>5&&Bmu1dxyPV<0.3&&Bmu2dxyPV<0.3&&Bmu1dzPV<20&&Bmu2dzPV<20&&Bmu1isTrackerMuon&&Bmu2isTrackerMuon&&Bmu1isGlobalMuon&&Bmu2isGlobalMuon)  && ( Btrk1Pt > 0.2 && Btrk2Pt > 0.2 && abs(Btrk1Eta-0.0) < 2.4 && abs(Btrk2Eta-0.0) < 2.4  && Btrk1highPurity  && Btrk2highPurity  && Btrk1PixelHit + Btrk1StripHit > 10  && Btrk2PixelHit + Btrk2StripHit > 10) &&  (Btrk1PtErr/Btrk1Pt < 0.1)  &&  (Btrk2PtErr/Btrk2Pt < 0.1)    && Btrk1Chi2ndf/(Btrk1nStripLayer+Btrk1nPixelLayer) < 0.18   && Btrk2Chi2ndf/(Btrk2nStripLayer+Btrk2nPixelLayer) < 0.18 ))
+
+Notices: we also include BDT for the low pT (pT < 5 GeV/c), which is irrelavent in this analysis. 
+
+### BDT Cuts
+
+The BDT cuts are optimized for each pT bins. The Bs is optmized: 1-2-3-5-7-10-15-20-30-50 and the B+ is optimized: 1-2-3-5-7-10-15-20-50-100. The structure is BDT_pt_X_Y:
+
+B+: ( (Bpt > 3 && Bpt < 5 && BDT_pt_3_5 > 0.08) || (Bpt > 5 && Bpt < 7 && BDT_pt_5_7 > 0.06) || (Bpt > 7 && Bpt < 10 && BDT_pt_7_10 > 0.07) || (Bpt > 10 && Bpt < 15 && BDT_pt_10_15 > 0.08) || (Bpt > 15 && Bpt < 20 && BDT_pt_15_20 > 0.12)  || (Bpt > 20 && Bpt < 50 && BDT_pt_20_50 > 0.12) || (Bpt > 50 && Bpt < 100))
+
+Bs: ( (Bpt > 5 && Bpt < 7 &&  BDT_pt_5_7 > -0.28) || (Bpt > 7 && Bpt < 10 &&  BDT_pt_7_10 > -0.30) || (Bpt > 10 && Bpt < 15 &&  BDT_pt_10_15 > -0.30) || (Bpt > 15 && Bpt < 20 &&  BDT_pt_15_20 > -0.25 ) || (Bpt > 20 && Bpt < 50 &&  BDT_pt_30_50 > -0.25 )  || (Bpt > 50) )
+
+### Total Cuts
+
+Total cuts is basically the Quality Cuts && BDT cuts. Here is the the total cuts:
+
+B+:  (((BDT_pt_1_2>0.04 && BsvpvDistance/BsvpvDisErr > 5 && Bchi2cl > 0.05 && Bpt > 1.0 && Bpt < 2.0) || (BDT_pt_1_2>0.04 && BsvpvDistance/BsvpvDisErr > 5 && Bchi2cl > 0.05 && Bpt > 0.0 && Bpt < 1.0) )   || (((HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1 && HLT_HIL1DoubleMu0_v1 == 1)  &&  (Bmu1isTriggered == 1 && Bmu2isTriggered == 1 ) &&  (Btrk1Pt > 0.2 && Bchi2cl > 0.05 && BsvpvDistance/BsvpvDisErr > 2.0 && Bpt > 2 && abs(Btrk1Eta-0.0) < 2.4  && (TMath::Abs(By)<2.4&&TMath::Abs(Bmumumass-3.096916)<0.15&&((abs(Bmu1eta)<1.2&&Bmu1pt>3.5)||(abs(Bmu1eta)>1.2&&abs(Bmu1eta)<2.1&&Bmu1pt>(5.47-1.89*abs(Bmu1eta)))||(abs(Bmu1eta)>2.1&&abs(Bmu1eta)<2.4&&Bmu1pt>1.5))&&((abs(Bmu2eta)<1.2&&Bmu2pt>3.5)||(abs(Bmu2eta)>1.2&&abs(Bmu2eta)<2.1&&Bmu2pt>(5.47-1.89*abs(Bmu2eta)))||(abs(Bmu2eta)>2.1&&abs(Bmu2eta)<2.4&&Bmu2pt>1.5))&&Bmu1InPixelLayer>0&&(Bmu1InPixelLayer+Bmu1InStripLayer)>5&&Bmu2InPixelLayer>0&&(Bmu2InPixelLayer+Bmu2InStripLayer)>5&&Bmu1dxyPV<0.3&&Bmu2dxyPV<0.3&&Bmu1dzPV<20&&Bmu2dzPV<20&&Bmu1isTrackerMuon&&Bmu2isTrackerMuon&&Bmu1isGlobalMuon&&Bmu2isGlobalMuon&&Btrk1highPurity&&abs(Btrk1Eta)<2.4&&Btrk1Pt>0.2)  && (Btrk1PixelHit + Btrk1StripHit > 10) &&  (Btrk1PtErr/Btrk1Pt < 0.1)&& Btrk1Chi2ndf/(Btrk1nStripLayer+Btrk1nPixelLayer) < 0.18   && (abs(PVz)<15))  &&( (Bpt > 3 && Bpt < 5 && BDT_pt_3_5 > 0.08) || (Bpt > 5 && Bpt < 7 && BDT_pt_5_7 > 0.06) || (Bpt > 7 && Bpt < 10 && BDT_pt_7_10 > 0.07) || (Bpt > 10 && Bpt < 15 && BDT_pt_10_15 > 0.08) || (Bpt > 15 && Bpt < 20 && BDT_pt_15_20 > 0.12)  || (Bpt > 20 && Bpt < 50 && BDT_pt_20_50 > 0.12) || (Bpt > 50 && Bpt < 100))) || ((HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1) &&  (Bpt > 2 && Bpt < 3 && BDT_pt_2_3 > -0.12) ) ))
+
+
+Bs: ((((abs(Btktkmass-1.019455)<0.015)&& BDT_pt_2_3 > -0.10 && TMath::Abs(Bmumumass-3.096916)<0.15 && Bpt > 0 && Bpt < 5 && (abs(Btrk1Eta)<2.4 && abs(Btrk2Eta)<2.4 && Btrk1Pt>0.0 && Btrk2Pt>0.0) && Btrk1Pt > 0.2 && Btrk2Pt > 0.2  && Bchi2cl > 0.05 && BsvpvDistance/BsvpvDisErr > 2.0)  && ( (Bpt < 2 && Bpt > 0 && BDT_pt_1_2 > -0.38 ) || (Bpt < 3 && Bpt > 2 && BDT_pt_2_3 > -0.05 ) || (Bpt < 5 && Bpt > 3 && BDT_pt_3_5 > -0.40)  )))  ||  ( ( (Bpt > 5 && Bpt < 7 &&  BDT_pt_5_7 > -0.28) || (Bpt > 7 && Bpt < 10 &&  BDT_pt_7_10 > -0.30) || (Bpt > 10 && Bpt < 15 &&  BDT_pt_10_15 > -0.30) || (Bpt > 15 && Bpt < 20 &&  BDT_pt_15_20 > -0.25 ) || (Bpt > 20 && Bpt < 50 &&  BDT_pt_30_50 > -0.25 )  || (Bpt > 50) ) && ((HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1 && HLT_HIL1DoubleMu0_v1 == 1 && (abs(PVz)<15))  &&  (Bmu1isTriggered == 1 && Bmu2isTriggered == 1 ) &&  (Bchi2cl > 0.05 && BsvpvDistance/BsvpvDisErr > 2.0)    && (TMath::Abs(By)<2.4&&TMath::Abs(Bmumumass-3.096916)<0.15&&((abs(Bmu1eta)<1.2&&Bmu1pt>3.5)||(abs(Bmu1eta)>1.2&&abs(Bmu1eta)<2.1&&Bmu1pt>(5.47-1.89*abs(Bmu1eta)))||(abs(Bmu1eta)>2.1&&abs(Bmu1eta)<2.4&&Bmu1pt>1.5))&&((abs(Bmu2eta)<1.2&&Bmu2pt>3.5)||(abs(Bmu2eta)>1.2&&abs(Bmu2eta)<2.1&&Bmu2pt>(5.47-1.89*abs(Bmu2eta)))||(abs(Bmu2eta)>2.1&&abs(Bmu2eta)<2.4&&Bmu2pt>1.5))&&Bmu1InPixelLayer>0&&(Bmu1InPixelLayer+Bmu1InStripLayer)>5&&Bmu2InPixelLayer>0&&(Bmu2InPixelLayer+Bmu2InStripLayer)>5&&Bmu1dxyPV<0.3&&Bmu2dxyPV<0.3&&Bmu1dzPV<20&&Bmu2dzPV<20&&Bmu1isTrackerMuon&&Bmu2isTrackerMuon&&Bmu1isGlobalMuon&&Bmu2isGlobalMuon)  && ( Btrk1Pt > 0.2 && Btrk2Pt > 0.2 && abs(Btrk1Eta-0.0) < 2.4 && abs(Btrk2Eta-0.0) < 2.4  && Btrk1highPurity  && Btrk2highPurity  && Btrk1PixelHit + Btrk1StripHit > 10  && Btrk2PixelHit + Btrk2StripHit > 10) &&  (Btrk1PtErr/Btrk1Pt < 0.1)  &&  (Btrk2PtErr/Btrk2Pt < 0.1)    && Btrk1Chi2ndf/(Btrk1nStripLayer+Btrk1nPixelLayer) < 0.18   && Btrk2Chi2ndf/(Btrk2nStripLayer+Btrk2nPixelLayer) < 0.18 ))
+
 
 
 ## Raw Yield Fit
@@ -35,8 +88,11 @@ source doRoofit.sh
 Here you can change the flags in doRoofit.sh
 
 DOANALYSISPbPb_ROOFIT_FULL_BP                means the include pT bin
+
 DOANALYSISPbPb_ROOFIT_BINNED_PT_BP           means the pT differential bin
+
 DOANALYSISPbPb_ROOFIT_BINNED_Y_BP            means the rapidity bin
+
 DOANALYSISPbPb_ROOFIT_BINNED_MULTI_BP        means the multiplicity bin
 
 The binning of the fits can be modified in parametersNew.h
@@ -58,7 +114,11 @@ The next step is to obtain the efficiency correction. The steps are also quite s
 
 cd BP/EffAna
 
-root -b -l -q MCEff.C
+root -b -l -q MCEff.C'(1,0)'
+
+The first option means the application of Tag and Probe scale factor: 0 mean no TnP applied and 1 means with TnP applied
+
+The second option means the rescaling of BsvpvDisErr: 0 mean no rescaling and 1 means with scale. The detailed of rescaling BsvpvDisErr can be found in the AN appenidx section C.
 
 Inside the efficiency codes
 
@@ -106,7 +166,6 @@ For pT, simply run
 
 root -b -l -q CrossSectionAna.C
 
-
 For Multiplicity, simply run
 
 root -b -l -q CrossSectionAnaMult.C
@@ -153,6 +212,17 @@ The B+ RAA plots are stored at BPRAA/
 root -b -l -q BsBPMult.C to get the BsBP.C ratio in Multiplicity 
 
 The plots are stored at Mult/
+
+## Comparison Plots 
+
+To run the comparison of the 2017 pp Bs and B+ results with 2015 pp and FONLL calculations, go to the folder:
+
+Caveat - fiducial region: for the full 2015 pp results, since the measurement |By| > 2.4 for B pT < 10 GeV/c unlike the 2018 PbPb where a fiducial region |By| > 2.4 for B pT < 10 GeV/c. Therefore, we have produced two sets of analysis 
+
+### Without Fiducial Region 
+
+
+
 
 ## Technical Support
 
