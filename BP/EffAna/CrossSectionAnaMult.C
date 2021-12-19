@@ -22,7 +22,7 @@ using namespace std;
 using std::cout;
 using std::endl;
 
-void CrossSectionAnaMult(){
+void CrossSectionAnaMult(int DoTnP){
 
 	const int NBins = 10;
 	//const int NBins = 6;
@@ -32,7 +32,7 @@ void CrossSectionAnaMult(){
 
 	double BRchain = 6.02061e-5;
 
-//	gStyle->SetOptTitle(0);
+	//	gStyle->SetOptTitle(0);
 	gStyle->SetOptStat(0);
 
 
@@ -58,6 +58,7 @@ void CrossSectionAnaMult(){
 	Float_t BEff[NCand];
 	Float_t BEffErr[NCand];
 
+	Int_t nMult;
 
 	Float_t BEffInv[NCand];
 	Float_t BEffInvErr[NCand];
@@ -81,7 +82,8 @@ void CrossSectionAnaMult(){
 	EffInfoTree->SetBranchAddress("Bmass",BmassNew);
 	EffInfoTree->SetBranchAddress("By",ByNew);
 	EffInfoTree->SetBranchAddress("Bpt",BptNew);
-	
+
+	EffInfoTree->SetBranchAddress("nMult",&nMult);
 
 
 
@@ -138,7 +140,6 @@ void CrossSectionAnaMult(){
 		ptbinsvec.push_back(50);
 	}
 
-
 	if(NBins == 3){
 
 		ptbinsvec.push_back(5);
@@ -187,14 +188,14 @@ void CrossSectionAnaMult(){
 	if(NBins == 7){
 
 
-	//	ptbinsvec.push_back(3);
+		//	ptbinsvec.push_back(3);
 		ptbinsvec.push_back(5);
 		ptbinsvec.push_back(7);		
 		ptbinsvec.push_back(10);
 		ptbinsvec.push_back(15);
 		ptbinsvec.push_back(20);
 		ptbinsvec.push_back(30);
-		
+
 		ptbinsvec.push_back(50);
 		ptbinsvec.push_back(100);
 
@@ -375,27 +376,266 @@ void CrossSectionAnaMult(){
 
 
 
-	TFile * foutCorr = new TFile("FinalFiles/BPPPCorrYieldMult.root","RECREATE");
+
+
+
 
 	//pt Binned Correction//
-	TFile * fin1DEff = new TFile("NewEff2DMaps/EffFineBDT.root");
+	TFile * fin1DEff; 
+
+	if(DoTnP == 0) fin1DEff = new TFile("NewEff2DMaps/EffFineNoTnP.root");
+	if(DoTnP == 1) fin1DEff = new TFile("NewEff2DMaps/EffFineBDT.root");	
+
+
 	fin1DEff->cd();
+
+
+	//Add 2D eff calculations
+	
+	TH2D * invEff2D = (TH2D *) fin1DEff->Get("invEff2D");
+
+
+		int XBin;
+		int YBin;
+
+
+
+
+	for( int i = 0; i < NEvents; i++){
+
+		EffInfoTree->GetEntry(i);
+		//MuonInfoTree->GetEntry(i);
+
+
+		for(int j = 0; j < BsizeNew; j++){
+
+
+			for(int k = 0; k < NBins; k++){
+
+				//	if((BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08  && ((BptNew[j] > 7 && BptNew[j] < 10 && ByNew[j] > 1.5 )||(BptNew[j] > 10)) && (Bmu1Type > -0.1 && Bmu2Type > -0.1)))
+				if(nMult > ptBins[k] && nMult < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08 &&  TMath::Abs(ByNew[j]) < 2.4  && ((BptNew[j] > 5 && BptNew[j] < 10 && abs(ByNew[j]) > 1.5 )||(BptNew[j] > 10)))
+				{
+
+
+					XBin = invEff2D->GetXaxis()->FindBin( BptNew[j]);
+					YBin = invEff2D->GetYaxis()->FindBin( TMath::Abs(ByNew[j]));
+					BEffInv[j] = invEff2D->GetBinContent(XBin,YBin);
+
+					BEffInvErr[j] = invEff2D->GetBinError(XBin,YBin);
+					BEff[j] = 1.0/invEff2D->GetBinContent(XBin,YBin);
+
+					BEffErr[j] = BEffInvErr[j]/(BEffInv[j] * BEffInv[j]);
+
+					if(BEffInv[j] > 0){
+						SumCounts[k] = SumCounts[k] + BEffInv[j];
+						SumCountsErr[k] = SumCountsErr[k] + BEffInvErr[j] * BEffInvErr[j];
+						SumCountsEff[k] = SumCountsEff[k] + BEff[j];
+						SumCountsEffErr[k] = SumCountsEffErr[k] + BEffErr[j] * BEffErr[j];
+						SumCountsSyst[k] = 	SumCountsSyst[k]  + BEffInvBDTWeighted[j];
+						SumCountsSystErr[k] = 	SumCountsSystErr[k]  + BEffInvErrBDTWeighted[j] * BEffInvErrBDTWeighted[j];
+
+						SumCountsUp[k] = SumCountsUp[k] + BEffInvUp[j];
+						SumCountsErrUp[k] = SumCountsErrUp[k] + BEffInvErrUp[j] * BEffInvErrUp[j];
+
+						SumCountsDown[k] = SumCountsDown[k] + BEffInvDown[j];
+						SumCountsErrDown[k] = SumCountsErrUp[k] + BEffInvErrDown[j] * BEffInvErrDown[j];
+
+						Counts[k] = Counts[k] + 1;
+
+						//cout << "SumCounts = " << SumCounts[k] << endl;
+
+						//cout << "SumCountsUp = " << SumCountsUp[k] << endl;
+						//cout << "Candidate: " << "   Bpt = " << BptNew[j] << "   Efficiency =  " << BEffInv[j] << "   Efficiency Error  = " << BEffInvErr[j] << endl;
+					}
+				}
+
+			}
+
+
+		}
+
+	}
+
+
+	TH1D * hInvEff = new TH1D("hInvEff","",NBins,ptBins);
+
+
+	hInvEff->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+	hInvEff->GetYaxis()->SetTitle("<1/(Eff * Acc)>");
+	hInvEff->GetYaxis()->SetTitleOffset(1.4);
+	hInvEff->GetXaxis()->CenterTitle();
+	hInvEff->GetYaxis()->CenterTitle();
+	hInvEff->SetMarkerColor(1);
+	hInvEff->SetLineColor(1);
+	hInvEff->SetMarkerStyle(20);
+
+	hInvEff->SetMinimum(0);
+
+
+	TH1D * hInvEffSyst = new TH1D("hInvEffSyst","",NBins,ptBins);
+
+	hInvEffSyst->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+	hInvEffSyst->GetYaxis()->SetTitle("<1/(Eff * Acc)> - BDT Data-MC Weighted");
+	hInvEffSyst->GetYaxis()->SetTitleOffset(1.4);
+	hInvEffSyst->GetXaxis()->CenterTitle();
+	hInvEffSyst->GetYaxis()->CenterTitle();
+	hInvEffSyst->SetMarkerColor(1);
+	hInvEffSyst->SetLineColor(2);
+	hInvEffSyst->SetMarkerStyle(20);
+
+	hInvEffSyst->SetMinimum(0);
+
+	TH1D * hEff = new TH1D("hEff","",NBins,ptBins);
+
+
+	hEff->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+	hEff->GetYaxis()->SetTitle("<(Eff * Acc)>");
+	hEff->GetYaxis()->SetTitleOffset(1.4);
+	hEff->GetXaxis()->CenterTitle();
+	hEff->GetYaxis()->CenterTitle();
+	hEff->SetMarkerColor(1);
+	hEff->SetLineColor(1);
+	hEff->SetMarkerStyle(20);
+
+	hEff->SetMinimum(0);
+
+
+	TH1D * hInvEffUp = new TH1D("hInvEffUp","",NBins,ptBins);
+
+
+	hInvEffUp->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+	hInvEffUp->GetYaxis()->SetTitle("<1./(Eff * Acc)>");
+	hInvEffUp->GetYaxis()->SetTitleOffset(1.4);
+	hInvEffUp->GetXaxis()->CenterTitle();
+	hInvEffUp->GetYaxis()->CenterTitle();
+	hInvEffUp->SetMarkerColor(1);
+	hInvEffUp->SetLineColor(1);
+	hInvEffUp->SetMarkerStyle(20);
+	hInvEffUp->SetMinimum(0);
+
+
+
+	TH1D * hInvEffDown = new TH1D("hInvEffDown","",NBins,ptBins);
+
+
+	hInvEffDown->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+	hInvEffDown->GetYaxis()->SetTitle("<1/(Eff * Acc)>");
+	hInvEffDown->GetYaxis()->SetTitleOffset(1.4);
+	hInvEffDown->GetXaxis()->CenterTitle();
+	hInvEffDown->GetYaxis()->CenterTitle();
+	hInvEffDown->SetMarkerColor(1);
+	hInvEffDown->SetLineColor(1);
+	hInvEffDown->SetMarkerStyle(20);
+	hInvEffDown->SetMinimum(0);
+
+
+
+	for(int i = 0; i < NBins; i++){
+
+
+		NewEff[i] = SumCounts[i]/Counts[i];
+		NewEffErr[i] = TMath::Sqrt(SumCountsErr[i])/Counts[i];
+
+
+		NewEffUp[i] = SumCountsUp[i]/Counts[i];
+		NewEffErrUp[i] = TMath::Sqrt(SumCountsErrUp[i])/Counts[i];
+
+
+
+		NewEffDown[i] = SumCountsDown[i]/Counts[i];
+		NewEffErrDown[i] = TMath::Sqrt(SumCountsErrDown[i])/Counts[i];
+
+
+		NewEffReal[i] = SumCountsEff[i]/Counts[i];
+		NewEffRealErr[i] = TMath::Sqrt(SumCountsEffErr[i])/Counts[i];
+
+
+		hInvEff->SetBinContent(i+1,NewEff[i]);
+		hInvEff->SetBinError(i+1,NewEffErr[i]);
+
+		hEff->SetBinContent(i+1,1/NewEff[i]);
+		hEff->SetBinError(i+1,NewEffErr[i]/(NewEff[i] * NewEff[i]));
+
+
+		NewEffSyst[i] = SumCountsSyst[i]/Counts[i];
+		NewEffSystErr[i] = TMath::Sqrt(SumCountsSystErr[i])/Counts[i];
+
+
+		hInvEffSyst->SetBinContent(i+1,	NewEffSyst[i]);
+		hInvEffSyst->SetBinError(i+1, NewEffSystErr[i]);
+
+
+
+		hInvEffUp->SetBinContent(i+1,NewEffUp[i]);
+		hInvEffUp->SetBinError(i+1,NewEffErrUp[i]);
+
+
+		hInvEffDown->SetBinContent(i+1,NewEffDown[i]);
+		hInvEffDown->SetBinError(i+1,NewEffErrDown[i]);
+
+		//	cout << "Real eff = " << SumCountsReal[i]/Counts[i] << endl;
+		//cout << "Counts = " << Counts[i] << endl;
+		cout << "Count =  " <<  Counts[i] << "   NewEff = " << NewEff[i] << "     NewEffErr = " << NewEffErr[i] << endl;
+		cout << "Count =  " <<  Counts[i] << "   NewEffSyst = " << NewEffSyst[i] << "     NewEffSystErr = " << NewEffSystErr[i] << endl;
+
+
+
+		cout << "-----------------------------------------------------------------------------------------------" << endl;
+
+		cout << "   NewEff = " << NewEff[i] << "     NewEffErr = " << NewEffErr[i] << "  Fractional = " << NewEffErr[i]/NewEff[i] << endl;
+		//	cout << "   NewEff = " << NewEffUp[i] << "     NewEffErr = " << NewEffErrUp[i] << "  Fractional = " << NewEffErrUp[i]/NewEffUp[i] << endl;
+
+
+
+		//NewEffErr[i] = 0; //Remove Error on Efficiency Correction//
+	}
+
+
+	TH1D * CorrDiffHis = new TH1D("hPtSigma","",NBins,ptBins);
+	CorrDiffHis->GetXaxis()->SetTitle("p_{T} (GeV/c)");
+	CorrDiffHis->GetYaxis()->SetTitle("d #sigma/d p_{T} (pb GeV^{-1} c)");
+
+	CorrDiffHis->GetYaxis()->SetTitleOffset(1.3);
+	CorrDiffHis->GetXaxis()->CenterTitle();
+	CorrDiffHis->GetYaxis()->CenterTitle();
+
+
+
+
+	for(int i = 0; i < NBins;i++){
+		RawCount = hPt->GetBinContent(i+1);
+		RawCountErr = hPt->GetBinError(i+1);
+		CorrYieldDiff[i] = (RawCount *  NewEff[i])/(BRchain*2* lumi);
+		CorrYieldDiffErr[i] = TMath::Sqrt((RawCountErr *  NewEff[i]) *(RawCountErr  *  NewEff[i]) + (RawCount *  NewEffErr[i]) * (RawCount  *  NewEffErr[i]))/(BRchain*2* lumi);
+		CorrDiffHis->SetBinContent(i+1,CorrYieldDiff[i]);
+		CorrDiffHis->SetBinError(i+1,CorrYieldDiffErr[i]);
+
+	}
+
+	
+	CorrDiffHis->SetTitle("(Preliminary) B^{+} #rightarrow J/#psi K^{+} p_{T} Differential Cross Section in pp");
+
+	CorrDiffHis->SetMarkerColor(kBlack);
+	CorrDiffHis->SetMarkerSize(1);
+	CorrDiffHis->SetMarkerStyle(20);
+
+
 
 	TH1D * Eff1DHisMult = (TH1D * ) fin1DEff->Get("Eff1DHisMult");
 
-	TH1D * CorrDiffMult = new TH1D("CorrDiffMult","",NBins,ptBins);
-	CorrDiffMult->GetXaxis()->SetTitle("nMult");
-	CorrDiffMult->GetYaxis()->SetTitle("#sigma (pb)");
+	TH1D * CorrDiffHisBin = new TH1D("CorrDiffHisBin","",NBins,ptBins);
+	CorrDiffHisBin->GetXaxis()->SetTitle("nMult");
+	CorrDiffHisBin->GetYaxis()->SetTitle("#sigma (pb)");
 
-	CorrDiffMult->GetYaxis()->SetTitleOffset(1.3);
-	CorrDiffMult->GetXaxis()->CenterTitle();
-	CorrDiffMult->GetYaxis()->CenterTitle();
+	CorrDiffHisBin->GetYaxis()->SetTitleOffset(1.3);
+	CorrDiffHisBin->GetXaxis()->CenterTitle();
+	CorrDiffHisBin->GetYaxis()->CenterTitle();
 
 
-	CorrDiffMult->SetMarkerColor(kRed);
-	CorrDiffMult->SetLineColor(kRed);	
-	CorrDiffMult->SetMarkerSize(1);
-	CorrDiffMult->SetMarkerStyle(20);
+	CorrDiffHisBin->SetMarkerColor(kRed);
+	CorrDiffHisBin->SetLineColor(kRed);	
+	CorrDiffHisBin->SetMarkerSize(1);
+	CorrDiffHisBin->SetMarkerStyle(20);
 
 	float Eff1D[NBins];
 	float Eff1DErr[NBins];
@@ -405,24 +645,28 @@ void CrossSectionAnaMult(){
 		RawCountErr = hPt->GetBinError(i+1);
 		Eff1D[i] = Eff1DHisMult->GetBinContent(i+1);
 		Eff1DErr[i] = Eff1DHisMult->GetBinError(i+1);
-	
-//		CorrYieldDiff[i] = (RawCount *  Eff1D[i])/(BRchain*2* lumi);
-//		CorrYieldDiffErr[i] = TMath::Sqrt((RawCountErr *  Eff1D[i]) *(RawCountErr  *  Eff1D[i]) + (RawCount *  Eff1DErr[i]) * (RawCount  *  Eff1DErr[i]))/(BRchain*2* lumi);
+
+		//		CorrYieldDiff[i] = (RawCount *  Eff1D[i])/(BRchain*2* lumi);
+		//		CorrYieldDiffErr[i] = TMath::Sqrt((RawCountErr *  Eff1D[i]) *(RawCountErr  *  Eff1D[i]) + (RawCount *  Eff1DErr[i]) * (RawCount  *  Eff1DErr[i]))/(BRchain*2* lumi);
 		CorrYieldDiff[i] = (RawCount /  Eff1D[i])/(BRchain*2* lumi);
 		CorrYieldDiffErr[i] = TMath::Sqrt((RawCountErr /  Eff1D[i]) *(RawCountErr  /  Eff1D[i]) + (RawCount /Eff1D[i] *  Eff1DErr[i]) * (RawCount /Eff1D[i] *  Eff1DErr[i]))/(BRchain*2* lumi);
 
-		CorrDiffMult->SetBinContent(i+1,CorrYieldDiff[i]);
-		CorrDiffMult->SetBinError(i+1,CorrYieldDiffErr[i]);
+		CorrDiffHisBin->SetBinContent(i+1,CorrYieldDiff[i]);
+		CorrDiffHisBin->SetBinError(i+1,CorrYieldDiffErr[i]);
 
 	}
 
-	
+
+	TFile * foutCorr;
+	if(DoTnP == 0)	foutCorr = new TFile("FinalFiles/BPPPCorrYieldMultNoTnP.root","RECREATE");
+	if(DoTnP == 1)	foutCorr = new TFile("FinalFiles/BPPPCorrYieldMult.root","RECREATE");
+
 	foutCorr->cd();
-	CorrDiffMult->Write();
-//	CorrDiffHisBin->Write();
+	CorrDiffHis->Write();
+	CorrDiffHisBin->Write();
 	foutCorr->Close();
 
-	
+
 
 
 
