@@ -214,13 +214,11 @@ cd BsBPFinalResults/BsBPRatio
 
 And then run 
 
-root -b -l -q PlotsBsBPRatio.C'(0,0)'
-
-The first argument: 0 stands for the ratio as a function of pT while 1 stands for multiplicity
+root -b -l -q PlotsBsBPRatio.C'(0)'
 
 The second argument: 0 stands for Binned pT efficiency correction while 1 stands for 2D map efficiency correction
 
-The plots are stored at Pt/
+The plots are stored at Plots/Binned and Plots/2DMap
 
 If we run 
 
@@ -240,6 +238,30 @@ We can change the configuration to remove the fiducial region. Here we do not go
 
 
 
+### Fiducial Region 
+
+Since the 2015 pp reference does not have a fiducial region, in our comparison, we will only include FONLL calculations with a fiducial 1.5 < |By| < 2.4 selection for B pt < 10 GeV/c. For B pt > 10 GeV/c, we will simply use |By| < 2.4. We put all the codes under the folder: Comparisons/Fiducial
+
+cd Comparisons/Fiducial
+
+
+To get the comparison of B+ 2017 data with FONLL calculations, simply do 
+
+root -b -l -q BPComparison.C 
+
+The plots will be stored at Plots/BP/
+
+We could look at the plot 
+
+Plots/BP/BPCrossCompLog.png 
+
+We can see there are two panels. The top panel is the comparison of the B+ pp cross section with FONLL cross section calculation with 2 methods: the binned pt (blue) and 2D map (orange). The bottom panel is their ratio and comparison with unity (red line). 
+
+Similarly, we could run 
+
+root -b -l -q BsComparison.C 
+
+to obtain the comparison of Bs cross section with FONLL calculations.
 
 ### Without Fiducial Region 
 

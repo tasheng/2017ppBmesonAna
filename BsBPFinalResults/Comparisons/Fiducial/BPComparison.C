@@ -1,0 +1,529 @@
+#include "TROOT.h"
+#include "TH1.h"
+#include "TTree.h"
+#include "TH2.h"
+#include "TF1.h"
+#include "TFile.h"
+#include "TMath.h"
+#include "TSystem.h"
+#include "TVector2.h"
+#include "TLorentzVector.h"
+#include "TVector3.h"
+#include "TRandom.h"
+#include <iostream>
+#include <fstream>
+
+#include "TCanvas.h"
+#include "TF1.h"
+#include "TFile.h"
+#include "TGraphAsymmErrors.h"
+#include "TGraphErrors.h"
+
+#include "TH1.h"
+#include "TLatex.h"
+#include "TLegend.h"
+#include "TLegendEntry.h"
+#include "TMath.h"
+//#include "tnp_weight_lowptPbPb.h"
+
+
+
+//#include "his.h"
+using namespace std;
+
+using std::cout;
+using std::endl;
+
+void BPComparison(){
+
+
+
+	
+	gStyle->SetOptStat(0);
+
+	TCanvas * c = new TCanvas("c","c",600,600);
+
+	c->cd();
+
+	c->SetLeftMargin(0.16);
+
+
+
+	TString InfileBP = "../../../BP/EffAna/FinalFiles/BPPPCorrYieldPT.root";
+
+	TFile * FileBP = new TFile(InfileBP.Data());
+	TH1D * BPCross = (TH1D *) FileBP->Get("CorrDiffHisBin");
+	BPCross->SetMarkerStyle(20);
+	BPCross->SetMarkerSize(1);
+	BPCross->SetMarkerColor(1);
+	BPCross->SetLineColor(1);
+
+
+
+
+
+
+
+	//B+ PbPb//
+	
+	const int NBins = 7;
+
+	float BPXsecPPY[NBins];
+	float BPXsecPPX[NBins] = {6,8.5,12.5,17.5,25,40,55};
+
+	float BPXSecPPYErrUp[NBins];
+	float BPXSecPPYErrDown[NBins];
+
+
+	float BPXSecPPYErrUpPercent[NBins];
+	float BPXSecPPYErrDownPercent[NBins];
+
+
+	for(int i = 0; i < NBins; i++){
+
+		BPXsecPPY[i] = BPCross->GetBinContent(i+1);
+		BPXSecPPYErrUp[i] = BPCross->GetBinError(i+1);
+		BPXSecPPYErrDown[i] = BPCross->GetBinError(i+1);
+		BPXSecPPYErrUpPercent[i] = BPXSecPPYErrUp[i]/BPXsecPPY[i];
+		BPXSecPPYErrDownPercent[i] = BPXSecPPYErrDown[i]/BPXsecPPY[i];
+		
+	}
+
+
+	float BPXsecPPY2D[NBins];
+	float BPXSecPPY2DErrUp[NBins];
+	float BPXSecPPY2DErrDown[NBins];
+
+	TH1D * BPCross2D = (TH1D *) FileBP->Get("hPtSigma");
+	BPCross2D->SetMarkerStyle(20);
+	BPCross2D->SetMarkerSize(1);
+	BPCross2D->SetMarkerColor(1);
+	BPCross2D->SetLineColor(1);
+
+
+
+	for(int i = 0; i < NBins; i++){
+
+		BPXsecPPY2D[i] = BPCross2D->GetBinContent(i+1);
+		BPXSecPPY2DErrUp[i] = BPCross2D->GetBinError(i+1);
+		BPXSecPPY2DErrDown[i] = BPCross2D->GetBinError(i+1);
+		
+	}
+
+
+
+
+
+	float BPXSecPPXErrUp[NBins] = {1,1.5,2.5,2.5,5,10,5};
+	float BPXSecPPXErrDown[NBins] = {1,1.5,2.5,2.5,5,10,5};
+	
+
+
+	float BPXsecPbPbY[NBins] = {4.82132e+06/11.1,311668,270167,64384.4,208537/11.1,28700.6/11.1,7000.73/11.1};
+	float BPXsecPbPbX[NBins] = {6,8.73,12.4,17.2,25,40,55};
+
+
+	float BPXSecPbPbXErrUp[NBins] = {1,1.27,2.6,2.8,5,10,5};
+	float BPXSecPbPbXErrDown[NBins] = {1,1.23,2.4,2.2,5,10,5};
+
+	float BPXSecPbPbYErrUpPercent[NBins] = {0.278198,0.159,0.041,0.0654,0.0690334,0.104543,0.24575};
+	float BPXSecPbPbYErrDownPercent[NBins] = {0.278198,0.145,0.0795,0.065,0.0690334,0.104543,0.24575};
+
+
+	float BPXSecPbPbYErrUp[NBins];
+	float BPXSecPbPbYErrDown[NBins];
+
+	for(int i = 0; i < NBins; i++){
+
+		BPXSecPbPbYErrUp[i] = BPXSecPbPbYErrUpPercent[i] * BPXsecPbPbY[i];
+		BPXSecPbPbYErrDown[i] = BPXSecPbPbYErrDownPercent[i] * BPXsecPbPbY[i];
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+	TH2D * HisEmpty = new TH2D("HisEmpty","",100,5,60,100,100.0,2000000);
+	HisEmpty->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+	HisEmpty->GetYaxis()->SetTitle("Cross Section (Or Production Yield)");
+	HisEmpty->GetXaxis()->CenterTitle();
+	HisEmpty->GetYaxis()->CenterTitle();
+	HisEmpty->GetYaxis()->SetTitleOffset(1.8);
+	HisEmpty->Draw();
+
+	TGraphAsymmErrors *BPPPCrossGraph = new TGraphAsymmErrors(NBins, BPXsecPPX, BPXsecPPY,BPXSecPPXErrDown, BPXSecPPXErrUp,BPXSecPPYErrDown,BPXSecPPYErrUp);
+	
+
+	TGraphAsymmErrors *BPPPCrossGraph2D = new TGraphAsymmErrors(NBins, BPXsecPPX, BPXsecPPY2D,BPXSecPPXErrDown, BPXSecPPXErrUp,BPXSecPPY2DErrDown,BPXSecPPY2DErrUp);
+
+
+	TGraphAsymmErrors *BPPbPbCrossGraph = new TGraphAsymmErrors(NBins, BPXsecPbPbX, BPXsecPbPbY,BPXSecPbPbXErrDown, BPXSecPbPbXErrUp,BPXSecPbPbYErrDown,BPXSecPbPbYErrUp);
+
+	BPPbPbCrossGraph->SetLineColor(kGreen+2);
+//	BPPbPbCrossGraph->SetFillColorAlpha(kGreen-9,0.5);
+	BPPbPbCrossGraph->SetMarkerStyle(20);
+	BPPbPbCrossGraph->SetMarkerSize(1);
+	BPPbPbCrossGraph->SetMarkerColor(kGreen+2);
+
+	BPPPCrossGraph->SetLineColor(kBlue+2);
+//	BPPPCrossGraph->SetFillColorAlpha(kBlue-9,0.5);
+	BPPPCrossGraph->SetMarkerStyle(21);
+	BPPPCrossGraph->SetMarkerSize(1);
+	BPPPCrossGraph->SetMarkerColor(kBlue+2);
+
+
+	BPPbPbCrossGraph->Draw("epsame");	
+	BPPPCrossGraph->Draw("epsame");	
+
+	TLegend* leg = new TLegend(0.30,0.60,0.60,0.80,NULL,"brNDC");
+	leg->SetBorderSize(0);
+	leg->SetTextSize(0.040);
+	leg->SetTextFont(42);
+	leg->SetFillStyle(0);
+	leg->SetLineWidth(3);
+	leg->AddEntry(BPPbPbCrossGraph,"2018 PbPb 5.02 TeV","PL");
+	leg->AddEntry(BPPPCrossGraph,"2017 pp 5.02 TeV","PL");
+	leg->Draw("same");
+
+
+	c->SaveAs("Plots/BP/BPPbPbPPCross.png");
+
+
+
+
+
+
+	//2015 Reference//
+
+
+	TCanvas * cRatio = new TCanvas("cRatio","cRatio",800,1200);
+    TPad * MyPad1;
+
+	MyPad1 = new TPad("MyPad1","",0,0.5,1,1.0);
+	MyPad1->Draw();
+   
+
+	TPad * MyPad2;
+
+	MyPad2 = new TPad("MyPad2","",0,0.25,1,0.50);
+	MyPad2->Draw();
+
+
+
+	TPad * MyPad3;
+
+	MyPad3 = new TPad("MyPad3","",0,0.00,1,0.25);
+	MyPad3->Draw();
+
+
+	MyPad1->cd();
+
+
+
+	TH2D * HisEmpty2 = new TH2D("HisEmpty2","",100,5,60,100,100.0,30000000);
+	HisEmpty2->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+	HisEmpty2->GetYaxis()->SetTitle("d#sigma/d p_{T} (pb c/GeV)");
+	HisEmpty2->GetXaxis()->CenterTitle();
+	HisEmpty2->GetYaxis()->CenterTitle();
+	HisEmpty2->SetTitle("B^{+} Cross Section With Fiducial Region");
+	HisEmpty2->GetYaxis()->SetTitleOffset(1.2);
+	HisEmpty2->Draw();
+
+	BPPPCrossGraph->Draw("ep");
+
+
+	const int NBins2015 = 5;
+	float BPXsecPPX2015[NBins2015] = {8.5,12.5,17.5,25,40};
+	float BPXSecPPXErrDown2015[NBins2015] = {1.5,2.5,2.5,5,10};
+	float BPXSecPPXErrUp2015[NBins2015] = {1.5,2.5,2.5,5,10};
+	
+	float BPXsecPPY2015[NBins2015] = {2610000,744000,197000,46500,5300};
+	float BPXSecPPYErrDown2015[NBins2015] = {170000,29000,9000,2400,500};
+	float BPXSecPPYErrUp2015[NBins2015] = {170000,29000,9000,2400,500};
+
+
+	TGraphAsymmErrors *BPPPCrossGraph2015 = new TGraphAsymmErrors(NBins2015, BPXsecPPX2015, BPXsecPPY2015,BPXSecPPXErrDown2015, BPXSecPPXErrUp2015,BPXSecPPYErrDown2015,BPXSecPPYErrUp2015);
+
+
+
+	BPPPCrossGraph2015->SetLineColor(kGreen+2);
+	BPPPCrossGraph2015->SetMarkerStyle(33);
+	BPPPCrossGraph2015->SetMarkerSize(1);
+	BPPPCrossGraph2015->SetMarkerColor(kGreen+2);
+	BPPPCrossGraph2015->Draw("epSAME");
+
+
+
+
+
+
+	BPPPCrossGraph2D->SetLineColor(kOrange+1);
+	BPPPCrossGraph2D->SetMarkerStyle(34);
+	BPPPCrossGraph2D->SetMarkerSize(1);
+	BPPPCrossGraph2D->SetMarkerColor(kOrange+1);
+	BPPPCrossGraph2D->Draw("epSAME");
+
+
+
+	TFile * finFONLL = new TFile("FONLLs/BPFONLLMix.root");
+	finFONLL->cd();
+	TGraphAsymmErrors *BPFONLL = (TGraphAsymmErrors*) finFONLL->Get("gaeSigmaBplus");
+	BPFONLL->SetLineColor(kRed+2);
+	BPFONLL->SetMarkerStyle(20);
+	BPFONLL->SetMarkerSize(1);
+	BPFONLL->SetMarkerColor(kRed+2);
+	BPFONLL->Draw("epSAME");
+
+
+	TFile * finFONLL2 = new TFile("FONLLs/BPFONLL2.root");
+	finFONLL2->cd();
+	TGraphAsymmErrors *BPFONLL2 = (TGraphAsymmErrors*) finFONLL2->Get("gaeSigmaBplus");
+	BPFONLL2->SetLineColor(kRed+2);
+	BPFONLL2->SetMarkerStyle(20);
+	BPFONLL2->SetMarkerSize(1);
+	BPFONLL2->SetMarkerColor(kRed+2);
+	BPFONLL2->Draw("epSAME");
+
+	double XTempChange;
+	double YTempChange;
+
+	for(int i = 0; i < 2; i ++){
+
+
+		BPFONLL2->GetPoint(i,XTempChange,YTempChange);
+		BPFONLL->SetPoint(i,XTempChange,YTempChange);
+	}
+
+
+	TLegend* leg3 = new TLegend(0.37,0.50,0.70,0.80,NULL,"brNDC");
+	leg3->SetBorderSize(0);
+	leg3->SetTextSize(0.040);
+	leg3->SetTextFont(42);
+	leg3->SetFillStyle(0);
+	leg3->SetLineWidth(3);
+	leg3->AddEntry(BPPPCrossGraph,"2017 pp 5.02 TeV","PL");
+	leg3->AddEntry(BPPPCrossGraph2D,"2017 pp 5.02 TeV (2D Map)","PL");	
+	leg3->AddEntry(BPPPCrossGraph2015,"2015 pp 5.02 TeV","PL");
+	leg3->AddEntry(BPFONLL,"FONLL Calculations","PL");
+	leg3->Draw("same");
+
+
+
+	MyPad1->Update();
+
+
+
+
+	//Ratio
+
+	float Ratio1Y[NBins2015];
+	float Ratio1YErr[NBins2015];
+	
+	float Ratio2Y[NBins2015];
+	float Ratio2YErr[NBins2015];
+
+	
+
+	for(int i = 1; i < NBins2015; i++){
+
+		Ratio1Y[i] = BPXsecPPY[i+1]/BPXsecPPY2015[i];
+		Ratio1YErr[i] = Ratio1Y[i] * TMath::Sqrt(BPXSecPPYErrDown[i+1]/BPXsecPPY[i+1] * BPXSecPPYErrDown[i+1]/BPXsecPPY[i+1] + BPXSecPPYErrDown2015[i]/BPXsecPPY2015[i] * BPXSecPPYErrDown2015[i]/BPXsecPPY2015[i]);
+
+	//	cout << "BPXSecPPYErrDown2015[i]/BPXsecPPY2015[i] = " << BPXSecPPYErrDown[i+1]/BPXsecPPY[i+1]  << endl;
+			
+	
+
+
+	//	cout << "sqrt(BPXSecPPYErrDown[i+1]/BPXsecPPY[i+1] * BPXSecPPYErrDown[i+1]/BPXsecPPY[i+1] + BPXSecPPYErrDown2015[i]/BPXsecPPY2015[i] * BPXSecPPYErrDown2015[i]/BPXsecPPY2015[i]) = " << sqrt(BPXSecPPYErrDown[i+1]/BPXsecPPY[i+1] * BPXSecPPYErrDown[i+1]/BPXsecPPY[i+1] + BPXSecPPYErrDown2015[i]/BPXsecPPY2015[i] * BPXSecPPYErrDown2015[i]/BPXsecPPY2015[i]) << endl;
+
+		Ratio2Y[i] = BPXsecPPY2D[i+1]/BPXsecPPY2015[i];
+		Ratio2YErr[i] = Ratio2Y[i] *TMath::Sqrt(BPXSecPPY2DErrDown[i+1]/BPXsecPPY2D[i+1] * BPXSecPPY2DErrDown[i+1]/BPXsecPPY2D[i+1] + BPXSecPPYErrDown2015[i]/BPXsecPPY2015[i] * BPXSecPPYErrDown2015[i]/BPXsecPPY2015[i] );
+
+
+	}
+
+	Ratio2YErr[0] = 0.00001;
+	Ratio2Y[0] = -0.1;
+	Ratio1YErr[0] = 0.00001;
+	Ratio1Y[0] = -0.1;
+
+	cRatio->cd();
+
+
+
+	MyPad2->cd();
+
+
+
+	TH2D * HisEmpty3 = new TH2D("HisEmpty3","",100,5,60,100,0,2);
+	HisEmpty3->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+	HisEmpty3->GetYaxis()->SetTitle("2017/2015 Data");
+	HisEmpty3->GetXaxis()->CenterTitle();
+	HisEmpty3->GetYaxis()->CenterTitle();
+	HisEmpty3->GetYaxis()->SetTitleOffset(1.2);
+	HisEmpty3->Draw();
+
+
+	TGraphAsymmErrors *Ratio1 = new TGraphAsymmErrors(NBins2015, BPXsecPPX2015, Ratio1Y ,BPXSecPPXErrDown2015, BPXSecPPXErrUp2015,Ratio1YErr,Ratio1YErr);
+	
+	TGraphAsymmErrors *Ratio2 = new TGraphAsymmErrors(NBins2015, BPXsecPPX2015, Ratio2Y,BPXSecPPXErrDown2015, BPXSecPPXErrUp2015,Ratio2YErr,Ratio2YErr);
+
+	Ratio1->SetLineColor(kBlue+2);
+	Ratio1->SetMarkerStyle(21);
+	Ratio1->SetMarkerSize(1);
+	Ratio1->SetMarkerColor(kBlue+2);
+	Ratio1->Draw("epSAME");
+
+
+
+
+	Ratio2->SetLineColor(kOrange+1);
+	Ratio2->SetMarkerStyle(34);
+	Ratio2->SetMarkerSize(1);
+	Ratio2->SetMarkerColor(kOrange+1);
+	Ratio2->Draw("epSAME");
+
+
+	TLine * Unity2 = new TLine(5,1,60,1);
+	Unity2->SetLineWidth(2);
+	Unity2->SetLineStyle(2);
+	Unity2->SetLineColor(1);
+	Unity2->Draw("SAME");
+
+
+
+
+	MyPad2->Update();
+
+
+	//FONLL
+
+
+
+
+	float Ratio3Y[NBins];
+	float Ratio3YErr[NBins];
+	
+	float Ratio4Y[NBins];
+	float Ratio4YErr[NBins];
+
+	float FONLLY[NBins];
+	float FONLLYErr[NBins];
+
+
+	double XTempFONLL;
+	double YTempFONLL;
+
+	for(int i = 0; i < NBins; i++){
+
+
+
+		
+		BPFONLL->GetPoint(i,XTempFONLL,YTempFONLL);
+		FONLLY[i] = YTempFONLL;
+		FONLLYErr[i] = BPFONLL->GetErrorYhigh (i);
+
+
+		cout << "FONLLY[i]  = " << FONLLY[i] << endl;
+
+		Ratio3Y[i] = BPXsecPPY[i]/FONLLY[i];
+		Ratio3YErr[i] = Ratio3Y[i] * sqrt(BPXSecPPYErrDown[i]/BPXsecPPY[i] * BPXSecPPYErrDown[i]/BPXsecPPY[i] + FONLLYErr[i]/FONLLY[i] * FONLLYErr[i]/FONLLY[i]);
+
+		Ratio4Y[i] = BPXsecPPY2D[i]/FONLLY[i];
+		Ratio4YErr[i] = Ratio4Y[i] *TMath::Sqrt(BPXSecPPY2DErrDown[i]/BPXsecPPY2D[i] * BPXSecPPY2DErrDown[i]/BPXsecPPY2D[i] + FONLLYErr[i]/FONLLY[i] * FONLLYErr[i]/FONLLY[i] );
+	
+
+		//cout << "Ratio3YErr[i]  = " << Ratio3YErr[i]  << "   Ratio4YErr[i] = " << Ratio4YErr[i] << endl;
+
+	}
+
+	cRatio->cd();
+
+
+
+	MyPad3->cd();
+
+
+
+	TH2D * HisEmpty4 = new TH2D("HisEmpty4","",100,5,60,100,0,2);
+	HisEmpty4->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+	HisEmpty4->GetYaxis()->SetTitle("2017 Data/FONLL");
+	HisEmpty4->GetXaxis()->CenterTitle();
+	HisEmpty4->GetYaxis()->CenterTitle();
+	HisEmpty4->GetYaxis()->SetTitleOffset(1.2);
+	HisEmpty4->Draw();
+
+
+	TGraphAsymmErrors *Ratio3 = new TGraphAsymmErrors(NBins, BPXsecPPX, Ratio3Y ,BPXSecPPXErrDown, BPXSecPPXErrUp,Ratio3YErr,Ratio3YErr);
+
+	TGraphAsymmErrors *Ratio4 = new TGraphAsymmErrors(NBins, BPXsecPPX, Ratio4Y,BPXSecPPXErrDown, BPXSecPPXErrUp,Ratio4YErr,Ratio4YErr);
+
+	Ratio3->SetLineColor(kBlue+2);
+	Ratio3->SetMarkerStyle(21);
+	Ratio3->SetMarkerSize(1);
+	Ratio3->SetMarkerColor(kBlue+2);
+	Ratio3->Draw("epSAME");
+
+
+
+
+	Ratio4->SetLineColor(kOrange+1);
+	Ratio4->SetMarkerStyle(34);
+	Ratio4->SetMarkerSize(1);
+	Ratio4->SetMarkerColor(kOrange+1);
+	Ratio4->Draw("epSAME");
+
+
+
+	Unity2->Draw("SAME");
+
+
+
+
+	MyPad2->Update();
+
+
+
+
+
+
+
+
+	cRatio->SaveAs("Plots/BP/BPCrossComp.png");
+//	cRatio->SetLogy();
+
+	//MyPad1->SetLogy();
+	
+	MyPad1->SetLogy();
+	MyPad1->Update();
+
+	cRatio->SaveAs("Plots/BP/BPCrossCompLog.png");
+
+	cRatio->SaveAs("Plots/BP/BPCrossCompLog.pdf");
+
+
+
+
+	//FONLL
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}

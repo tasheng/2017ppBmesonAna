@@ -29,7 +29,7 @@ using namespace std;
 using std::cout;
 using std::endl;
 
-void PlotBsBPRatio(int Type, int Opt){
+void PlotBsBPRatio(int Opt){
 
 
 
@@ -46,14 +46,8 @@ void PlotBsBPRatio(int Type, int Opt){
 	c->cd();
 
 	c->SetLeftMargin(0.16);
-	
-	TString TypeName;
-	
-	if(Type == 0) TypeName="PT";
-	if(Type == 1) TypeName="Mult";
 
-
-	TString InfileBP = Form("../../BP/EffAna/FinalFiles/BPPPCorrYield%s.root",TypeName.Data());
+	TString InfileBP = "../../BP/EffAna/FinalFiles/BPPPCorrYieldMult.root";
 
 	TString FileName;
 
@@ -136,7 +130,7 @@ void PlotBsBPRatio(int Type, int Opt){
 //	tex->Draw();
 
 
-	c->SaveAs(Form("Plots/%s/%s/BPPPCrossMult.png",TypeName.Data(),Method.Data()));
+	c->SaveAs(Form("Plots/%s/BPPPCrossMult.png",Method.Data()));
 
 
 
@@ -144,13 +138,12 @@ void PlotBsBPRatio(int Type, int Opt){
 
 	tex->DrawLatex(0.9,1.8,"p_{T} < 100 GeV/c");
 	tex->DrawLatex(1.2,0.79,"|y| < 2.4 for 10 < p_{T} < 100 GeV/c");
-	c->SaveAs(Form("Plots/%s/%s/BPPPCrossMultLog.png",TypeName.Data(),Method.Data()));
+	c->SaveAs(Form("Plots/%s/BPPPCrossMultLog.png",Method.Data()));
 
 	//Bs PP
 
 
-//	TString InfileBs = "../../Bs/EffAna/FinalFiles/BsPPCorrYieldMult.root";
-	TString InfileBs = Form("../../Bs/EffAna/FinalFiles/BsPPCorrYield%s.root",TypeName.Data());
+	TString InfileBs = "../../Bs/EffAna/FinalFiles/BsPPCorrYieldMult.root";
 
 
 	TFile * FileBs = new TFile(InfileBs.Data());
@@ -227,7 +220,7 @@ void PlotBsBPRatio(int Type, int Opt){
 
 
 
-	c2->SaveAs(Form("Plots/%s/%s/BsPPCrossMult.png",TypeName.Data(),Method.Data()));
+	c2->SaveAs(Form("Plots/%s/BsPPCrossMult.png",Method.Data()));
 
 
 
@@ -235,7 +228,7 @@ void PlotBsBPRatio(int Type, int Opt){
 
 //	tex->DrawLatex(0.9,1.8,"p_{T} < 100 GeV/c");
 //	tex->DrawLatex(1.2,0.79,"|y| < 2.4 for 10 < p_{T} < 100 GeV/c");
-	c2->SaveAs(Form("Plots/%s/%s/BsPPCrossMultLog.png",TypeName.Data(),Method.Data()));
+	c2->SaveAs(Form("Plots/%s/BsPPCrossMultLog.png",Method.Data()));
 
 //	c2->SaveAs("Plots/BsPPCrossMultLog.png");
 	
@@ -268,14 +261,14 @@ void PlotBsBPRatio(int Type, int Opt){
 	leg->Draw("same");
 
 
-	c3->SaveAs(Form("Plots/%s/%s/BsBPMult.png",TypeName.Data(),Method.Data()));
+	c3->SaveAs(Form("Plots/%s/BsBPMult.png",Method.Data()));
 
 
 
 	c3->SetLogy();
 	leg->Draw("same");
 	
-	c3->SaveAs(Form("Plots/%s/%s/BsBPMultLog.png",TypeName.Data(),Method.Data()));
+	c3->SaveAs(Form("Plots/%s/BsBPMultLog.png",Method.Data()));
 
 
 
@@ -341,9 +334,10 @@ void PlotBsBPRatio(int Type, int Opt){
 	BsBPRatioGraph->Draw("ep");
 
 
-	c4->SaveAs(Form("Plots/%s/%s/BsBPRatio.png",TypeName.Data(),Method.Data()));
+	c4->SaveAs(Form("Plots/%s/BsBPRatio.png",Method.Data()));
 	
 
 
 
 }
+
