@@ -204,15 +204,21 @@ At this point we get the Bs and BP cross sections as function of B meson pT and 
 ## Results Involving with Bs and B+ Cross Sections
 
 
+To obtain more relevant physics results for the B-meson measurement to compare with theoretical calculations, we need to calculate the physical obserables such as Bs/B+ production yield ratio in pp and PbPb collisions and Nuclear modification factor RAA. The folder BsBPFinalResults contains the codes to produce the plots.
+
 ### RAA and Bs/B+
 
 To Run the RAA and Bs/B+. It is also very simple. We could go to 
 
-cd BsBP/
+cd BsBPFinalResults/BsBPRatio
 
-And run 
+And then run 
 
-root -b -l -q BsBP.C to get the BsBP.C ratio in Pt
+root -b -l -q PlotsBsBPRatio.C'(0,0)'
+
+The first argument: 0 stands for the ratio as a function of pT while 1 stands for multiplicity
+
+The second argument: 0 stands for Binned pT efficiency correction while 1 stands for 2D map efficiency correction
 
 The plots are stored at Pt/
 
@@ -221,10 +227,6 @@ If we run
 root -b -l -q BPRAA.C
 
 The B+ RAA plots are stored at BPRAA/
-
-root -b -l -q BsBPMult.C to get the BsBP.C ratio in Multiplicity 
-
-The plots are stored at Mult/
 
 
 
