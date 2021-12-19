@@ -206,9 +206,22 @@ At this point we get the Bs and BP cross sections as function of B meson pT and 
 
 To obtain more relevant physics results for the B-meson measurement to compare with theoretical calculations, we need to calculate the physical obserables such as Bs/B+ production yield ratio in pp and PbPb collisions and Nuclear modification factor RAA. The folder BsBPFinalResults contains the codes to produce the plots.
 
-### RAA and Bs/B+
 
-To Run the RAA and Bs/B+. It is also very simple. We could go to 
+### Bs and B+ RAA
+
+With the PbPb production yield and pp cross section, we can calculate the RAA. To obtain the RAA plots, first go to the folder BsBPFinalResults/RAA
+
+cd BsBPFinalResults/RAA
+
+To obatin B+ RAA, simply do:
+
+Note that we use a fiducial region of |By| > 1.5 for B pT < 10 GeV/c.
+
+
+
+### Bs/B+ 
+
+To Run the Bs/B+ as a function of multiplicity. It is also very simple. We could go to 
 
 cd BsBPFinalResults/BsBPRatio
 
@@ -224,18 +237,34 @@ If we run
 
 root -b -l -q BPRAA.C
 
-The B+ RAA plots are stored at BPRAA/
+The B+ RAA plots are stored at RAAPlots/BP/
 
+There are basically 3 types of plots:
+
+1. The cross section of 2017 pp and production yield of 2018 PbPb, both plotted together, in linear scale: RAAPlots/BP/BPPbPbPPCross.png and log scale RAAPlots/BP/BPPbPbPPCrossLog.png. 
+
+2. We also produce a comparison plot between the cross section with and without fiducial region: RAAPlots/BP/BPFidOrNotComp.png
+
+3. The RAA, that is the ratio between production yield of 2018 PbPb to 2017 pp located at RAAPlots/BP/BPRAA.png. A comparison with 2015 B+ RAA is also made at RAAPlots/BP/BPRAACompairson.png.
+
+A root file containing all these plots are also saved at OutFile/BPRAA.root
+
+Like wise, to obatin the RAA of Bs, simply do 
+
+root -b -l -q BsRAA.C
+
+Same plots are saved at RAAPlots/BP/ and analysis histogram stored at OutFile/BsRAA.root
 
 
 ## Generate Comparison Plots 
 
 To run the comparison of the 2017 pp Bs and B+ results with 2015 pp and FONLL calculations, go to the folder:
 
-Caveat - fiducial region: for the full 2015 pp results, since the measurement |By| > 2.4 for B pT < 10 GeV/c unlike the 2018 PbPb where a fiducial region |By| > 2.4 for B pT < 10 GeV/c. Therefore, we have produced two sets of analysis 
+Caveat - fiducial region: for the full 2015 pp results, since the measurement |By| > 2.4 for B pT < 10 GeV/c unlike the 2018 PbPb where a fiducial region |By| > 2.4 for B pT < 10 GeV/c. Therefore, we have produced two sets of analysis. One with the fiducial region cut of |By| > 1.5 for B pT < 10 GeV/c. The other one is without the fiducial region (still keeping |By| < 2.4 for B pT < 10 GeV/c).
 
 We can change the configuration to remove the fiducial region. Here we do not go through the details about that. I have produced two files one for Bs and one for B+ where the fiducial region is removed in order to compare with 2015 pp results. You can find the cross section files at:
 
+BsBPFinalResults/Comparisons/NoFiducial/FinalFiles/
 
 
 ### Fiducial Region 
@@ -263,11 +292,22 @@ root -b -l -q BsComparison.C
 
 to obtain the comparison of Bs cross section with FONLL calculations.
 
-### Without Fiducial Region 
+Again, the files can be found at Plots/Bs just like B+ stated above
+
+### Without Fiducial Region  (Optional)
+
+This is optional, but if you also want to run the results without fiducial region, simply go to the folder
 
 
+### Generating FONLL Files (Optional)
 
+This is also optional, if you want to generate FONLL files, first obtain the calculations from the FONLL website:
 
+http://www.lpthe.jussieu.fr/~cacciari/fonll/fonllform.html
+
+Turn on the "Include PDFs uncertainties" and "uncertainties range from scale and masses" options.
+
+Then, 
 
 # Systematic Studies 
 
