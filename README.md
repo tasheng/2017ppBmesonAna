@@ -383,13 +383,42 @@ http://www.lpthe.jussieu.fr/~cacciari/fonll/fonllform.html
 
 Turn on the "Include PDFs uncertainties" and "uncertainties range from scale and masses" options.
 
-Then, to generate the 
+Then, to generate the FONLL results. Then dump the results to the dat file
+
+Then go to  
+
+Run 
+
+root -b -l -q 
+
+to generate the FONLL with the desired binning defined in the code:
+
 
 # Systematic Studies 
 
 
+## TnP Systematics
+
+
+## MC/Data Discrepancy 
+
+
+## Bpt Systematics
+
+
+## MC Stat Systematics 
+
+
+## Generating Summary Plots
+
+
+## Report the Systematic Uncertanties to the Final Results
+
 
 # Tests
+
+
+
 
 ## Bs NonPrompt Studies
 
