@@ -75,6 +75,82 @@ B+:  (((BDT_pt_1_2>0.04 && BsvpvDistance/BsvpvDisErr > 5 && Bchi2cl > 0.05 && Bp
 
 Bs: ((((abs(Btktkmass-1.019455)<0.015)&& BDT_pt_2_3 > -0.10 && TMath::Abs(Bmumumass-3.096916)<0.15 && Bpt > 0 && Bpt < 5 && (abs(Btrk1Eta)<2.4 && abs(Btrk2Eta)<2.4 && Btrk1Pt>0.0 && Btrk2Pt>0.0) && Btrk1Pt > 0.2 && Btrk2Pt > 0.2  && Bchi2cl > 0.05 && BsvpvDistance/BsvpvDisErr > 2.0)  && ( (Bpt < 2 && Bpt > 0 && BDT_pt_1_2 > -0.38 ) || (Bpt < 3 && Bpt > 2 && BDT_pt_2_3 > -0.05 ) || (Bpt < 5 && Bpt > 3 && BDT_pt_3_5 > -0.40)  )))  ||  ( ( (Bpt > 5 && Bpt < 7 &&  BDT_pt_5_7 > -0.28) || (Bpt > 7 && Bpt < 10 &&  BDT_pt_7_10 > -0.30) || (Bpt > 10 && Bpt < 15 &&  BDT_pt_10_15 > -0.30) || (Bpt > 15 && Bpt < 20 &&  BDT_pt_15_20 > -0.25 ) || (Bpt > 20 && Bpt < 50 &&  BDT_pt_30_50 > -0.25 )  || (Bpt > 50) ) && ((HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1 && HLT_HIL1DoubleMu0_v1 == 1 && (abs(PVz)<15))  &&  (Bmu1isTriggered == 1 && Bmu2isTriggered == 1 ) &&  (Bchi2cl > 0.05 && BsvpvDistance/BsvpvDisErr > 2.0)    && (TMath::Abs(By)<2.4&&TMath::Abs(Bmumumass-3.096916)<0.15&&((abs(Bmu1eta)<1.2&&Bmu1pt>3.5)||(abs(Bmu1eta)>1.2&&abs(Bmu1eta)<2.1&&Bmu1pt>(5.47-1.89*abs(Bmu1eta)))||(abs(Bmu1eta)>2.1&&abs(Bmu1eta)<2.4&&Bmu1pt>1.5))&&((abs(Bmu2eta)<1.2&&Bmu2pt>3.5)||(abs(Bmu2eta)>1.2&&abs(Bmu2eta)<2.1&&Bmu2pt>(5.47-1.89*abs(Bmu2eta)))||(abs(Bmu2eta)>2.1&&abs(Bmu2eta)<2.4&&Bmu2pt>1.5))&&Bmu1InPixelLayer>0&&(Bmu1InPixelLayer+Bmu1InStripLayer)>5&&Bmu2InPixelLayer>0&&(Bmu2InPixelLayer+Bmu2InStripLayer)>5&&Bmu1dxyPV<0.3&&Bmu2dxyPV<0.3&&Bmu1dzPV<20&&Bmu2dzPV<20&&Bmu1isTrackerMuon&&Bmu2isTrackerMuon&&Bmu1isGlobalMuon&&Bmu2isGlobalMuon)  && ( Btrk1Pt > 0.2 && Btrk2Pt > 0.2 && abs(Btrk1Eta-0.0) < 2.4 && abs(Btrk2Eta-0.0) < 2.4  && Btrk1highPurity  && Btrk2highPurity  && Btrk1PixelHit + Btrk1StripHit > 10  && Btrk2PixelHit + Btrk2StripHit > 10) &&  (Btrk1PtErr/Btrk1Pt < 0.1)  &&  (Btrk2PtErr/Btrk2Pt < 0.1)    && Btrk1Chi2ndf/(Btrk1nStripLayer+Btrk1nPixelLayer) < 0.18   && Btrk2Chi2ndf/(Btrk2nStripLayer+Btrk2nPixelLayer) < 0.18 ))
 
+## Prerequisite - MC Reweighting
+
+Before we start doing the analysis, we have some prerequisites. We need to perform global event level to reweight the MC to make it better match to the data. There are two reweight processes: PVz and Bpt. These are all included in the folder: MCReweight
+
+Before reweihghting, we could produce some plots to show the MC performances in the GEN and RECO level. To do so, first get in the folder:
+
+cd MCReweight/GenInfo
+
+To obtain the Gen info for B+, simply do 
+
+root -b -l -q PlotGen.C'(0)'
+
+Here the argument 0 is for B+ and 1 for Bs. The plots are saved as:
+
+Pthat Distribution: MCPlots/BPpthat.png 
+
+Generated B+ pT distribution: MCPlots/BPGpt.png
+
+Generated B+ J/psi distribution: MCPlots/BPJPsiPt.png
+
+Same plots are generated for Bs when running 
+
+root -b -l -q PlotGen.C'(1)'
+
+
+### PVz Reweighting
+
+To reweight the PVz, we simply produce the data and MC PVz distribution, fit them with Gaussian functions, and then define the weight as the ratio of Data Gaussian function to the MC Gaussian function. Finally, recheck the data-MC agreement by applying the weight to MC and compare it to data. To produce the stduies, simply do 
+
+cd PVZ
+
+root -b -l -q PVzMC.root'(0)'
+
+Again, here the argument 0 is for B+ and 1 for Bs. The plots are saved as:
+
+BPPVZMCData.png
+
+There are 3 panels in the plots. The left is data, the middle is MC, and the right the PVz reweighted MC and comparison with data. Also, the Gaussian fit function parameters (constant, mean, and width) are printed out as well when running the codes.
+
+Same for Bs as mentioned above. We simply need to change the argument from 0 to 1. 
+
+root -b -l -q PVzMC.root'(1)'
+
+We will get 
+
+BsPVZMCData.png
+
+
+### B pT Reweighting
+
+
+Likewise, to run the B pT reweighting, we go to the folder Bpt
+
+cd Bpt
+
+The B pT shape in the data are already computed from raw yield extraction for each pT bin and saved at:
+
+../../BP/RawYieldFits/ROOTfiles/yields_Bp_binned_pt.root
+
+../../Bs/RawYieldFits/ROOTfiles/yields_Bs_binned_pt.root
+
+The signal raw yield in MC is obtained by doing GenMatch selection. To compute the Bpt weight, we simply need to fit the raw yield ratio of data to MC as a function of Bpt with a function. To do so, run
+
+root -b -l -q BptReweight.C'(0)'
+
+Again, here the argument 0 is for B+ and 1 for Bs. The plots are saved as:
+
+DataMCCompSide_BP.png and DataMCRatio_BP.png
+
+The data/MC ratio as well as the fits function can be found at DataMCRatio_BP.png.
+
+Same for Bs. We simply need to replace the argument 0 to 1 and run the codes
+
+root -b -l -q BptReweight.C'(1)'
+
+
 # Nominal Analysis
 
 
@@ -307,9 +383,15 @@ http://www.lpthe.jussieu.fr/~cacciari/fonll/fonllform.html
 
 Turn on the "Include PDFs uncertainties" and "uncertainties range from scale and masses" options.
 
-Then, 
+Then, to generate the 
 
 # Systematic Studies 
+
+
+
+# Tests
+
+## Bs NonPrompt Studies
 
 
 
