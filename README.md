@@ -396,9 +396,71 @@ to generate the FONLL with the desired binning defined in the code:
 
 # Systematic Studies 
 
+Now we have finished the nominal analysis and obtain the central values of the B-meson cross section. Since the analysis involves with two parts: signal raw yield extraction and efficiency correction. For the binned pT correctio, we have also obtained the statistical uncertainties. For the 2D Map method, an addition data boostraping approaching is needed to extract the statistical uncertainties of the results. The signal raw yield extraction ,which is called PDF variation, is the same for both methods. Henrique Legoinha is the contact person for signal extraction for everything involving with efficiency correction.
+
+The following sections focus on the systematic uncertainties on the efficiency using the binned pT correction method. 
 
 ## TnP Systematics
 
+One of the systematic uncertainties is related to muon. A data driven method, name Tag and Probe (TnP) is applied as the nominal of our analysis. Here we evaluate the TnP systematic uncertainties. To do so, fist obtain the TnP information for the MC samples under the folder MakeMCTnP. 
+
+cd MakeMCTnP
+
+To produce the TnPInfo tree with the scale factor and their uncertainties the based on the TnP header file, simply do
+
+root -b -l -q TnPWeight.C'(0)'
+
+Again, the argument 0 stands for B+ while the argument 1 stands for Bs.
+
+Then, the output file is named "BPTnPInfo.root" (BsTnPInfo.root for Bs). 
+
+Then merging the TnP input file with the MC file, we get the MC with TnPInfo tree that can be used in the analysis.
+
+Now, to obtain the TnP systematic uncertainties, it turns out that it is also in the code MCEff.C. Thus, we simply run (not need to run again if you already run it):
+
+cd BP/EffAna/
+
+root -b -l -q MCEff.C'(1,0)'
+
+We will save the TnP systematic in the file NewEff2DMap/BPSyst.root
+
+When we open the file, we can see:
+
+root -l NewEff2DMaps/BPSyst.root 
+root [0] 
+Attaching file NewEff2DMaps/BPSyst.root as _file0...
+(TFile *) 0x113db70
+root [1] .ls
+TFile**		NewEff2DMaps/BPSyst.root	
+ TFile*		NewEff2DMaps/BPSyst.root	
+  KEY: TH1D	Eff1DHis;1	
+  KEY: TH1D	Eff1DHisTnPUp;1	
+  KEY: TH1D	Eff1DHisTnPDown;1	
+  KEY: TH1D	Eff1DHisBpt;1	
+  KEY: TH1D	Eff1DHisBDT;1	
+  KEY: TH1D	Eff1DHisMult;1	
+  KEY: TH1D	Eff1DHisTnPUpMult;1	
+  KEY: TH1D	Eff1DHisTnPDownMult;1	
+  KEY: TH1D	Eff1DHisBptMult;1	
+  KEY: TH1D	Eff1DHisBDTMult;1	
+
+Indeed, the file also contains that the Splot weight variation for MC/Data Discrepancy systamtics as well as Bpt Systematics
+
+Here, the histograms of Eff1DHis is the nominal, Eff1DHisTnPUp is the TnP variation up, and the Eff1DHisTnPDown is TnP variation down. Basically, we take the percent variation of TnP Up/Down to the nominal as the TnP systematic uncertainties
+
+Finally, to obtain the TnP systematic uncertainties, we go to the folder SystStudies/
+
+cd SystStudies
+
+Then run the code:
+
+root -b -l -q PlotEffSyst.C'(0)'
+
+Again, the argument 0 stands for B+ while the argument 1 stands for Bs.
+
+The plots of TnP Systematic for B+ is saved at SystPlots
+
+Here the outplots computes the percent deviation, again, which is systematics uncertainties, due to TnP for pT and multiplicity.
 
 ## MC/Data Discrepancy 
 

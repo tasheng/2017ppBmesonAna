@@ -272,7 +272,7 @@ void BPComparison(){
 
 
 
-	TFile * finFONLL = new TFile("FONLLs/BPFONLLMix.root");
+	TFile * finFONLL = new TFile("FONLLs/BPFONLL.root");
 	finFONLL->cd();
 	TGraphAsymmErrors *BPFONLL = (TGraphAsymmErrors*) finFONLL->Get("gaeSigmaBplus");
 	BPFONLL->SetLineColor(kRed+2);
@@ -282,7 +282,7 @@ void BPComparison(){
 	BPFONLL->Draw("epSAME");
 
 
-	TFile * finFONLL2 = new TFile("FONLLs/BPFONLL2.root");
+	TFile * finFONLL2 = new TFile("FONLLs/BPFONLLFid.root");
 	finFONLL2->cd();
 	TGraphAsymmErrors *BPFONLL2 = (TGraphAsymmErrors*) finFONLL2->Get("gaeSigmaBplus");
 	BPFONLL2->SetLineColor(kRed+2);
@@ -293,12 +293,20 @@ void BPComparison(){
 
 	double XTempChange;
 	double YTempChange;
+	double YErrLowTemp;
+	double YErrHighTemp;
 
 	for(int i = 0; i < 2; i ++){
 
 
 		BPFONLL2->GetPoint(i,XTempChange,YTempChange);
+		YErrLowTemp = BPFONLL2->GetErrorYlow(i);
+		YErrHighTemp = BPFONLL2->GetErrorYhigh(i);
+
 		BPFONLL->SetPoint(i,XTempChange,YTempChange);
+		BPFONLL->SetPointEYhigh(i,YErrHighTemp);
+		BPFONLL->SetPointEYlow(i,YErrLowTemp);
+
 	}
 
 
