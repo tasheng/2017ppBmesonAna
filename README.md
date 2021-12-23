@@ -444,7 +444,7 @@ TFile**		NewEff2DMaps/BPSyst.root
   KEY: TH1D	Eff1DHisBptMult;1	
   KEY: TH1D	Eff1DHisBDTMult;1	
 
-Indeed, the file also contains that the Splot weight variation for MC/Data Discrepancy systamtics as well as Bpt Systematics
+In fact, the file also contains that the Splot weight variation for MC/Data Discrepancy systamtics as well as Bpt Systematics
 
 Here, the histograms of Eff1DHis is the nominal, Eff1DHisTnPUp is the TnP variation up, and the Eff1DHisTnPDown is TnP variation down. Basically, we take the percent variation of TnP Up/Down to the nominal as the TnP systematic uncertainties
 
@@ -460,18 +460,102 @@ Again, the argument 0 stands for B+ while the argument 1 stands for Bs.
 
 The plots of TnP Systematic for B+ is saved at SystPlots
 
-Here the outplots computes the percent deviation, again, which is systematics uncertainties, due to TnP for pT and multiplicity.
+Inside the folder SystPlots, it constain both B mesons:
 
-## MC/Data Discrepancy 
+BP/ and Bs/
+
+Inside one of the Bmesons, it has both Pt and Multiplicity:
+
+Pt/ and Mult/
+
+Inside each of them, there two types of plots saved.
+
+1. The comparison between the variated efficiency with the nominal efficiency. All of them overlay in a single plot with legend identifying them.
+
+In this case, for TnP, the plot for Pt is located at: SystPlots/BP/Pt/TnPSystComp.png
+
+2. The percent deviation of the variated efficiciency (again, quoted as systematic uncertainties)
+
+In this case, for TnP, the plot for Pt is located at: SystPlots/BP/Pt/TnPSystRatio.png
+
+We will collect the numbers here and enter them in the array for TnP systematic uncertainties in the systematic summary stage to plot the systematic uncertainties for each pT and multiplicity bin for B+ and Bs.
+
+Likewise, to do this for Bs, simply run 
+
+root -b -l -q PlotEffSyst.C'(0)'
+
+Same plots will be produced under the folder 
+
+SystPlots/Bs/
+
+## MC-Data Discrepancy 
+
+As mentioned above, the codes MCEff.C and PlotEffSyst.C includes also MC-Data discrepancy using Splot Techniques. Here, the prerequite is the input weight files: BPw.root and Bsw.root under the folder BP/EffAna/BDTWeights. They can be obtained from Splot studies done Henrique. The plots are saved as, for instance, for B+ Pt bins
+
+SystPlots/BP/Pt/MCDataSystComp.png and SystPlots/BP/Pt/MCDataSystRatio.png
 
 
 ## Bpt Systematics
 
+Again, as mentioned above, the codes MCEff.C and PlotEffSyst.C includes also Bpt shape. The plots are saved as, for instance, for B+ Pt bins
+
+SystPlots/BP/Pt/BptSystComp.png and SystPlots/BP/Pt/BptSystRatio.png
+
 
 ## MC Stat Systematics 
 
+It looks like in this case for binned pT correction, the way to calculate MC stat is undocumented in the previous analysis. So here for binned pT correction, we believe this uncertainty is small and decide to neglect it.  
 
 ## Generating Summary Plots
+
+Now, with all systematic uncertainties in hand, we are ready to plot them for B+ and Bs pT and event multiplicity bins. The codes are located at: PlotSystSummary
+
+cd PlotSystSummary
+
+Inside the folder, you will find the header files:
+
+BpSystValues.h and BsSystValues.h
+
+If you open the header file, you will see
+
+NPtBins = 7
+
+NCentBins = 2
+
+This stands for the pt and multiplicity binning 
+
+So basically, we have 4 types of systematic uncertainties:
+
+1. Global: they are basically the systematic uncertainties on lumi and Bs and B+ decay branching ratios
+
+2. Signal: the systematic uncertainties related to (Henrique has this number)
+
+3. Eff: the efficiency correction systematic uncertainties: basically the quadruture of Bpt shape and MC-Data discrepancy as well as the tracking efficiency systematic uncertainties above added up 
+
+4. TnP: the efficiency correction based on muon TnP, which we have calculated above.
+
+The total here is the quadrature sum of Eff, TnP, and signal extractions. 
+
+**Currently, the numerical values of this table is not yet finalized. Once the systematic uncertainties studies are finalized, you can refresh the header files and rerun the codes to obtain the plot on the summary of systematic uncertainties. 
+
+
+Anyhow, to plot the systematic uncertainties for pt, event multiplicity, as well as inclusive bins, for B+, we can do:
+
+root -b -l -q PlotSystBp.C
+
+The plots are saved at PlotSyst/Bp/
+
+Pt: PlotSyst/Bp/BpPtSyst.png or PlotSyst/Bp/BpPtSyst.pdf
+
+Mult: PlotSyst/Bp/BpCentSyst.png or PlotSyst/Bp/BpCentSyst.pdf
+
+Inc: PlotSyst/Bp/BpIncSyst.png or PlotSyst/Bp/BpIncSyst.pdf
+
+All plots in 1 canvas: PlotSyst/Bp/BpSysSumPlot.png or PlotSyst/Bp/BpSysSumPlot.pdf
+
+Same for Bs, simply do 
+
+root -b -l -q PlotSystBs.C
 
 
 ## Report the Systematic Uncertanties to the Final Results
@@ -479,13 +563,66 @@ Here the outplots computes the percent deviation, again, which is systematics un
 
 # Tests
 
-
-
+In addition to systematic uncertainties, there are several tests we need to do in order to validate our results. The tests are documented at the appendix after the systematic uncertainties section. 
 
 ## Bs NonPrompt Studies
 
 
+To check the leakage b-hadron decay modes in the Bs signal region, we need to conduct a studies of different b hadrons decay using the inclusive non-prompt J/psi samples. Here, we have prepared everything: the BDT values are all computed, to conduct the studies. The BDT is computed on the root tree, a Bfinder produce tree where the tracks are taken into fully reconstructing the Bs via the decay channel Bs -> J/psi phi -> mu+ mu- K+ K- are all saved. Here, we have computed the BDT values for all pT bins and apply the analysis cuts to the samples.
 
+The codes are located at: Bs/Tests/ppNonPrompStudies
+
+cd Bs/Tests/ppNonPrompStudies
+
+
+The files with all possible decay models are saved at:
+
+[szhaozho@GRENDEL01 ppNonPrompStudies]$ ls OutFile
+BsNPStudies_0_100.root  BsNPStudies_1_2.root    BsNPStudies_20_30.root  BsNPStudies_30_50.root  BsNPStudies_5_7.root
+BsNPStudies_10_15.root  BsNPStudies_15_20.root  BsNPStudies_2_3.root    BsNPStudies_3_5.root    BsNPStudies_7_10.root
+
+Here we have the studies of each pT bin as well as the inclusive pT bin as seen above 
+
+Inside each file, the signal Bs decay as well as the non-signal and a decomposition of the decay models are saved. For instance:
+
+[szhaozho@GRENDEL01 OutFile]$ root -l BsNPStudies_15_20.root 
+root [0] 
+Attaching file BsNPStudies_15_20.root as _file0...
+(TFile *) 0x2b3d6a0
+root [1] .ls
+TFile**		BsNPStudies_15_20.root	
+ TFile*		BsNPStudies_15_20.root	
+  KEY: TH1D	Bmass;1	Bmass
+  KEY: TH1D	BmassBs;1	BmassBs
+  KEY: TH1D	BmassBs_nosig;1	BmassBs_nosig
+  KEY: TH1D	BmassBsPiK;1	BmassBsPiK
+  KEY: TH1D	BmassBsKK;1	BmassBsKK
+  KEY: TH1D	BmassBsKKfake_binfo;1	BmassBsKKfake_binfo
+  KEY: TH1D	BmassBsXpipi;1	BmassBsXpipi
+  KEY: TH1D	BmassBsKKX;1	BmassBsKKX
+  KEY: TH1D	BmassB0KStar;1	BmassB0KStar
+  KEY: TH1D	BmassB0Hard;1	BmassB0Hard
+  KEY: TH1D	BmassB0Leak;1	BmassB0Leak
+
+The details of each decay mode is documented in the appendix C of the analysis note. 
+
+Here, to obtain the plots, simply run the code:
+
+root -b -l -q PlotNPShapesNew.C
+
+
+The plots will be produced and saved at NPNewPlots/ as:
+
+NPBackground_0.png  NPBackground_3.png  NPBackground_6.png  NPBackgroundONLY_0.png  NPBackgroundONLY_3.png  NPBackgroundONLY_6.png
+NPBackground_1.png  NPBackground_4.png  NPBackground_7.png  NPBackgroundONLY_1.png  NPBackgroundONLY_4.png  NPBackgroundONLY_7.png
+NPBackground_2.png  NPBackground_5.png  NPBackground_8.png  NPBackgroundONLY_2.png  NPBackgroundONLY_5.png  NPBackgroundONLY_8.png
+
+NPBackground_5.png: is for pT bin of 10 - 15 GeV/c with both signal decay channel: Bs -> J/psi phi -> mu+ mu- K+ K- a in red plot together with all other non-prompt background channels 
+NPBackgroundONLY_5.png: is for  pT bin of 10 - 15 GeV/c with all other non-prompt background channels as well as the red one of the inclusive non-prompt background channels subtracting the K* and KK channel, where peaking ocruing within our signal region: 5.36 +- 0.08 GeV/c^2
+
+I have also saved one before cut name as: NPNewPlotsNoCut
+
+Here, we can see that after applying the phi meson veto cut, we have significantly suppressed the non-prompt background to the degree of < 10% compared to the results without cuts. 
 
 ## Technical Support
 
