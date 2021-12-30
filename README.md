@@ -561,6 +561,64 @@ root -b -l -q PlotSystBs.C
 ## Report the Systematic Uncertanties to the Final Results
 
 
+###Cross Section
+
+Finally, with all uncertainties values in hand, we can also add that to the final results in addition to the nominal cnetral values and the statistical uncertainties. To do so simply go back to the BsBPFinalResults/Comparisons/Fiducial/ and check out the codes: BPComparison.C and BsComparison.C
+
+
+float BPMDDataSyst[NBins];
+
+float BPPDFSyst[NBins];
+
+float BPPtShapeSyst[NBins];
+
+float BPTnPSystDown[NBins];
+	
+float BPTnPSystUp[NBins];
+
+
+These are from line 153 to 161. (The number BPPtShapeSyst, the last pT bin 50 - 60 GeV/c of BPMDDataSyst, and the first 5 - 7 GeV/c, and last bins 50 - 60 GeV/c BPPDFSyst are no yet finalized). We will need to update them once we have obtained our final results on systematic uncertainties. 
+
+
+Now run again the codes: 
+
+cd BsBPFinalResults/Comparisons/Fiducial/
+
+root -b -l -q BPComparison.C
+
+We will get thes plots under the folder for B+ cross section including the total systematic uncertainties drawn in boxes with png and pdf formats: 
+
+
+Plots/BP/BPCrossONLY.png
+
+Plots/BP/BPCrossONLY.pdf
+
+We also have the comparison plot, which also includes the total systematic uncertainties of B+ 2017 pp and 2018 PbPb drawn in boxes with png and pdf formats: 
+
+Plots/BP/BPCrossCompLog.png
+
+Plots/BP/BPCrossCompLog.pdf
+
+At these point, all information about the measurements are reported in the figures. 
+
+Similarly, to do the same for Bs, just run:
+
+root -b -l -q BsComparison.C
+
+
+Same plots are saved under the folder: Plots/Bs/
+
+
+### RAA
+
+Likewisw, systematic uncertainties are also included to the RAA. To do so, go back to the RAA folder: BsBPFinalResults/Comparisons/RAA
+
+
+cd BsBPFinalResults/Comparisons/RAA/
+
+
+
+
 # Tests
 
 In addition to systematic uncertainties, there are several tests we need to do in order to validate our results. The tests are documented at the appendix after the systematic uncertainties section. 
