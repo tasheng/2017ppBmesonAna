@@ -118,6 +118,63 @@ void BPRAA(){
 
 
 
+	//Syst//
+
+
+
+	float BPXSecPPYSystUp[NBins];
+	float BPXSecPPYSystDown[NBins];
+
+
+
+	float BPMDDataSyst[NBins] = {0.208,0.00947,0.00458,0.0181,0.0490,0.0459,0.05};
+	float BPPDFSyst[NBins] = {0.020,0.0122,0.0091,0.0411,0.0120,0.0150,0.0140};
+	float BPPtShapeSyst[NBins] = {0.08,0.08,0.08,0.08,0.08,0.08,0.08};
+
+	float BPTnPSystDown[NBins] = {0.00454,0.00476,0.00382,0.00354,0.00429,0.00581,0.00613};
+	float BPTnPSystUp[NBins] = {0.00454,0.00476,0.00382,0.00354,0.00429,0.00581,0.00613};
+
+	float BPTotalSystDown[NBins];
+	float BPTotalSystUp[NBins];
+
+	for(int i = 0; i < NBins; i++){
+
+		
+		BPTotalSystDown[i] = TMath::Sqrt(BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystDown[i] * BPTnPSystDown[i]);
+		BPTotalSystUp[i] = TMath::Sqrt(BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystUp[i] * BPTnPSystUp[i]);
+
+
+	}
+	
+	for(int i = 0; i < NBins; i++){
+
+		BPXSecPPYSystUp[i] = BPXsecPPY[i] * ( BPTotalSystUp[i]);
+		BPXSecPPYSystDown[i] = BPXsecPPY[i] * (BPTotalSystDown[i] );
+		//cout << "i = " << i << "     BPXSecPPYSystDown[i] = " << BPXSecPPYSystDown[i] << "  BPXSecPPYErrDown[i] =  " << BPXSecPPYErrDown[i] << endl;
+		
+	}
+
+
+	//PbPb
+
+	float BPXSecPbPbYSystUpPercent[NBins] = {0.3577,0.1404,0.1714,0.0775,0.0858,0.0715,0.1253};
+	float BPXSecPbPbYSystDownPercent[NBins] = {0.3210,0.1359,0.1705,0.0761,0.0843,0.0699,0.1220};
+
+
+	float BPXSecPbPbYSystUp[NBins];
+	float BPXSecPbPbYSystDown[NBins];
+
+
+	for(int i = 0; i < NBins; i++){
+
+		BPXSecPbPbYSystDown[i] = (BPXSecPbPbYSystDownPercent[i]) * BPXsecPbPbY[i];
+		BPXSecPbPbYSystUp[i] = (BPXSecPbPbYSystUpPercent[i]) * BPXsecPbPbY[i];
+
+	}
+
+
+
+	
 
 
 
@@ -151,8 +208,23 @@ void BPRAA(){
 	BPPPCrossGraph->SetMarkerColor(kBlue+2);
 
 
+	TGraphAsymmErrors *BPPPCrossGraphSyst  = new TGraphAsymmErrors(NBins, BPXsecPPX, BPXsecPPY, BPXSecPPXErrDown, BPXSecPPXErrUp, BPXSecPPYSystDown,BPXSecPPYSystUp);
+  	TGraphAsymmErrors *BPPbPbCrossGraphSyst    = new TGraphAsymmErrors(NBins, BPXsecPbPbX, BPXsecPbPbY, BPXSecPbPbXErrDown, BPXSecPbPbXErrUp, BPXSecPbPbYSystDown,BPXSecPbPbYSystUp);
+
+
+	BPPPCrossGraphSyst->SetFillColorAlpha(kBlue-9,0.5);
+	BPPPCrossGraphSyst->SetLineColor(kBlue-9);
+	BPPbPbCrossGraphSyst->SetFillColorAlpha(kGreen-9,0.5);
+	BPPbPbCrossGraphSyst->SetLineColor(kGreen-9);
+
+
+
 	BPPbPbCrossGraph->Draw("epsame");	
 	BPPPCrossGraph->Draw("epsame");	
+
+	BPPPCrossGraphSyst->Draw("5same");	
+	BPPbPbCrossGraphSyst->Draw("5same");	
+	
 
 	TLegend* leg = new TLegend(0.45,0.65,0.75,0.85,NULL,"brNDC");
 	leg->SetBorderSize(0);
@@ -287,6 +359,10 @@ void BPRAA(){
 	float BPRAAXErrDown[NBins] = {1,1.23,2.4,2.2,5,10,5};
 
 
+	float BPRAAYSystUp[NBins] ;
+	float BPRAAYSystDown[NBins];
+
+
 
 	float BPRAAYErrUp[NBins];
 	float BPRAAYErrDown[NBins];
@@ -300,11 +376,16 @@ void BPRAA(){
 	float BPRAAX2015[NBins2015] = {8.5,12.5,17.5,25,40};
 
 
+
+
 	float BPRAAXErrUp2015[NBins2015] = {1.5,2.5,2.5,5,10};
 	float BPRAAXErrDown2015[NBins2015] = {1.5,2.5,2.5,5,10};
 
 	float BPRAAYErrUp2015[NBins2015] = {0.11,0.074,0.075,0.092,0.11};
 	float BPRAAYErrDown2015[NBins2015] = {0.11,0.074,0.075,0.092,0.11};
+
+	float BPRAAYSystUp2015[NBins2015] = {0.064,0.077,0.074,0.102,0.0539};
+	float BPRAAYSystDown2015[NBins2015] = {0.064,0.077,0.074,0.102,0.0539};
 
 
 
@@ -318,6 +399,10 @@ void BPRAA(){
 		BPRAAYErrDown[i] = BPRAAY[i] * TMath::Sqrt(BPXSecPbPbYErrDownPercent[i] * BPXSecPbPbYErrDownPercent[i] + BPXSecPPYErrDownPercent[i] * BPXSecPPYErrDownPercent[i]);
 		
 
+		BPRAAYSystDown[i] = BPRAAY[i] * TMath::Sqrt(BPXSecPbPbYSystDownPercent[i] * BPXSecPbPbYSystDownPercent[i] + BPTotalSystDown[i] * BPTotalSystDown[i]);
+		BPRAAYSystUp[i] = BPRAAY[i] * TMath::Sqrt(BPXSecPbPbYSystUpPercent[i] * BPXSecPbPbYSystUpPercent[i] + BPTotalSystUp[i] * BPTotalSystUp[i]);
+
+
 			
 	}
 
@@ -328,18 +413,22 @@ void BPRAA(){
 
 	TGraphAsymmErrors *BPRAAGraph = new TGraphAsymmErrors(NBins, BPRAAX, BPRAAY,BPRAAXErrDown, BPRAAXErrUp,BPRAAYErrDown,BPRAAYErrUp);
 	BPRAAGraph->SetName("BPRAAGraph");
+	TGraphAsymmErrors *BPRAAGraphSyst = new TGraphAsymmErrors(NBins, BPRAAX, BPRAAY,BPRAAXErrDown, BPRAAXErrUp,BPRAAYSystDown,BPRAAYSystUp);
+
 
 
 	TGraphAsymmErrors *BPRAAGraph2015 = new TGraphAsymmErrors(NBins2015, BPRAAX2015, BPRAAY2015,BPRAAXErrDown2015, BPRAAXErrUp2015,BPRAAYErrDown2015,BPRAAYErrUp2015);
-
+	TGraphAsymmErrors *BPRAAGraphSyst2015 = new TGraphAsymmErrors(NBins2015, BPRAAX2015, BPRAAY2015,BPRAAXErrDown2015, BPRAAXErrUp2015,BPRAAYSystDown2015,BPRAAYSystUp2015);
 
 
 	BPRAAGraph->SetLineColor(kRed+2);
 //	BPRAAGraph->SetFillColorAlpha(kRed+2,0.5);
 	BPRAAGraph->SetMarkerStyle(20);
 	BPRAAGraph->SetMarkerSize(1);
-
 	BPRAAGraph->SetMarkerColor(kRed+2);
+
+
+
 
 	BPRAAGraph2015->SetLineColor(kBlue+2);
 //	BPRAAGraph->SetFillColorAlpha(kRed+2,0.5);
@@ -348,10 +437,25 @@ void BPRAA(){
 	BPRAAGraph2015->SetMarkerColor(kBlue+2);
 	
 
+	BPRAAGraphSyst->SetFillColorAlpha(kRed-9,0.5);
+	BPRAAGraphSyst->SetLineColor(kRed-9);
+	BPRAAGraphSyst2015->SetFillColorAlpha(kBlue-9,0.5);
+	BPRAAGraphSyst2015->SetLineColor(kBlue-9);
 
+
+
+
+
+	TLine * Unity = new TLine(5,1,60,1);
+	Unity->SetLineWidth(2);
+	Unity->SetLineStyle(2);
+	Unity->SetLineColor(1);
 
 	HisEmptyRAA->Draw();
 	BPRAAGraph->Draw("ep");
+	BPRAAGraphSyst->Draw("5same");
+	Unity->Draw("SAME");
+	
 	c2->SaveAs("RAAPlots/BP/BPRAA.png");
 
 
@@ -359,6 +463,8 @@ void BPRAA(){
 	BPRAAGraph->Draw("ep");
 	BPRAAGraph->Draw("epSAME");
 	BPRAAGraph2015->Draw("epSAME");
+	BPRAAGraphSyst->Draw("5same");
+	BPRAAGraphSyst2015->Draw("5same");
 
 
 	TLegend* leg2 = new TLegend(0.30,0.75,0.60,0.90,NULL,"brNDC");
@@ -371,12 +477,9 @@ void BPRAA(){
 	leg2->AddEntry(BPRAAGraph2015,"2015 PbPb + 2015 pp","PL");
 	leg2->Draw("same");
 
-	TLine * Unity = new TLine(5,1,60,1);
-	Unity->SetLineWidth(2);
-	Unity->SetLineStyle(2);
-	Unity->SetLineColor(1);
-	Unity->Draw("SAME");
 
+
+	Unity->Draw("SAME");
 
 
 

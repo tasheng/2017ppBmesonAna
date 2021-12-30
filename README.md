@@ -617,7 +617,24 @@ Likewisw, systematic uncertainties are also included to the RAA. To do so, go ba
 cd BsBPFinalResults/Comparisons/RAA/
 
 
+run root -b -l -q BPRAA.C
 
+The output results of B+ RAA with systematic uncertainties as a function of B+ pT is saved at 
+
+RAAPlots/BP/BPRAA.png
+
+and comparision with 2015 B+ RAA results is saved at  
+
+RAAPlots/BP/BPRAACompairson.png
+
+
+To do this for Bs, simply run 
+
+
+run root -b -l -q BsRAA.C
+
+
+The same resulrs for Bs save at RAAPlots/Bs
 
 # Tests
 
