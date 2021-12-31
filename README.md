@@ -151,6 +151,51 @@ Same for Bs. We simply need to replace the argument 0 to 1 and run the codes
 root -b -l -q BptReweight.C'(1)'
 
 
+To obtain the fit function on the Bpt shap over a fine binning for B+, simply do
+
+root -b -l -q FitBptShape.C'(0)'
+
+
+Again, here the argument 0 stands for B+ and 1 stands for Bs.
+
+
+After runing the codes, fit on data/MC ratio as a function of B+ pT plot is produced:
+
+BPPtWeight.png
+
+
+The fit function as well as the chi^2/ndf will also be printed out:
+
+8.646057/(x*x) +0.425834*TMath::Log(x) +-0.148249 
+
+Chi2ndf = 4.90555
+
+
+Here the B+ has taken a function form: p0/x^2 + p1 * log(x) - p2
+
+For Bs, just follow the same procedure to run 
+
+
+root -b -l -q FitBptShape.C'(1)'
+
+After runing the codes, fit on data/MC ratio as a function of Bs pT plot is produced:
+
+BsPtWeight.png
+
+Again, the fit function as well as the chi^2/ndf are printed out:
+
+1.000000/(x*x) +0.463653*TMath::Log(x) +-0.238962 
+
+Chi2ndf = 8.94302
+
+Then, we could enter these fit functions to the code for Bs and B+ efficiency correction:
+
+https://github.com/MYOMAO/2017ppBmesonAna/blob/master/BP/EffAna/MCEff.C#L790
+
+https://github.com/MYOMAO/2017ppBmesonAna/blob/master/Bs/EffAna/MCEff.C#L982
+
+At this point, the Bpt weight is also included. 
+
 # Nominal Analysis
 
 
