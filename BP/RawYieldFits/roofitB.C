@@ -417,7 +417,7 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 		int CentMax = int( centmax);
 
 		std::cout << "Now Finall We Validate Our Fits" << std::endl;
-	//	validate_fit(w_val, tree, _varExp, full, ptBins_check[i], ptBins_check[i+1], CentMin, CentMax);
+//		validate_fit(w_val, tree, _varExp, full, ptBins_check[i], ptBins_check[i+1], CentMin, CentMax);
 		//  return;
 
 			//datahist = frame->getHist("ds");

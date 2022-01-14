@@ -86,7 +86,9 @@ void BPComparison(){
 		BPXSecPPYErrDown[i] = BPCross->GetBinError(i+1);
 		BPXSecPPYErrUpPercent[i] = BPXSecPPYErrUp[i]/BPXsecPPY[i];
 		BPXSecPPYErrDownPercent[i] = BPXSecPPYErrDown[i]/BPXsecPPY[i];
-		
+	
+		cout << "BPXsecPPY[i] = " << BPXsecPPY[i]  << "   Stat[i]  = " << BPXSecPPYErrUpPercent[i] << endl;
+
 	}
 
 
@@ -145,22 +147,45 @@ void BPComparison(){
 
 
 
-	//Syst Add Up//
+	//Syst Add Up PP//
+
+
 
 	float BPXSecPPYSystUp[NBins];
 	float BPXSecPPYSystDown[NBins];
 
 
+	float BPTrackingSyst[NBins] = {0.05,0.05,0.05,0.05,0.05,0.05,0.05};
 
-	float BPMDDataSyst[NBins] = {0.208,0.00947,0.00458,0.0181,0.0490,0.0459,0.05};
-	float BPPDFSyst[NBins] = {0.020,0.0122,0.0091,0.0411,0.0120,0.0150,0.0140};
-	float BPPtShapeSyst[NBins] = {0.08,0.08,0.08,0.08,0.08,0.08,0.08};
+	float BPMDDataSyst[NBins] = {0.208,0.00947,0.00458,0.0181,0.0490,0.0459,0.0123};
+	float BPPDFSyst[NBins] = {0.0212,0.0122,0.0091,0.0411,0.0120,0.0150,0.0089};
+	float BPPtShapeSyst[NBins] = {0.0096,0.00814,0.000408,0.000617,0.000833,0.00138,0.000640};
 
 	float BPTnPSystDown[NBins] = {0.00454,0.00476,0.00382,0.00354,0.00429,0.00581,0.00613};
 	float BPTnPSystUp[NBins] = {0.00454,0.00476,0.00382,0.00354,0.00429,0.00581,0.00613};
 
 	float BPTotalSystDown[NBins];
 	float BPTotalSystUp[NBins];
+
+	for(int i = 0; i < NBins; i++){
+
+	
+		BPTotalSystDown[i] = TMath::Sqrt(BPTrackingSyst[i] * BPTrackingSyst[i] + BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystDown[i] * BPTnPSystDown[i]);
+		BPTotalSystUp[i] = TMath::Sqrt(BPTrackingSyst[i] * BPTrackingSyst[i] + BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystUp[i] * BPTnPSystUp[i]);
+
+
+	}
+	
+	for(int i = 0; i < NBins; i++){
+
+		BPXSecPPYSystUp[i] = BPXsecPPY[i] * ( BPTotalSystUp[i]);
+		BPXSecPPYSystDown[i] = BPXsecPPY[i] * (BPTotalSystDown[i] );
+		//cout << "i = " << i << "     BPXSecPPYSystDown[i] = " << BPXSecPPYSystDown[i] << "  BPXSecPPYErrDown[i] =  " << BPXSecPPYErrDown[i] << endl;
+		
+	}
+
+
+	//PbPb
 
 	float BPXSecPbPbYSystUpPercent[NBins] = {0.3577,0.1404,0.1714,0.0775,0.0858,0.0715,0.1253};
 	float BPXSecPbPbYSystDownPercent[NBins] = {0.3210,0.1359,0.1705,0.0761,0.0843,0.0699,0.1220};
@@ -178,24 +203,6 @@ void BPComparison(){
 	}
 
 
-	for(int i = 0; i < NBins; i++){
-
-		
-		BPTotalSystDown[i] = TMath::Sqrt(BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystDown[i] * BPTnPSystDown[i]);
-		BPTotalSystUp[i] = TMath::Sqrt(BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystUp[i] * BPTnPSystUp[i]);
-
-
-	}
-	
-	for(int i = 0; i < NBins; i++){
-
-		BPXSecPPYSystUp[i] = BPXsecPPY[i] * ( BPTotalSystUp[i]);
-		BPXSecPPYSystDown[i] = BPXsecPPY[i] * (BPTotalSystDown[i] );
-		cout << "i = " << i << "     BPXSecPPYSystDown[i] = " << BPXSecPPYSystDown[i] << "  BPXSecPPYErrDown[i] =  " << BPXSecPPYErrDown[i] << endl;
-		
-	}
-
-
 
 
 
@@ -205,10 +212,11 @@ void BPComparison(){
 
 	TH2D * HisEmpty = new TH2D("HisEmpty","",100,5,60,100,100.0,2000000);
 	HisEmpty->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
-	HisEmpty->GetYaxis()->SetTitle("Cross Section (Or Production Yield)");
+	HisEmpty->GetYaxis()->SetTitle("d#sigma/dp_{T} (pb c/GeV)");
 	HisEmpty->GetXaxis()->CenterTitle();
 	HisEmpty->GetYaxis()->CenterTitle();
 	HisEmpty->GetYaxis()->SetTitleOffset(1.8);
+	HisEmpty->GetXaxis()->SetTitleOffset(1.3);		
 	HisEmpty->Draw();
 
 
@@ -260,7 +268,7 @@ void BPComparison(){
 
 	BPPPCrossGraph->Draw("ep");	
 	BPPPCrossGraphSyst->Draw("5same");	
-	
+
 
 	c->SaveAs("Plots/BP/BPCrossONLY.png");
 	c->SaveAs("Plots/BP/BPCrossONLY.pdf");

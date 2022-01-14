@@ -93,6 +93,7 @@ void BsComparison(){
 		BsXSecPPYErrDown[i] = BsCross->GetBinError(i+1);
 		BsXSecPPYErrUpPercent[i] = BsXSecPPYErrUp[i]/BsXsecPPY[i];
 		BsXSecPPYErrDownPercent[i] = BsXSecPPYErrDown[i]/BsXsecPPY[i];
+		cout << "BsXsecPPY[i] = " << BsXsecPPY[i]  << "   Stat[i]  = " << BsXSecPPYErrUpPercent[i] << endl;
 		
 	}
 
@@ -115,6 +116,7 @@ void BsComparison(){
 		BsXSecPPY2DErrUp[i] = BsCross2D->GetBinError(i+1);
 		BsXSecPPY2DErrDown[i] = BsCross2D->GetBinError(i+1);
 		
+
 	}
 
 
@@ -154,21 +156,62 @@ void BsComparison(){
 
 */
 
+	//Syst Add Up PP//
+
+
+
+	float BsXSecPPYSystUp[NBins];
+	float BsXSecPPYSystDown[NBins];
+
+
+	float BsTrackingSyst[NBins] = {0.10,0.10,0.10,0.10};
+	float BsMDDataSyst[NBins] = {0.0466,0.0870,0.0725,0.0495};
+	float BsPtShapeSyst[NBins] = {0.0194,0.00607,0.00100,0.000312};	
+	float BsPDFSyst[NBins] = {0.0545,0.012,0.0213,0.0395};
+
+	float BsTnPSystDown[NBins] = {0.00412,0.00385,0.00376,0.00457};
+	float BsTnPSystUp[NBins] = {0.00412,0.00385,0.00376,0.00457};
+
+	float BsTotalSystDown[NBins];
+	float BsTotalSystUp[NBins];
+
+	for(int i = 0; i < NBins; i++){
+
+		
+		BsTotalSystDown[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] + BsMDDataSyst[i] * BsMDDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystDown[i] * BsTnPSystDown[i]);
+		BsTotalSystUp[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] +BsMDDataSyst[i] * BsMDDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystUp[i] * BsTnPSystUp[i]);
+
+
+	}
+	
+	for(int i = 0; i < NBins; i++){
+
+		BsXSecPPYSystUp[i] = BsXsecPPY[i] * ( BsTotalSystUp[i]);
+		BsXSecPPYSystDown[i] = BsXsecPPY[i] * (BsTotalSystDown[i] );
+		//cout << "i = " << i << "     BPXSecPPYSystDown[i] = " << BPXSecPPYSystDown[i] << "  BPXSecPPYErrDown[i] =  " << BPXSecPPYErrDown[i] << endl;
+		
+	}
+
+
 
 
 
 
 
 	TH2D * HisEmpty = new TH2D("HisEmpty","",100,7,50,100,100.0,2000000);
-	HisEmpty->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
-	HisEmpty->GetYaxis()->SetTitle("Cross Section (Or Production Yield)");
+	HisEmpty->GetXaxis()->SetTitle("B^{0}_{s} p_{T} (GeV/c)");
+	HisEmpty->GetYaxis()->SetTitle("d#sigma/dp_{T} (pb c/GeV)");
 	HisEmpty->GetXaxis()->CenterTitle();
 	HisEmpty->GetYaxis()->CenterTitle();
 	HisEmpty->GetYaxis()->SetTitleOffset(1.8);
+	HisEmpty->GetXaxis()->SetTitleOffset(1.3);	
 	HisEmpty->Draw();
 
 	TGraphAsymmErrors *BsPPCrossGraph = new TGraphAsymmErrors(NBins, BsXsecPPX, BsXsecPPY,BsXSecPPXErrDown, BsXSecPPXErrUp,BsXSecPPYErrDown,BsXSecPPYErrUp);
 	
+
+	TGraphAsymmErrors *BsPPCrossGraphSyst  = new TGraphAsymmErrors(NBins, BsXsecPPX, BsXsecPPY, BsXSecPPXErrDown, BsXSecPPXErrUp, BsXSecPPYSystDown,BsXSecPPYSystUp);
+
 
 	TGraphAsymmErrors *BsPPCrossGraph2D = new TGraphAsymmErrors(NBins, BsXsecPPX, BsXsecPPY2D,BsXSecPPXErrDown, BsXSecPPXErrUp,BsXSecPPY2DErrDown,BsXSecPPY2DErrUp);
 
@@ -188,6 +231,21 @@ void BsComparison(){
 	BsPPCrossGraph->SetMarkerColor(kBlue+2);
 
 
+
+	BsPPCrossGraphSyst->SetFillColorAlpha(kBlue-9,0.5);
+	BsPPCrossGraphSyst->SetLineColor(kBlue-9);
+	
+
+
+	BsPPCrossGraph->Draw("ep");	
+	BsPPCrossGraphSyst->Draw("5same");	
+	
+	c->SaveAs("Plots/Bs/BsCrossONLY.png");
+	c->SaveAs("Plots/Bs/BsCrossONLY.pdf");
+	
+	c->SetLogy();
+	c->SaveAs("Plots/Bs/BsCrossONLYLog.png");
+	c->SaveAs("Plots/Bs/BsCrossONLYLog.pdf");
 
 
 
@@ -220,11 +278,12 @@ void BsComparison(){
 
 
 	TH2D * HisEmpty2 = new TH2D("HisEmpty2","",100,7,50,100,100.0,30000000);
-	HisEmpty2->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
-	HisEmpty2->GetYaxis()->SetTitle("Cross Section (Or Production Yield)");
+	HisEmpty2->GetXaxis()->SetTitle("B^{0}_{s} p_{T} (GeV/c)");
+	HisEmpty2->GetYaxis()->SetTitle("d#sigma/dp_{T} (pb c/GeV)");
 	HisEmpty2->GetXaxis()->CenterTitle();
 	HisEmpty2->GetYaxis()->CenterTitle();
 	HisEmpty2->GetYaxis()->SetTitleOffset(1.2);
+	HisEmpty2->SetTitle("B^{0}_{s} Cross Section With Fiducial Region");	
 	HisEmpty2->Draw();
 
 	BsPPCrossGraph->Draw("ep");
@@ -248,8 +307,18 @@ void BsComparison(){
 	float BsXSecPPYErrDown2015[NBins2015] = {37000,6300,670};
 	float BsXSecPPYErrUp2015[NBins2015] = {37000,6300,670};
 
+	float BsXSecPPYSystDown2015[NBins2015] = {62000,3200,360};
+	float BsXSecPPYSystUp2015[NBins2015] = {62000,3200,360};
+
 
 	TGraphAsymmErrors *BsPPCrossGraph2015 = new TGraphAsymmErrors(NBins2015, BsXsecPPX2015, BsXsecPPY2015,BsXSecPPXErrDown2015, BsXSecPPXErrUp2015,BsXSecPPYErrDown2015,BsXSecPPYErrUp2015);
+	TGraphAsymmErrors *BsPPCrossGraph2015Syst = new TGraphAsymmErrors(NBins2015, BsXsecPPX2015, BsXsecPPY2015,BsXSecPPXErrDown2015, BsXSecPPXErrUp2015,BsXSecPPYSystDown2015,BsXSecPPYSystUp2015);
+
+
+
+	BsPPCrossGraph2015Syst->SetFillColorAlpha(kGreen-9+2,0.5);
+	BsPPCrossGraph2015Syst->SetLineColor(kGreen-9+2);
+
 
 
 
@@ -260,6 +329,7 @@ void BsComparison(){
 	BsPPCrossGraph2015->Draw("epSAME");
 
 
+	BsPPCrossGraph2015Syst->Draw("5same");	
 
 
 
@@ -375,7 +445,7 @@ void BsComparison(){
 
 
 	TH2D * HisEmpty3 = new TH2D("HisEmpty3","",100,7,50,100,0,2);
-	HisEmpty3->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+	HisEmpty3->GetXaxis()->SetTitle("B^{0}_{s} p_{T} (GeV/c)");
 	HisEmpty3->GetYaxis()->SetTitle("2017/2015 Data");
 	HisEmpty3->GetXaxis()->CenterTitle();
 	HisEmpty3->GetYaxis()->CenterTitle();

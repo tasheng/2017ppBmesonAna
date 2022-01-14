@@ -127,9 +127,11 @@ void BPRAA(){
 
 
 
-	float BPMDDataSyst[NBins] = {0.208,0.00947,0.00458,0.0181,0.0490,0.0459,0.05};
-	float BPPDFSyst[NBins] = {0.020,0.0122,0.0091,0.0411,0.0120,0.0150,0.0140};
-	float BPPtShapeSyst[NBins] = {0.08,0.08,0.08,0.08,0.08,0.08,0.08};
+	float BPTrackingSyst[NBins] = {0.05,0.05,0.05,0.05,0.05,0.05,0.05};
+
+	float BPMDDataSyst[NBins] = {0.208,0.00947,0.00458,0.0181,0.0490,0.0459,0.0123};
+	float BPPDFSyst[NBins] = {0.0212,0.0122,0.0091,0.0411,0.0120,0.0150,0.0089};
+	float BPPtShapeSyst[NBins] = {0.0096,0.00814,0.000408,0.000617,0.000833,0.00138,0.000640};
 
 	float BPTnPSystDown[NBins] = {0.00454,0.00476,0.00382,0.00354,0.00429,0.00581,0.00613};
 	float BPTnPSystUp[NBins] = {0.00454,0.00476,0.00382,0.00354,0.00429,0.00581,0.00613};
@@ -140,8 +142,11 @@ void BPRAA(){
 	for(int i = 0; i < NBins; i++){
 
 		
-		BPTotalSystDown[i] = TMath::Sqrt(BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystDown[i] * BPTnPSystDown[i]);
-		BPTotalSystUp[i] = TMath::Sqrt(BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystUp[i] * BPTnPSystUp[i]);
+	//	BPTotalSystDown[i] = TMath::Sqrt(BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystDown[i] * BPTnPSystDown[i]);
+	//	BPTotalSystUp[i] = TMath::Sqrt(BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystUp[i] * BPTnPSystUp[i]);
+		BPTotalSystDown[i] = TMath::Sqrt(BPTrackingSyst[i] * BPTrackingSyst[i] + BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystDown[i] * BPTnPSystDown[i]);
+		BPTotalSystUp[i] = TMath::Sqrt(BPTrackingSyst[i] * BPTrackingSyst[i] + BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystUp[i] * BPTnPSystUp[i]);
+
 
 
 	}
@@ -392,8 +397,7 @@ void BPRAA(){
 	for(int i = 0; i < NBins; i++){
 
 		BPRAAY[i] = BPXsecPbPbY[i] / BPXsecPPY[i];
-	
-		cout << "i = " << i <<  "    BPRAAY[i] = " << BPRAAY[i] << endl;
+
 
 		BPRAAYErrUp[i] = BPRAAY[i] * TMath::Sqrt(BPXSecPbPbYErrUpPercent[i] * BPXSecPbPbYErrUpPercent[i] + BPXSecPPYErrUpPercent[i] * BPXSecPPYErrUpPercent[i]);
 		BPRAAYErrDown[i] = BPRAAY[i] * TMath::Sqrt(BPXSecPbPbYErrDownPercent[i] * BPXSecPbPbYErrDownPercent[i] + BPXSecPPYErrDownPercent[i] * BPXSecPPYErrDownPercent[i]);
@@ -402,6 +406,7 @@ void BPRAA(){
 		BPRAAYSystDown[i] = BPRAAY[i] * TMath::Sqrt(BPXSecPbPbYSystDownPercent[i] * BPXSecPbPbYSystDownPercent[i] + BPTotalSystDown[i] * BPTotalSystDown[i]);
 		BPRAAYSystUp[i] = BPRAAY[i] * TMath::Sqrt(BPXSecPbPbYSystUpPercent[i] * BPXSecPbPbYSystUpPercent[i] + BPTotalSystUp[i] * BPTotalSystUp[i]);
 
+		cout << "i = " << i <<  "    BPRAAY[i] = " << BPRAAY[i] << "   BPRAAYErrUp[i]  = "  << BPRAAYErrUp[i]/BPRAAY[i]   << "  BPRAAYErrDown[i] =   " << BPRAAYErrDown[i]/BPRAAY[i]  <<   "   BPRAAYSystUp[i]  = "  << BPRAAYSystUp[i]/BPRAAY[i]   << "  BPRAAYSystDown[i] =   " << BPRAAYSystDown[i]/BPRAAY[i]  << endl;
 
 			
 	}
@@ -457,6 +462,7 @@ void BPRAA(){
 	Unity->Draw("SAME");
 	
 	c2->SaveAs("RAAPlots/BP/BPRAA.png");
+	c2->SaveAs("RAAPlots/BP/BPRAA.pdf");
 
 
 	HisEmptyRAA->Draw();
@@ -485,6 +491,7 @@ void BPRAA(){
 
 
 	c2->SaveAs("RAAPlots/BP/BPRAACompairson.png");
+	c2->SaveAs("RAAPlots/BP/BPRAACompairson.pdf");
 	
 
 	TFile * fout = new TFile("OutFile/BPRAA.root","RECREATE");

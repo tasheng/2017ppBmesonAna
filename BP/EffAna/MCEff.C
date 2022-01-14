@@ -548,7 +548,6 @@ void  MCEff(int DoTnP, int Rescale){
 	double yBinning[yBinN+1] = {0.0,0.5, 1.0, 1.5,2.0, 2.4};
 
 	double LowBinWidth = 0.5;
-
 	int NLowBin = 10/LowBinWidth;
 	//	int NLowBin = 5;
 
@@ -787,7 +786,11 @@ void  MCEff(int DoTnP, int Rescale){
 
 	float BptWeight;
 
-	TF1 * BptWFunc = new TF1("BptWFunc","8.646057/(x*x) +0.425834*TMath::Log(x) -0.148249",0,100);
+//	TF1 * BptWFunc = new TF1("BptWFunc","8.646057/(x*x) +0.425834*TMath::Log(x) -0.148249",0,100);
+
+//	TF1 * BptWFunc = new TF1("BptWFunc","20801.474609/(x*x*x*x*x) -92.810738/(x*x) + 1.475384 ",0,100);
+
+	TF1 * BptWFunc = new TF1("BptWFunc"," 968.466885/x**(4.494808) + 0.800573 + 0.003677 * x",0,100);
 
 	int BDTWeightBin;
 	float BDTWeight;
@@ -818,6 +821,16 @@ void  MCEff(int DoTnP, int Rescale){
 	Eff1DGENHis->GetYaxis()->SetTitleOffset(1.5);
 
 
+	TH1D * Eff1DGENHisGpt = new TH1D("Eff1DGENHisGpt","",NPtBins1D,PtBin1D);
+	
+	Eff1DGENHisGpt->GetXaxis()->SetTitle("p_{T} (GeV/c)");
+	Eff1DGENHisGpt->GetYaxis()->SetTitle("#alpha #times #epsilon");
+	Eff1DGENHisGpt->GetXaxis()->CenterTitle();	
+	Eff1DGENHisGpt->GetYaxis()->CenterTitle();
+	Eff1DGENHisGpt->GetXaxis()->SetTitleOffset(1.2);	
+	Eff1DGENHisGpt->GetYaxis()->SetTitleOffset(1.5);
+
+
 	TH1D * Eff1DGENAccHis = new TH1D("Eff1DGENAccHis","",NPtBins1D,PtBin1D);
 	
 	Eff1DGENAccHis->GetXaxis()->SetTitle("p_{T} (GeV/c)");
@@ -837,6 +850,16 @@ void  MCEff(int DoTnP, int Rescale){
 	Eff1DGENMultHis->GetYaxis()->CenterTitle();
 	Eff1DGENMultHis->GetXaxis()->SetTitleOffset(1.2);	
 	Eff1DGENMultHis->GetYaxis()->SetTitleOffset(1.5);
+
+
+	TH1D * Eff1DGENMultHisGpt = new TH1D("Eff1DGENMultHisGpt","",NMultiBin,MultiBin1D);
+
+	Eff1DGENMultHisGpt->GetXaxis()->SetTitle("Multiplicity");
+	Eff1DGENMultHisGpt->GetYaxis()->SetTitle("#alpha #times #epsilon");
+	Eff1DGENMultHisGpt->GetXaxis()->CenterTitle();	
+	Eff1DGENMultHisGpt->GetYaxis()->CenterTitle();
+	Eff1DGENMultHisGpt->GetXaxis()->SetTitleOffset(1.2);	
+	Eff1DGENMultHisGpt->GetYaxis()->SetTitleOffset(1.5);
 
 
 	TH1D * Eff1DGENAccMultHis = new TH1D("Eff1DGENAccMultHis","",NMultiBin,MultiBin1D);
@@ -1284,9 +1307,12 @@ void  MCEff(int DoTnP, int Rescale){
 			root->GetEntry(i);
 
 			PVzWeight = 1;
-
+		//	PVzWeight = (0.0132 * TMath::Exp((PVz -  0.7538) * (PVz -  0.7538)/(2* 6.024* 6.024)))/(  0.0137 * TMath::Exp((PVz -  0.7538) * (PVz -  0.7538)) );
+				
 			CentWeight = 1;
 			
+			 
+
 			//PVzWeight = (0.0132 * TMath::Exp((PVz -  0.7538) * (PVz -  0.7538)/(2* 6.024* 6.024)))/(  0.0137 * TMath::Exp((PVz -  0.7538) * (PVz -  0.7538)) );
 
 			//	PVzWeight = (0.163562 * TMath::Exp(- 0.021039 * (PVz - 0.426587)*(PVz - 0.426587)))/(0.159629 * TMath::Exp(- 0.020014 * (PVz - 0.589381)*(PVz - 0.589381)));
@@ -1295,11 +1321,15 @@ void  MCEff(int DoTnP, int Rescale){
 			//	EventWeight = PVzWeight * CentWeight * pthat * weight;
 			
 			EventWeight = PVzWeight * CentWeight * weight;
+						
 
 
 			for(int j = 0; j < Gsize; j++){
 
-
+		
+				BptWeight = BptWFunc->Eval(Gpt[j]);
+			//	EventWeight = PVzWeight * BptWeight * weight;
+				
 
 
 
@@ -1312,8 +1342,11 @@ void  MCEff(int DoTnP, int Rescale){
 					EvtWeightGenHis->Fill(Gpt[j],abs(Gy[j]),EventWeight);
 					Eff1DGENHis->Fill(Gpt[j],EventWeight);
 					Eff1DGENMultHis->Fill(nMult,EventWeight);
+					Eff1DGENHisGpt->Fill(Gpt[j],EventWeight * BptWeight);
+					Eff1DGENMultHisGpt->Fill(nMult,EventWeight * BptWeight);
+				
 				}
-	
+
 				if((TMath::Abs(Gy[j])<2.4 && TMath::Abs(GpdgId[j])==521 && GisSignal[j]==1 && GcollisionId[j]==0 && TMath::Abs(Gtk1eta[j])<2.4 && ((TMath::Abs(Gmu1eta[j])<1.2 && Gmu1pt[j]>3.5) || (TMath::Abs(Gmu1eta[j])>1.2 && TMath::Abs(Gmu1eta[j])<2.1 && Gmu1pt[j]>5.47-1.89*TMath::Abs(Gmu1eta[j])) || (TMath::Abs(Gmu1eta[j])>2.1 && TMath::Abs(Gmu2eta[j])<2.4 && Gmu1pt[j]>1.5)) && ((TMath::Abs(Gmu2eta[j])<1.2 && Gmu2pt[j]>3.5) || (TMath::Abs(Gmu2eta[j])>1.2 && TMath::Abs(Gmu2eta[j])<2.1 && Gmu2pt[j]>5.47-1.89*TMath::Abs(Gmu2eta[j])) || (TMath::Abs(Gmu2eta[j])>2.1 && TMath::Abs(Gmu2eta[j])<2.4 && Gmu2pt[j]>1.5)) && ((Gpt[j]>5 && Gpt[j]<10 && TMath::Abs(Gy[j])>1.5) || (Gpt[j]>10))) ){
 
 					NoWeightGenAccHis->Fill(Gpt[j],abs(Gy[j]),EventWeight);
@@ -1426,8 +1459,8 @@ void  MCEff(int DoTnP, int Rescale){
 
 		TH1D * Eff1DHisBpt = (TH1D * ) Eff1DRECOHisBpt->Clone("Eff1DHisBpt");
 		Eff1DHisBpt->Sumw2();
-		Eff1DGENHis->Sumw2();
-		Eff1DHisBpt->Divide(Eff1DGENHis);
+		Eff1DGENHisGpt->Sumw2();
+		Eff1DHisBpt->Divide(Eff1DGENHisGpt);
 
 
 		//Draw Syst//
@@ -1653,8 +1686,8 @@ void  MCEff(int DoTnP, int Rescale){
 
 		TH1D * Eff1DHisBptMult = (TH1D * ) Eff1DRECOHisBptMult->Clone("Eff1DHisBptMult");
 		Eff1DHisBptMult->Sumw2();
-		Eff1DGENMultHis->Sumw2();
-		Eff1DHisBptMult->Divide(Eff1DGENMultHis);
+		Eff1DGENMultHisGpt->Sumw2();
+		Eff1DHisBptMult->Divide(Eff1DGENMultHisGpt);
 
 
 		//Draw Syst//

@@ -29,8 +29,10 @@ void  MCEff4(int DoTnP, int Rescale, float Factor){
 	int ptmax = 50;
 
 	//TString infile = "/data/szhaozho/2017ppSamplesNew/BDTOutput/AllMerge/BPMCAllBDT.root";
-	TString infile = "../../UnskimmedSamples/OfficialMC/BPMC.root";
+//	TString infile = "../../UnskimmedSamples/OfficialMC/BPMC.root";
 	//TString infile = "/data/szhaozho/2017ppSamples/UnSkimmed/OfficialMC/BPMC.root";
+	TString infile = "/data/szhaozho/NewOfficialMCMore/BP/BDTMCBDTAll.root";
+	//TString infile = "/data/szhaozho/NewOfficialMCMore/BP/BDTMCAllOfficial.root";
 
 //	infile="/data/szhaozho/2017ppSamplesFinal/Unskimmed/BPMC.root"; 
 

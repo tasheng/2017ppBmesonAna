@@ -730,6 +730,16 @@ void  MCEff(int DoTnP, int Rescale){
 
 
 
+	TH1D * Eff1DGENHisGpt = new TH1D("Eff1DGENHisGpt","",NPtBins1D,PtBin1D);
+
+	Eff1DGENHisGpt->GetXaxis()->SetTitle("p_{T} (GeV/c)");
+	Eff1DGENHisGpt->GetYaxis()->SetTitle("#alpha #times #epsilon");
+	Eff1DGENHisGpt->GetXaxis()->CenterTitle();	
+	Eff1DGENHisGpt->GetYaxis()->CenterTitle();
+	Eff1DGENHisGpt->GetXaxis()->SetTitleOffset(1.2);	
+	Eff1DGENHisGpt->GetYaxis()->SetTitleOffset(1.5);
+
+
 	//TnP Varied
 
 	TH1D * Eff1DRECOHisTnPUp = new TH1D("Eff1DRECOHisTnPUp","",NPtBins1D,PtBin1D);
@@ -793,6 +803,21 @@ void  MCEff(int DoTnP, int Rescale){
 	Eff1DGENMultHis->GetYaxis()->SetTitleOffset(1.5);
 
 
+
+
+
+	TH1D * Eff1DGENMultHisGpt = new TH1D("Eff1DGENMultHisGpt","",NMultiBin,MultiBin1D);
+
+	Eff1DGENMultHisGpt->GetXaxis()->SetTitle("Multiplicity");
+	Eff1DGENMultHisGpt->GetYaxis()->SetTitle("#alpha #times #epsilon");
+	Eff1DGENMultHisGpt->GetXaxis()->CenterTitle();	
+	Eff1DGENMultHisGpt->GetYaxis()->CenterTitle();
+	Eff1DGENMultHisGpt->GetXaxis()->SetTitleOffset(1.2);	
+	Eff1DGENMultHisGpt->GetYaxis()->SetTitleOffset(1.5);
+
+
+
+
 	TH1D * Eff1DGENAccHis = new TH1D("Eff1DGENAccHis","",NPtBins1D,PtBin1D);
 	
 	Eff1DGENAccHis->GetXaxis()->SetTitle("p_{T} (GeV/c)");
@@ -813,6 +838,9 @@ void  MCEff(int DoTnP, int Rescale){
 	Eff1DGENAccMultHis->GetYaxis()->CenterTitle();
 	Eff1DGENAccMultHis->GetXaxis()->SetTitleOffset(1.2);	
 	Eff1DGENAccMultHis->GetYaxis()->SetTitleOffset(1.5);
+
+
+
 
 
 	//Mult Stuffs
@@ -979,7 +1007,10 @@ void  MCEff(int DoTnP, int Rescale){
 
 
 	float BptWeight;
-	TF1 * BptWFunc = new TF1("BptWFunc","1.00/(x*x) +0.436*TMath::Log(x) + 0.171",0,100);
+	//TF1 * BptWFunc = new TF1("BptWFunc","1.00/(x*x) +0.436*TMath::Log(x) + 0.171",0,100);
+	//TF1 * BptWFunc = new TF1("BptWFunc","-0.026373 + 0.136451 * x + -0.003132 * x * x ",0,100);
+	TF1 * BptWFunc = new TF1("BptWFunc","183.192801/x**(3.375830) + 0.761976 + -0.000021 * x",0,100);
+
 
 
 	float BDTWeight;
@@ -1050,7 +1081,7 @@ void  MCEff(int DoTnP, int Rescale){
 		//if( (Bgen[j] == 23333)  &&(      ((((abs(Btktkmass[j]-1.019455)<0.015)&& BDT_pt_2_3[j] > -0.10 && TMath::Abs(Bmumumass[j]-3.096916)<0.15 && Bpt[j] > 0 && Bpt[j] < 5 && (abs(Btrk1Eta[j])<2.4 && abs(Btrk2Eta[j])<2.4 && Btrk1Pt[j]>0.0 && Btrk2Pt[j]>0.0) && Btrk1Pt[j] > 0.2 && Btrk2Pt[j] > 0.2  && Bchi2cl[j] > 0.05 && BsvpvDistance[j]/BsvpvDisErr[j] > 2.0)  && ( (Bpt[j] < 2 && Bpt[j] > 0 && BDT_pt_1_2[j] > -0.38 ) || (Bpt[j] < 3 && Bpt[j] > 2 && BDT_pt_2_3[j] > -0.05 ) || (Bpt[j] < 5 && Bpt[j] > 3 && BDT_pt_3_5[j] > -0.40)  ))) ||    (   (Btrk1Pt[j] > 0.5 && Btrk2Pt[j] > 0.5 && Bchi2cl[j] > 0.05 && BsvpvDistance[j]/BsvpvDisErr[j] > 2.0 && abs(Btrk1Eta[j]-0.0) < 2.4 && abs(Btrk2Eta[j]-0.0) < 2.4 && (TMath::Abs(By[j])<2.4&&TMath::Abs(Bmumumass[j]-3.096916)<0.15&&((abs(Bmu1eta[j])<1.2&&Bmu1pt[j]>3.5)||(abs(Bmu1eta[j])>1.2&&abs(Bmu1eta[j])<2.1&&Bmu1pt[j]>(5.47-1.89*abs(Bmu1eta[j])))||(abs(Bmu1eta[j])>2.1&&abs(Bmu1eta[j])<2.4&&Bmu1pt[j]>1.5))&&((abs(Bmu2eta[j])<1.2&&Bmu2pt[j]>3.5)||(abs(Bmu2eta[j])>1.2&&abs(Bmu2eta[j])<2.1&&Bmu2pt[j]>(5.47-1.89*abs(Bmu2eta[j])))||(abs(Bmu2eta[j])>2.1&&abs(Bmu2eta[j])<2.4&&Bmu2pt[j]>1.5))&&Bmu1InPixelLayer[j]>0&&(Bmu1InPixelLayer[j]+Bmu1InStripLayer[j])>5&&Bmu2InPixelLayer[j]>0&&(Bmu2InPixelLayer[j]+Bmu2InStripLayer[j])>5&&Bmu1dxyPV[j]<0.3&&Bmu2dxyPV[j]<0.3&&Bmu1dzPV[j]<20&&Bmu2dzPV[j]<20 && Bmu1isTriggered[j] && Bmu2isTriggered[j] &&Bmu1isTrackerMuon[j]&&Bmu2isTrackerMuon[j]&&Bmu1isGlobalMuon[j]&&Bmu2isGlobalMuon[j]&&Btrk1highPurity[j]&&Btrk2highPurity[j]&&abs(Btrk1Eta[j])<2.4&&abs(Btrk2Eta[j])<2.4&&Btrk1Pt[j]>0.5&&Btrk2Pt[j]>0.5&&abs(Btktkmass[j]-1.019455)<0.015) && (abs(PVz)<15) && (Btrk1PixelHit[j] + Btrk1StripHit[j] > 10) && (Btrk2PixelHit[j] + Btrk2StripHit[j] > 10) && (Btrk1PtErr[j]/Btrk1Pt[j] < 0.1)&& (Btrk2PtErr[j]/Btrk2Pt[j] < 0.1) && Btrk1Chi2ndf[j]/(Btrk1nStripLayer[j]+Btrk1nPixelLayer[j]) < 0.18 && Btrk2Chi2ndf[j]/(Btrk2nStripLayer[j]+Btrk2nPixelLayer[j]) < 0.18   && (abs(PVz)<15))  &&    ( (Bpt[j] > 5 && Bpt[j] < 7 &&  BDT_pt_5_7[j] > -0.28) || (Bpt[j] > 7 && Bpt[j] < 10 &&  BDT_pt_7_10[j] > -0.30) || (Bpt[j] > 10 && Bpt[j] < 15 &&  BDT_pt_10_15[j] > -0.30) || (Bpt[j] > 15 && Bpt[j] < 20 &&  BDT_pt_15_20[j] > -0.25 ) || (Bpt[j] > 20 && Bpt[j] < 50 &&  BDT_pt_30_50[j] > -0.25 )  )   )  )){
 				//if( (Bgen[j] == 23333)  &&(      ((((abs(Btktkmass[j]-1.019455)<0.015)&& BDT_pt_2_3[j] > -0.10 && TMath::Abs(Bmumumass[j]-3.096916)<0.15 && Bpt[j] > 0 && Bpt[j] < 5 && (abs(Btrk1Eta[j])<2.4 && abs(Btrk2Eta[j])<2.4 && Btrk1Pt[j]>0.0 && Btrk2Pt[j]>0.0) && Btrk1Pt[j] > 0.2 && Btrk2Pt[j] > 0.2  && Bchi2cl[j] > 0.05 && BsvpvDistance[j]/BsvpvDisErr[j] > 2.0)  && ( (Bpt[j] < 2 && Bpt[j] > 0 && BDT_pt_1_2[j] > -0.38 ) || (Bpt[j] < 3 && Bpt[j] > 2 && BDT_pt_2_3[j] > -0.05 ) || (Bpt[j] < 5 && Bpt[j] > 3 && BDT_pt_3_5[j] > -0.40)  ))) ||    (   (Btrk1Pt[j] > 0.5 && Btrk2Pt[j] > 0.5 && Bchi2cl[j] > 0.05 && BsvpvDistance[j]/BsvpvDisErr[j] > 2.0 && abs(Btrk1Eta[j]-0.0) < 2.4 && abs(Btrk2Eta[j]-0.0) < 2.4 && (TMath::Abs(By[j])<2.4&&TMath::Abs(Bmumumass[j]-3.096916)<0.15&&((abs(Bmu1eta[j])<1.2&&Bmu1pt[j]>3.5)||(abs(Bmu1eta[j])>1.2&&abs(Bmu1eta[j])<2.1&&Bmu1pt[j]>(5.47-1.89*abs(Bmu1eta[j])))||(abs(Bmu1eta[j])>2.1&&abs(Bmu1eta[j])<2.4&&Bmu1pt[j]>1.5))&&((abs(Bmu2eta[j])<1.2&&Bmu2pt[j]>3.5)||(abs(Bmu2eta[j])>1.2&&abs(Bmu2eta[j])<2.1&&Bmu2pt[j]>(5.47-1.89*abs(Bmu2eta[j])))||(abs(Bmu2eta[j])>2.1&&abs(Bmu2eta[j])<2.4&&Bmu2pt[j]>1.5))&&Bmu1InPixelLayer[j]>0&&(Bmu1InPixelLayer[j]+Bmu1InStripLayer[j])>5&&Bmu2InPixelLayer[j]>0&&(Bmu2InPixelLayer[j]+Bmu2InStripLayer[j])>5&&Bmu1dxyPV[j]<0.3&&Bmu2dxyPV[j]<0.3&&Bmu1dzPV[j]<20&&Bmu2dzPV[j]<20 && Bmu1isTriggered[j] && Bmu2isTriggered[j] &&Bmu1isTrackerMuon[j]&&Bmu2isTrackerMuon[j]&&Bmu1isGlobalMuon[j]&&Bmu2isGlobalMuon[j]&&Btrk1highPurity[j]&&Btrk2highPurity[j]&&abs(Btrk1Eta[j])<2.4&&abs(Btrk2Eta[j])<2.4&&Btrk1Pt[j]>0.5&&Btrk2Pt[j]>0.5&&abs(Btktkmass[j]-1.019455)<0.015) && (abs(PVz)<15) && (Btrk1PixelHit[j] + Btrk1StripHit[j] > 10) && (Btrk2PixelHit[j] + Btrk2StripHit[j] > 10) && (Btrk1PtErr[j]/Btrk1Pt[j] < 0.1)&& (Btrk2PtErr[j]/Btrk2Pt[j] < 0.1) && Btrk1Chi2ndf[j]/(Btrk1nStripLayer[j]+Btrk1nPixelLayer[j]) < 0.18 && Btrk2Chi2ndf[j]/(Btrk2nStripLayer[j]+Btrk2nPixelLayer[j]) < 0.18   && (abs(PVz)<15))  &&    ( (Bpt[j] > 5 && Bpt[j] < 7 &&  BDT_pt_5_7[j] > -0.28 && abs(By[j]) > 1.5) || (Bpt[j] > 7 && Bpt[j] < 10 &&  BDT_pt_7_10[j] > -0.30 && abs(By[j]) > 1.5) || (Bpt[j] > 10 && Bpt[j] < 15 &&  BDT_pt_10_15[j] > -0.30) || (Bpt[j] > 15 && Bpt[j] < 20 &&  BDT_pt_15_20[j] > -0.25 ) || (Bpt[j] > 20 && Bpt[j] < 50 &&  BDT_pt_30_50[j] > -0.25 )  || (Bpt[j] > 50) )   )  )) {
 
-			if(  ((((abs(Btktkmass[j]-1.019455)<0.015)&& BDT_pt_2_3[j] > -0.10 && TMath::Abs(Bmumumass[j]-3.096916)<0.15 && Bpt[j] > 0 && Bpt[j] < 5 && (abs(Btrk1Eta[j])<2.4 && abs(Btrk2Eta[j])<2.4 && Btrk1Pt[j]>0.0 && Btrk2Pt[j]>0.0) && Btrk1Pt[j] > 0.2 && Btrk2Pt[j] > 0.2  && Bchi2cl[j] > 0.05 && BsvpvDistance[j]/BsvpvDisErr[j] > 2.0)  && ( (Bpt[j] < 2 && Bpt[j] > 0 && BDT_pt_1_2[j] > -0.38 ) || (Bpt[j] < 3 && Bpt[j] > 2 && BDT_pt_2_3[j] > -0.05 ) || (Bpt[j] < 5 && Bpt[j] > 3 && BDT_pt_3_5[j] > -0.40)  )))  ||  ( ( (Bpt[j] > 5 && Bpt[j] < 7 &&  BDT_pt_5_7[j] > -0.28 && abs(By[j]) > 1.5) || (Bpt[j] > 7 && Bpt[j] < 10 &&  BDT_pt_7_10[j] > -0.30 && abs(By[j]) > 1.5) || (Bpt[j] > 10 && Bpt[j] < 15 &&  BDT_pt_10_15[j] > -0.30) || (Bpt[j] > 15 && Bpt[j] < 20 &&  BDT_pt_15_20[j] > -0.25 ) || (Bpt[j] > 20 && Bpt[j] < 50 &&  BDT_pt_30_50[j] > -0.25 )  || (Bpt[j] > 50) ) && ((HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1 && HLT_HIL1DoubleMu0_v1 == 1 && (abs(PVz)<15))  &&  (Bmu1isTriggered[j] == 1 && Bmu2isTriggered[j] == 1 ) &&  (Bchi2cl[j] > 0.05 && BsvpvDistance[j]/BsvpvDisErr[j] > 2.0)    && (TMath::Abs(By[j])<2.4&&TMath::Abs(Bmumumass[j]-3.096916)<0.15&&((abs(Bmu1eta[j])<1.2&&Bmu1pt[j]>3.5)||(abs(Bmu1eta[j])>1.2&&abs(Bmu1eta[j])<2.1&&Bmu1pt[j]>(5.47-1.89*abs(Bmu1eta[j])))||(abs(Bmu1eta[j])>2.1&&abs(Bmu1eta[j])<2.4&&Bmu1pt[j]>1.5))&&((abs(Bmu2eta[j])<1.2&&Bmu2pt[j]>3.5)||(abs(Bmu2eta[j])>1.2&&abs(Bmu2eta[j])<2.1&&Bmu2pt[j]>(5.47-1.89*abs(Bmu2eta[j])))||(abs(Bmu2eta[j])>2.1&&abs(Bmu2eta[j])<2.4&&Bmu2pt[j]>1.5))&&Bmu1InPixelLayer[j]>0&&(Bmu1InPixelLayer[j]+Bmu1InStripLayer[j])>5&&Bmu2InPixelLayer[j]>0&&(Bmu2InPixelLayer[j]+Bmu2InStripLayer[j])>5&&Bmu1dxyPV[j]<0.3&&Bmu2dxyPV[j]<0.3&&Bmu1dzPV[j]<20&&Bmu2dzPV[j]<20&&Bmu1isTrackerMuon[j]&&Bmu2isTrackerMuon[j]&&Bmu1isGlobalMuon[j]&&Bmu2isGlobalMuon[j])  && ( Btrk1Pt[j] > 0.2 && Btrk2Pt[j] > 0.2 && abs(Btrk1Eta[j]-0.0) < 2.4 && abs(Btrk2Eta[j]-0.0) < 2.4  && Btrk1highPurity[j]  && Btrk2highPurity[j]  && Btrk1PixelHit[j] + Btrk1StripHit[j] > 10  && Btrk2PixelHit[j] + Btrk2StripHit[j] > 10) &&  (Btrk1PtErr[j]/Btrk1Pt[j] < 0.1)  &&  (Btrk2PtErr[j]/Btrk2Pt[j] < 0.1)    && Btrk1Chi2ndf[j]/(Btrk1nStripLayer[j]+Btrk1nPixelLayer[j]) < 0.18   && Btrk2Chi2ndf[j]/(Btrk2nStripLayer[j]+Btrk2nPixelLayer[j]) < 0.18 ))){
+			if( (Bgen[j] == 23333)  && ( ((((abs(Btktkmass[j]-1.019455)<0.015)&& BDT_pt_2_3[j] > -0.10 && TMath::Abs(Bmumumass[j]-3.096916)<0.15 && Bpt[j] > 0 && Bpt[j] < 5 && (abs(Btrk1Eta[j])<2.4 && abs(Btrk2Eta[j])<2.4 && Btrk1Pt[j]>0.0 && Btrk2Pt[j]>0.0) && Btrk1Pt[j] > 0.2 && Btrk2Pt[j] > 0.2  && Bchi2cl[j] > 0.05 && BsvpvDistance[j]/BsvpvDisErr[j] > 2.0)  && ( (Bpt[j] < 2 && Bpt[j] > 0 && BDT_pt_1_2[j] > -0.38 ) || (Bpt[j] < 3 && Bpt[j] > 2 && BDT_pt_2_3[j] > -0.05 ) || (Bpt[j] < 5 && Bpt[j] > 3 && BDT_pt_3_5[j] > -0.40)  )))  ||  ( ( (Bpt[j] > 5 && Bpt[j] < 7 &&  BDT_pt_5_7[j] > -0.28 && abs(By[j]) > 1.5) || (Bpt[j] > 7 && Bpt[j] < 10 &&  BDT_pt_7_10[j] > -0.10 && abs(By[j]) > 1.5) || (Bpt[j] > 10 && Bpt[j] < 15 &&  BDT_pt_10_15[j] > -0.30) || (Bpt[j] > 15 && Bpt[j] < 20 &&  BDT_pt_15_20[j] > -0.25 ) || (Bpt[j] > 20 && Bpt[j] < 50 &&  BDT_pt_30_50[j] > -0.25 )  || (Bpt[j] > 50) ) && (((abs(Btktkmass[j]-1.019455)<0.015) && HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1 && HLT_HIL1DoubleMu0_v1 == 1 && (abs(PVz)<15))  &&  (Bmu1isTriggered[j] == 1 && Bmu2isTriggered[j] == 1 ) &&  (Bchi2cl[j] > 0.05 && BsvpvDistance[j]/BsvpvDisErr[j] > 2.0)    && (TMath::Abs(By[j])<2.4&&TMath::Abs(Bmumumass[j]-3.096916)<0.15&&((abs(Bmu1eta[j])<1.2&&Bmu1pt[j]>3.5)||(abs(Bmu1eta[j])>1.2&&abs(Bmu1eta[j])<2.1&&Bmu1pt[j]>(5.47-1.89*abs(Bmu1eta[j])))||(abs(Bmu1eta[j])>2.1&&abs(Bmu1eta[j])<2.4&&Bmu1pt[j]>1.5))&&((abs(Bmu2eta[j])<1.2&&Bmu2pt[j]>3.5)||(abs(Bmu2eta[j])>1.2&&abs(Bmu2eta[j])<2.1&&Bmu2pt[j]>(5.47-1.89*abs(Bmu2eta[j])))||(abs(Bmu2eta[j])>2.1&&abs(Bmu2eta[j])<2.4&&Bmu2pt[j]>1.5))&&Bmu1InPixelLayer[j]>0&&(Bmu1InPixelLayer[j]+Bmu1InStripLayer[j])>5&&Bmu2InPixelLayer[j]>0&&(Bmu2InPixelLayer[j]+Bmu2InStripLayer[j])>5&&Bmu1dxyPV[j]<0.3&&Bmu2dxyPV[j]<0.3&&Bmu1dzPV[j]<20&&Bmu2dzPV[j]<20&&Bmu1isTrackerMuon[j]&&Bmu2isTrackerMuon[j]&&Bmu1isGlobalMuon[j]&&Bmu2isGlobalMuon[j])  && ( Btrk1Pt[j] > 0.2 && Btrk2Pt[j] > 0.2 && abs(Btrk1Eta[j]-0.0) < 2.4 && abs(Btrk2Eta[j]-0.0) < 2.4  && Btrk1highPurity[j]  && Btrk2highPurity[j]  && Btrk1PixelHit[j] + Btrk1StripHit[j] > 10  && Btrk2PixelHit[j] + Btrk2StripHit[j] > 10) &&  (Btrk1PtErr[j]/Btrk1Pt[j] < 0.1)  &&  (Btrk2PtErr[j]/Btrk2Pt[j] < 0.1)    && Btrk1Chi2ndf[j]/(Btrk1nStripLayer[j]+Btrk1nPixelLayer[j]) < 0.18   && Btrk2Chi2ndf[j]/(Btrk2nStripLayer[j]+Btrk2nPixelLayer[j]) < 0.18 )))){
 
 
 				PVzWeight = 1;
@@ -1334,7 +1365,7 @@ void  MCEff(int DoTnP, int Rescale){
 
 			CentWeight = 1;
 
-			//	PVzWeight = (0.163562 * TMath::Exp(- 0.021039 * (PVz - 0.426587)*(PVz - 0.426587)))/(0.159629 * TMath::Exp(- 0.020014 * (PVz - 0.589381)*(PVz - 0.589381)));
+			//PVzWeight = (0.163562 * TMath::Exp(- 0.021039 * (PVz - 0.426587)*(PVz - 0.426587)))/(0.159629 * TMath::Exp(- 0.020014 * (PVz - 0.589381)*(PVz - 0.589381)));
 
 			//	PVzWeight = (TMath::Gaus(PVz,0.432315,4.874300)/(sqrt(2*3.14159)*4.874300))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989));
 			//	EventWeight = PVzWeight * CentWeight * pthat * weight;
@@ -1349,7 +1380,8 @@ void  MCEff(int DoTnP, int Rescale){
 
 				//cout << "Gpt = " << Gpt[j] << "    GpdgId[j] = " << GpdgId[j]  << endl;
 
-
+				BptWeight = BptWFunc->Eval(Gpt[j]);
+				
 
 
 
@@ -1361,6 +1393,9 @@ void  MCEff(int DoTnP, int Rescale){
 					EvtWeightGenHis->Fill(Gpt[j],abs(Gy[j]),EventWeight);
 					Eff1DGENHis->Fill(Gpt[j],EventWeight);
 					Eff1DGENMultHis->Fill(nMult,EventWeight);
+					Eff1DGENHisGpt->Fill(Gpt[j],EventWeight * BptWeight);
+					Eff1DGENMultHisGpt->Fill(nMult,EventWeight * BptWeight);
+
 				}
 
 				if( (TMath::Abs(Gy[j])<2.4 && TMath::Abs(GpdgId[j])==531 && GisSignal[j]>0 )&& (TMath::Abs(Gtk1eta[j])<2.4 && TMath::Abs(Gtk2eta[j])<2.4  && ((TMath::Abs(Gmu1eta[j])<1.2 && Gmu1pt[j]>3.5) || (TMath::Abs(Gmu1eta[j])>1.2 && TMath::Abs(Gmu1eta[j])<2.1 && Gmu1pt[j]>5.47-1.89*TMath::Abs(Gmu1eta[j])) || (TMath::Abs(Gmu1eta[j])>2.1 && TMath::Abs(Gmu2eta[j])<2.4 && Gmu1pt[j]>1.5)) && ((TMath::Abs(Gmu2eta[j])<1.2 && Gmu2pt[j]>3.5) || (TMath::Abs(Gmu2eta[j])>1.2 && TMath::Abs(Gmu2eta[j])<2.1 && Gmu2pt[j]>5.47-1.89*TMath::Abs(Gmu2eta[j])) || (TMath::Abs(Gmu2eta[j])>2.1 && TMath::Abs(Gmu2eta[j])<2.4 && Gmu2pt[j]>1.5)) && ((Gpt[j]>5 && Gpt[j]<10 && TMath::Abs(Gy[j])>1.5) || (Gpt[j]>10))) ){
@@ -1402,7 +1437,7 @@ void  MCEff(int DoTnP, int Rescale){
 
 		//Save 1D Eff Plots/
 
-		Eff1DHis->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+		Eff1DHis->GetXaxis()->SetTitle("B^{0}_{s} p_{T} (GeV/c)");
 		Eff1DHis->GetYaxis()->SetTitle("#alpha #times #epsilon");
 		Eff1DHis->GetYaxis()->SetTitleOffset(1.4);
 		Eff1DHis->GetXaxis()->CenterTitle();
@@ -1415,7 +1450,7 @@ void  MCEff(int DoTnP, int Rescale){
 		Eff1DHis->SetLineColor(kBlack);
 
 
-		Sel1DHis->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+		Sel1DHis->GetXaxis()->SetTitle("B^{0}_{s} p_{T} (GeV/c)");
 		Sel1DHis->GetYaxis()->SetTitle("#epsilon");
 		Sel1DHis->GetYaxis()->SetTitleOffset(1.4);
 		Sel1DHis->GetXaxis()->CenterTitle();
@@ -1430,7 +1465,7 @@ void  MCEff(int DoTnP, int Rescale){
 	
 
 
-		Acc1DHis->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+		Acc1DHis->GetXaxis()->SetTitle("B^{0}_{s} p_{T} (GeV/c)");
 		Acc1DHis->GetYaxis()->SetTitle("#alpha");
 		Acc1DHis->GetYaxis()->SetTitleOffset(1.4);
 		Acc1DHis->GetXaxis()->CenterTitle();
@@ -1467,8 +1502,8 @@ void  MCEff(int DoTnP, int Rescale){
 
 		TH1D * Eff1DHisBpt = (TH1D * ) Eff1DRECOHisBpt->Clone("Eff1DHisBpt");
 		Eff1DHisBpt->Sumw2();
-		Eff1DGENHis->Sumw2();
-		Eff1DHisBpt->Divide(Eff1DGENHis);
+		Eff1DGENHisGpt->Sumw2();
+		Eff1DHisBpt->Divide(Eff1DGENHisGpt);
 
 		//Draw Syst//
 
@@ -1540,7 +1575,7 @@ void  MCEff(int DoTnP, int Rescale){
 		Eff1DHisBpt->SetMarkerColor(kRed);
 		Eff1DHisBpt->SetLineColor(kRed);
 
-		Eff1DHis->SetMaximum(0.25);
+//		Eff1DHis->SetMaximum(0.25);
 		Eff1DHis->Draw("ep");
 		Eff1DHisBpt->Draw("epSAME");
 
@@ -1606,7 +1641,7 @@ void  MCEff(int DoTnP, int Rescale){
 
 		//Save 1D Eff Plots/
 
-		Eff1DHisMult->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+		Eff1DHisMult->GetXaxis()->SetTitle("B^{0}_{s} p_{T} (GeV/c)");
 		Eff1DHisMult->GetYaxis()->SetTitle("#alpha #times #epsilon");
 		Eff1DHisMult->GetYaxis()->SetTitleOffset(1.4);
 		Eff1DHisMult->GetXaxis()->CenterTitle();
@@ -1619,7 +1654,7 @@ void  MCEff(int DoTnP, int Rescale){
 		Eff1DHisMult->SetLineColor(kBlack);
 
 
-		Sel1DHisMult->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+		Sel1DHisMult->GetXaxis()->SetTitle("B^{0}_{s} p_{T} (GeV/c)");
 		Sel1DHisMult->GetYaxis()->SetTitle("#epsilon");
 		Sel1DHisMult->GetYaxis()->SetTitleOffset(1.4);
 		Sel1DHisMult->GetXaxis()->CenterTitle();
@@ -1634,7 +1669,7 @@ void  MCEff(int DoTnP, int Rescale){
 	
 
 
-		Acc1DHisMult->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+		Acc1DHisMult->GetXaxis()->SetTitle("B^{0}_{s} p_{T} (GeV/c)");
 		Acc1DHisMult->GetYaxis()->SetTitle("#alpha");
 		Acc1DHisMult->GetYaxis()->SetTitleOffset(1.4);
 		Acc1DHisMult->GetXaxis()->CenterTitle();
@@ -1677,8 +1712,8 @@ void  MCEff(int DoTnP, int Rescale){
 
 		TH1D * Eff1DHisBptMult = (TH1D * ) Eff1DRECOHisBptMult->Clone("Eff1DHisBptMult");
 		Eff1DHisBptMult->Sumw2();
-		Eff1DGENMultHis->Sumw2();
-		Eff1DHisBptMult->Divide(Eff1DGENMultHis);
+		Eff1DGENMultHisGpt->Sumw2();
+		Eff1DHisBptMult->Divide(Eff1DGENMultHisGpt);
 
 
 		//Draw Syst//

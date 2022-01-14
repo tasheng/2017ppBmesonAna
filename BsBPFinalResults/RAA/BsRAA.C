@@ -50,8 +50,8 @@ void BsRAA(){
 
 
 
-	//TString InfileBs = "../../Bs/EffAna/FinalFiles/BsPPCorrYieldPT.root";
-	TString InfileBs = "BsPPCorrYieldPT.root";
+	TString InfileBs = "../../Bs/EffAna/FinalFiles/BsPPCorrYieldPT.root";
+	//TString InfileBs = "BsPPCorrYieldPT.root";
 
 
 	TFile * FileBs = new TFile(InfileBs.Data());
@@ -133,12 +133,14 @@ void BsRAA(){
 
 
 
-	float BsMDDataSyst[NBins] = {0.244,0.0711,0.0230,0.197};
-	float BsPDFSyst[NBins] = {0.0545,0.012,0.0213,0.0395};
-	float BsPtShapeSyst[NBins] = {0.112,0.260,0.414,0.587};
 
-	float BsTnPSystDown[NBins] = {0.00416,0.00374,0.00381,0.00475};
-	float BsTnPSystUp[NBins] = {0.00416,0.00374,0.00381,0.00475};
+	float BsTrackingSyst[NBins] = {0.10,0.10,0.10,0.10};
+	float BsMDDataSyst[NBins] = {0.0466,0.0870,0.0725,0.0495};
+	float BsPtShapeSyst[NBins] = {0.0194,0.00607,0.00100,0.000312};	
+	float BsPDFSyst[NBins] = {0.0545,0.012,0.0213,0.0395};
+
+	float BsTnPSystDown[NBins] = {0.00412,0.00385,0.00376,0.00457};
+	float BsTnPSystUp[NBins] = {0.00412,0.00385,0.00376,0.00457};
 
 	float BsTotalSystDown[NBins];
 	float BsTotalSystUp[NBins];
@@ -146,11 +148,12 @@ void BsRAA(){
 	for(int i = 0; i < NBins; i++){
 
 		
-		BsTotalSystDown[i] = TMath::Sqrt(BsMDDataSyst[i] * BsMDDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystDown[i] * BsTnPSystDown[i]);
-		BsTotalSystUp[i] = TMath::Sqrt(BsMDDataSyst[i] * BsMDDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystUp[i] * BsTnPSystUp[i]);
+		BsTotalSystDown[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] + BsMDDataSyst[i] * BsMDDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystDown[i] * BsTnPSystDown[i]);
+		BsTotalSystUp[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] +BsMDDataSyst[i] * BsMDDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystUp[i] * BsTnPSystUp[i]);
 
 
 	}
+
 	
 	for(int i = 0; i < NBins; i++){
 
@@ -471,6 +474,9 @@ void BsRAA(){
 		BsRAAYSystUp[i] = BsRAAY[i] * TMath::Sqrt(BsXSecPbPbYSystUpPercent[i] * BsXSecPbPbYSystUpPercent[i] + BsTotalSystUp[i] * BsTotalSystUp[i]);
 
 
+		cout << "i = " << i <<  "    BPRAAY[i] = " << BsRAAY[i] << "   BPRAAYErrUp[i]  = "  << BsRAAYErrUp[i]/BsRAAY[i]   << "  BPRAAYErrDown[i] =   " << BsRAAYErrDown[i]/BsRAAY[i] <<   "   BPRAAYSystUp[i]  = "  << BsRAAYSystUp[i]/BsRAAY[i]   << "  BPRAAYSystDown[i] =   " << BsRAAYSystDown[i]/BsRAAY[i]  << endl;
+
+
 			
 	}
 
@@ -523,6 +529,7 @@ void BsRAA(){
 	BsRAAGraphSyst->Draw("5same");
 	Unity->Draw("SAME");
 	c2->SaveAs("RAAPlots/Bs/BsRAA.png");
+	c2->SaveAs("RAAPlots/Bs/BsRAA.pdf");
 
 
 	HisEmptyRAA->Draw();
@@ -552,6 +559,7 @@ void BsRAA(){
 
 
 	c2->SaveAs("RAAPlots/Bs/BsRAAComparison.png");
+	c2->SaveAs("RAAPlots/Bs/BsRAAComparison.pdf");
 
 
 	TFile * fout = new TFile("OutFile/BsRAA.root","RECREATE");

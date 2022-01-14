@@ -832,8 +832,8 @@ CorrDiffHisBin
 
 
 	TFile * foutCorr;
-	if(DoTnP == 0)	foutCorr = new TFile("FinalFiles/BPPPCorrYieldPTNoTnP.root","RECREATE");
-	if(DoTnP == 1)	foutCorr = new TFile("FinalFiles/BPPPCorrYieldPT.root","RECREATE");
+	if(DoTnP == 0)	foutCorr = new TFile("FinalFiles/BsPPCorrYieldPTNoTnP.root","RECREATE");
+	if(DoTnP == 1)	foutCorr = new TFile("FinalFiles/BsPPCorrYieldPT.root","RECREATE");
 
 
 	TH1D * CorrDiffHis = new TH1D("hPtSigma","",NBins,ptBins);
