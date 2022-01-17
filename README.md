@@ -656,7 +656,7 @@ Same plots are saved under the folder: Plots/Bs/
 
 ### RAA
 
-Likewisw, systematic uncertainties are also included to the RAA. To do so, go back to the RAA folder: BsBPFinalResults/Comparisons/RAA
+Likewise, systematic uncertainties are also included to the RAA. To do so, go back to the RAA folder: BsBPFinalResults/Comparisons/RAA
 
 
 cd BsBPFinalResults/Comparisons/RAA/
@@ -679,7 +679,104 @@ To do this for Bs, simply run
 run root -b -l -q BsRAA.C
 
 
-The same resulrs for Bs save at RAAPlots/Bs
+The same results for Bs save at RAAPlots/Bs
+
+
+
+## Final Results Plots With Correct Style for Publication and Presentation 
+
+In the end, with all the results available, we should make format plots that compile with the CMS rules of publication and presentation. To generate the plot with only 2017 pp and 2018 PbPb, go to the folder MakeFinalPlot/NominalPlots
+
+cd MakeFinalPlots/NominalPlots
+
+### Cross Section
+
+To produce the pp cross section of Bs and B+ as a function of pT in the same plot, simply do:
+
+cd CrossSection/
+
+root -b -l -q plotPt'(1,1,0,1,1)'
+
+The cross section plot files will be saved at figs/pdf/xsec_vsPt.pdf as pdf format and figs/png/xsec_vsPt.png as png
+
+Here, the dataSource folder includes all in the information of the measurement
+
+The files: corryield_pt_Bp_New.txt and corryield_pt_Bs_New.txt contain
+
+pT bin lower and upper, central value of the cross section, statstistical uncertainties, systematic uncertainties, global systematic uncertanties, and abscissae for the bin center for B+ and Bs repectfully
+
+The data information is current manually entered based on the analysis results. You can confirm this from Table 8 and Table 9 in the Results section summarizing the Bs and B+ cross section results the AN-21-091.
+
+
+### Nuclear Modification Factor
+
+To produce the RAA of Bs and B+ as a function of pT in the same plot, simply do:
+
+cd RAA/
+
+root -b -l -q plotPt'(1,1,0,1,1)'
+
+The RAA plot files will be saved at figs/pdf/BRAA_vsPt.pdf as pdf format and figs/png/BRAA_vsPt.png as png
+
+The files RAA_pt_Bp.txt and RAA_pt_Bs.txt contain 
+
+pT bin lower and upper, central value of RAA, statstistical uncertainties, systematic uncertainties, global systematic uncertanties, and abscissae for the bin center
+
+Again, the data information is current manually entered based on the analysis results. You can confirm this from Table 11 and Table 12 in the Results section summarizing the Bs and B+ cross section results the AN-21-091
+
+Note that, here for the RAA calculations, the systematic uncertainties here assume the cancellation of Branching Ratio systematics. All other systematic uncertainties are added into quadruture. 
+
+When the results have been updated, we will need to update the data in the dataSource folder. It would be benefit to produce a code to automatically generate the txt files in the dataSource to synchronize any changes in the analysis. 
+
+
+### Cross Section Comparison Plots
+
+To compare our pp results with 2015 pp and FONLL calculations, we can go to the folder MakeFinalPlots/ComparisonPlots
+
+cd MakeFinalPlots/ComparisonPlots
+
+The FONLL pp cross section calculations for Bs and B+ are saved at the folder FONLL/
+
+B+: FONLLs/output-Bp.root 
+
+Bs: FONLLs/output-Bs.root 
+
+
+To compare the B+ cross section results, simply do:
+
+root -b -l -q BPComparison.C
+
+The files are saved at 
+
+Plots/BP/
+
+The comparison with 2015 results is saved as Plots/BP/BP2015CompLog.png as png format and Plots/BP/BP2015CompLog.pdf pdf format in log scale
+
+The comparison with FONLL results is saved as Plots/BP/BPFONLLCompLog.png as png format and Plots/BP/BPFONLLCompLog.pdf pdf format in log scale
+
+The files contains the comparison and the ratio between 2017 pp and the references.
+
+Likewise for Bs, just do 
+
+root -b -l -q BsComparison.C
+
+The files are saved at 
+
+Plots/Bs/
+
+The comparison with 2015 results is saved as Plots/Bs/Bs2015CompLog.png as png format and Plots/Bs/Bs2015CompLog.pdf pdf format in log scale
+
+The comparison with FONLL results is saved as Plots/Bs/BsFONLLCompLog.png as png format and Plots/Bs/BsFONLLCompLog.pdf pdf format in log scale
+
+
+At this point, we have obtained the comparison with 2015 pp and FONLL results. Note that here the 2D map correction method is commented out. We could uncomment them to also include the 2D map efficiency correction medthod, which will be presented in orange, if needed later. 
+
+
+### RAA Comparison Plots
+
+
+The comparison of RAA results with 2015 are documented in the RAA Section under  BsBPFinalResults/Comparisons/RAA/ folder. 
+
 
 # Tests
 
