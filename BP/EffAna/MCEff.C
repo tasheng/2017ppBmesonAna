@@ -31,6 +31,8 @@ void  MCEff(int DoTnP, int Rescale){
 	//TString infile = "/data/szhaozho/2017ppSamplesNew/BDTOutput/AllMerge/BPMCAllBDT.root";
 	TString infile = "../../UnskimmedSamples/OfficialMC/BPMC.root";
 	//TString infile = "/data/szhaozho/2017ppSamples/UnSkimmed/OfficialMC/BPMC.root";
+	
+
 
 //	infile="/data/szhaozho/2017ppSamplesFinal/Unskimmed/BPMC.root"; 
 
@@ -38,6 +40,9 @@ void  MCEff(int DoTnP, int Rescale){
 	if(Rescale == 1){
 		infile = "/data/szhaozho/ReComputeBDTRescaled/BPMC.root";
 	}
+
+		
+	infile = "/data/szhaozho/2017ppSamplesFinal/Unskimmed/NewOfficialMC/BPMC.root";
 
 	TFile * fin = new TFile(infile.Data());
 
@@ -540,6 +545,7 @@ void  MCEff(int DoTnP, int Rescale){
 	   */
 
 
+	float Factor = 4.0;
 
 
 	int NEvents = ntKp->GetEntries();
@@ -547,14 +553,14 @@ void  MCEff(int DoTnP, int Rescale){
 	const int yBinN = 5;
 	double yBinning[yBinN+1] = {0.0,0.5, 1.0, 1.5,2.0, 2.4};
 
-	double LowBinWidth = 0.5;
+	double LowBinWidth = 0.5/Factor;
 	int NLowBin = 10/LowBinWidth;
 	//	int NLowBin = 5;
 
-	double MidBinWidth = 1;
+	double MidBinWidth = 1/Factor;
 	int NMidBin = 10/MidBinWidth;
-	double HighBinWidth = 1;
-	int NHighBin = 30/HighBinWidth;
+	double HighBinWidth = 1/Factor;
+	int NHighBin = 40/HighBinWidth;
 	const int BptBin = NHighBin + NMidBin + NLowBin;
 	double BptBinning[BptBin + 1];
 
@@ -618,7 +624,8 @@ void  MCEff(int DoTnP, int Rescale){
 	TH2D * TnPWeightHis = new TH2D("TnPWeightHis","",BptBin,BptBinning,yBinN,yBinning);
 	TH2D * TnPWeightHisSystUp = new TH2D("TnPWeightHisSystUp","",BptBin,BptBinning,yBinN,yBinning);
 	TH2D * TnPWeightHisSystDown = new TH2D("TnPWeightHisSystDown","",BptBin,BptBinning,yBinN,yBinning);
-
+	TH2D * BDTWeightHisSyst = new TH2D("BDTWeightHisSyst","",BptBin,BptBinning,yBinN,yBinning);
+	TH2D * BptWeightHisSyst = new TH2D("BptWeightHisSyst","",BptBin,BptBinning,yBinN,yBinning);
 
 
 	TH2D * TnPWeightHisMuidUp = new TH2D("TnPWeightHisMuidUp","",BptBin,BptBinning,yBinN,yBinning);
@@ -634,9 +641,9 @@ void  MCEff(int DoTnP, int Rescale){
 	//Gen//
 	TH2D * NoWeightGenHis = new TH2D("NoWeightGenHis","",BptBin,BptBinning,yBinN,yBinning);
 	TH2D * EvtWeightGenHis = new TH2D("EvtWeightGenHis","",BptBin,BptBinning,yBinN,yBinning);
+	TH2D * BptWeightGenHis = new TH2D("BptWeightGenHis","",BptBin,BptBinning,yBinN,yBinning);	
 	TH2D * EvtWeightGenAccHis = new TH2D("EvtWeightGenAccHis","",BptBin,BptBinning,yBinN,yBinning);
 	TH2D * NoWeightGenAccHis = new TH2D("NoWeightGenAccHis","",BptBin,BptBinning,yBinN,yBinning);
-
 
 
 	TH1D * Bmu1ptHis = new TH1D("Bmu1ptHis","",200,0,50);
@@ -1267,11 +1274,13 @@ void  MCEff(int DoTnP, int Rescale){
 
 				
 				Eff1DRECOHisBDT->Fill(Bpt[j],TotalWeight * BDTWeight);
+				BDTWeightHisSyst->Fill(Bpt[j],abs(By[j]),TotalWeight * BDTWeight);
 
 			
 				BptWeight = BptWFunc->Eval(Bpt[j]);
 
 				Eff1DRECOHisBpt->Fill(Bpt[j],TotalWeight * BptWeight);
+				BptWeightHisSyst->Fill(Bpt[j],abs(By[j]),TotalWeight * BptWeight);
 			
 
 
@@ -1340,6 +1349,7 @@ void  MCEff(int DoTnP, int Rescale){
 
 					NoWeightGenHis->Fill(Gpt[j],abs(Gy[j]),1);
 					EvtWeightGenHis->Fill(Gpt[j],abs(Gy[j]),EventWeight);
+					BptWeightGenHis->Fill(Gpt[j],abs(Gy[j]),EventWeight * BptWeight);					
 					Eff1DGENHis->Fill(Gpt[j],EventWeight);
 					Eff1DGENMultHis->Fill(nMult,EventWeight);
 					Eff1DGENHisGpt->Fill(Gpt[j],EventWeight * BptWeight);
@@ -1711,7 +1721,7 @@ void  MCEff(int DoTnP, int Rescale){
 		Eff1DHisTnPDownMult->SetMarkerColor(kBlue);
 		Eff1DHisTnPDownMult->SetLineColor(kBlue);
 
-
+		
 
 		Eff1DHisTnPUpMult->Draw("ep");
 		Eff1DHisMult->Draw("epSAME");
@@ -1797,14 +1807,15 @@ void  MCEff(int DoTnP, int Rescale){
 		//Systematics
 
 
-		TH2D * invEff2DSystUp = (TH2D * ) EvtWeightGenHis->Clone("invEff2DSystUp");
-		invEff2DSystUp->Sumw2();
-		invEff2DSystUp->Divide(TnPWeightHisSystDown);
 
-		TH2D * invEff2DSystDown = (TH2D * ) EvtWeightGenHis->Clone("invEff2DSystDown");
-		invEff2DSystDown->Sumw2();
-		invEff2DSystDown->Divide(TnPWeightHisSystUp);
 
+		TH2D * invEff2DTnPSystUp = (TH2D * ) EvtWeightGenHis->Clone("invEff2DTnPSystUp");
+		invEff2DTnPSystUp->Sumw2();
+		invEff2DTnPSystUp->Divide(TnPWeightHisSystDown);
+
+		TH2D * invEff2DTnPSystDown = (TH2D * ) EvtWeightGenHis->Clone("invEff2DTnPSystDown");
+		invEff2DTnPSystDown->Sumw2();
+		invEff2DTnPSystDown->Divide(TnPWeightHisSystUp);
 
 
 		TH2D * invEff2DMuidUp = (TH2D * ) EvtWeightGenHis->Clone("invEff2DMuidUp");
@@ -1835,6 +1846,16 @@ void  MCEff(int DoTnP, int Rescale){
 		invEff2DTrgDown->Divide(TnPWeightHisTrgUp);
 
 
+		TH2D * invEff2DBDTSyst = (TH2D * ) EvtWeightGenHis->Clone("invEff2DBDTSyst");
+		invEff2DBDTSyst->Sumw2();
+		BDTWeightHisSyst->Sumw2();
+		invEff2DBDTSyst->Divide(BDTWeightHisSyst);
+
+
+		TH2D * invEff2DBptSyst = (TH2D * ) BptWeightGenHis->Clone("invEff2DBptSyst");
+		invEff2DBptSyst->Sumw2();
+		BptWeightHisSyst->Sumw2();
+		invEff2DBptSyst->Divide(BptWeightHisSyst);
 
 
 
@@ -1856,8 +1877,8 @@ void  MCEff(int DoTnP, int Rescale){
 		invEff2D->Write();
 
 
-		invEff2DSystUp->Write();
-		invEff2DSystDown->Write();
+		invEff2DTnPSystUp->Write();
+		invEff2DTnPSystDown->Write();
 
 		invEff2DMuidUp->Write();
 		invEff2DMuidDown->Write();
@@ -1941,27 +1962,27 @@ void  MCEff(int DoTnP, int Rescale){
 
 		c->SetLogz();
 
-		invEff2DSystUp->GetYaxis()->SetTitle("B |y|");
-		invEff2DSystUp->GetXaxis()->SetTitle("B_{s} p_{T} (GeV/c)");
-		invEff2DSystUp->GetXaxis()->CenterTitle();
-		invEff2DSystUp->GetYaxis()->CenterTitle();
-		invEff2DSystUp->GetYaxis()->SetTitleOffset(1.2);
-		invEff2DSystUp->SetTitle("");
+		invEff2DTnPSystUp->GetYaxis()->SetTitle("B |y|");
+		invEff2DTnPSystUp->GetXaxis()->SetTitle("B_{s} p_{T} (GeV/c)");
+		invEff2DTnPSystUp->GetXaxis()->CenterTitle();
+		invEff2DTnPSystUp->GetYaxis()->CenterTitle();
+		invEff2DTnPSystUp->GetYaxis()->SetTitleOffset(1.2);
+		invEff2DTnPSystUp->SetTitle("");
 
-		invEff2DSystUp->Draw("COLZ");
+		invEff2DTnPSystUp->Draw("COLZ");
 		c->SaveAs("Eff2DMapTnP/Eff2D_Up.png");
 
 
 
 
-		invEff2DSystDown->GetYaxis()->SetTitle("B |y|");
-		invEff2DSystDown->GetXaxis()->SetTitle("B_{s} p_{T} (GeV/c)");
-		invEff2DSystDown->GetXaxis()->CenterTitle();
-		invEff2DSystDown->GetYaxis()->CenterTitle();
-		invEff2DSystDown->GetYaxis()->SetTitleOffset(1.2);
-		invEff2DSystDown->SetTitle("");
+		invEff2DTnPSystDown->GetYaxis()->SetTitle("B |y|");
+		invEff2DTnPSystDown->GetXaxis()->SetTitle("B_{s} p_{T} (GeV/c)");
+		invEff2DTnPSystDown->GetXaxis()->CenterTitle();
+		invEff2DTnPSystDown->GetYaxis()->CenterTitle();
+		invEff2DTnPSystDown->GetYaxis()->SetTitleOffset(1.2);
+		invEff2DTnPSystDown->SetTitle("");
 
-		invEff2DSystDown->Draw("COLZ");
+		invEff2DTnPSystDown->Draw("COLZ");
 		c->SaveAs("Eff2DMapTnP/Eff2D_Down.png");
 
 
@@ -2003,8 +2024,20 @@ void  MCEff(int DoTnP, int Rescale){
 		Eff1DHisBptMult->Write();
 		Eff1DHisBDTMult->Write();
 		foutSyst->Close();
-		
 
+
+
+		TFile * foutSyst2D = new TFile("NewEff2DMaps/BPSyst2D.root","RECREATE");
+
+		invEff2D->Write();
+		invEff2DTnPSystUp->Write();
+		invEff2DTnPSystDown->Write();
+		invEff2DBDTSyst->Write();
+		invEff2DBptSyst->Write();
+
+		foutSyst2D->Close();
+
+	
 
 		fout->Close();
 		fin->Close();
