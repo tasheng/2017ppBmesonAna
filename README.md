@@ -439,7 +439,7 @@ root -b -l -q
 to generate the FONLL with the desired binning defined in the code:
 
 
-# Systematic Studies 
+# Systematic Studies (Binned pT Method)
 
 Now we have finished the nominal analysis and obtain the central values of the B-meson cross section. Since the analysis involves with two parts: signal raw yield extraction and efficiency correction. For the binned pT correctio, we have also obtained the statistical uncertainties. For the 2D Map method, an addition data boostraping approaching is needed to extract the statistical uncertainties of the results. The signal raw yield extraction ,which is called PDF variation, is the same for both methods. Henrique Legoinha is the contact person for signal extraction for everything involving with efficiency correction.
 
@@ -601,6 +601,200 @@ All plots in 1 canvas: PlotSyst/Bp/BpSysSumPlot.png or PlotSyst/Bp/BpSysSumPlot.
 Same for Bs, simply do 
 
 root -b -l -q PlotSystBs.C
+
+
+
+
+# Systematic Studies (2D Map Method)
+
+Similar to binned pT method, 2D map efficiency correction also has the systematic uncertainties including:
+
+PDF variation - same as the binned pT method since the efficiency correction does not affect signal raw yield extraction
+
+MC-Data Disagreement
+
+pT Shape Systematics
+
+TnP Systematics
+
+MC Statistics Systematics (New)
+
+## MC-Data Disagreement, pT Shape, and TnP Systematics  
+
+Basically, when we run the codes MCEff.C, we have computed the nominal 2D map as a function of B-meson pT and rapidity |y|: 1/(acc X eff) as well as the (1/acc X eff) varied by sPlot weight for MC-Data Disagreement, Bpt weight to acceount for pT Shape Systematics, and muon TnP scale factors to account for TnP Systematics. All these files are stored at 
+## MC-Data Disagreement, pT Shape, and TnP Systematics  
+
+NewEff2DMaps/BPSyst2D.root
+
+NewEff2DMaps/BsSyst2D.root
+
+for Bs and B+ respectfully under the folder EffAna/
+
+To evaluate the <1/(acc X eff)> for nominal and varied cases, go to the folder 2DMapSyst
+
+cd 2DMapSyst
+
+Then run
+
+root -b -l -q CalEffSystBP.C
+
+for B+, a file BPSyst2D.root will be saved at
+
+OutFiles/BPSyst2D.root
+
+The file content is as follows:
+
+
+ TFile*		OutFiles/BPSyst2D.root	
+  KEY: TH1D	Eff2DHis;1	
+  KEY: TH1D	Eff2DTnPUpSystHis;1	
+  KEY: TH1D	Eff2DTnPDownSystHis;1	
+  KEY: TH1D	Eff2DBDTHis;1	
+  KEY: TH1D	Eff2DBptHis;1	
+
+The nominal is Eff2DHis, TnP systematic varied up is Eff2DTnPUpSystHis, down is Eff2DTnPDownSystHis, the MC-Data discrepancy is Eff2DBDTHis, and the Bpt shape variation is Eff2DBptHis.
+
+
+Finally, to evaluate the percent of systematic uncertainties, simply run:
+
+root -b -l -q PlotEffSyst2D.C'(0)'
+
+Here the argument 0 is for B+ and the argument 1 is for Bs,. 
+
+
+The results will be printed out as percent:
+
+TnP Syst: 0.463625
+
+TnP Syst: 0.445255
+
+TnP Syst: 0.371436
+
+TnP Syst: 0.361883
+
+TnP Syst: 0.425895
+
+TnP Syst: 0.625206
+
+TnP Syst: 0.611058
+
+Bpt Syst: 0.0116134
+
+Bpt Syst: 0.00430247
+
+Bpt Syst: 0.000850791
+
+Bpt Syst: 0.000144326
+
+Bpt Syst: 0.000195505
+
+Bpt Syst: 0.000757004
+
+Bpt Syst: 0.00308549
+
+BDT Syst: 2.08743
+
+BDT Syst: 1.78165
+
+BDT Syst: 0.769814
+
+BDT Syst: 24.561
+
+BDT Syst: 0.821754
+
+BDT Syst: 2.62644
+
+BDT Syst: 0
+
+The plots comparing the varied efficiency to the nominal one are saved as 
+
+SystPlots/BP/Pt/TnPSystComp.png
+
+SystPlots/BP/Pt/MCDataSystComp.png
+
+SystPlots/BP/Pt/BptSystComp.png
+
+
+The computed systematic uncertainties plots are saved as 
+
+SystPlots/BP/Pt/TnPSystRatio.png
+
+SystPlots/BP/Pt/BptSysRatio.png
+
+SystPlots/BP/Pt/MCDataSystRatio.png
+
+
+Likewise for Bs, we will do the same as B+ to produce the systematic uncertainties 
+
+
+## MC Stat Systematics
+
+To evaluatiobn he MC Stat Systematics, just go to the folder
+
+
+cd MCStatSyst/BP
+
+Then run the code Generate2DMaps.C to generate 10k (default number than can be changed) of 2D maps based on the mean and error of each bin in the 2D map:
+
+root -b -l -q Generate2DMaps.C
+
+The 10k 2D maps will then be saved at:
+
+OutFiles/GenStatSyst.root
+
+with 10k 2D maps of 1/(eff X acc) name as EffBptByInvTrial for Total Efficiency
+ 
+1/(eff) name as SelBptByInvTrial for Selection Efficiency
+
+1/(acc) name as SelBptByInvTrial for Acceptance Efficiency
+
+Next we run:
+
+root -b -l -q MCStatCal.C
+
+Here, we evaluate the <1/(eff X acc)> for each 2D 1/(eff X acc) maps based on the same dataset from the skimmed B+ data and fill each of <1/(eff X acc)> them into a histogram. 
+
+The code will save the plots and also compare the nominal <1/(eff X acc)> (in a red vertical line) to the distribution of the histogram. Ideally, the distribution should be a perfectly symmetric Gaussian. The red vertical line will fall right at the mean of the distribution. If that is not the case, we will need to check the nominal value is correctly input in the code. For B+, since we have 7 bins, it will be at 
+
+meanvec.push_back(53.538932);
+	
+meanvec.push_back(23.943692);
+	
+meanvec.push_back(12.038493);
+	
+meanvec.push_back(5.7727937);
+	
+meanvec.push_back(3.7848080);
+	
+meanvec.push_back(3.0837052);
+	
+meanvec.push_back(2.9782204);
+
+Also make sure that the are input 2D map for the 10k generation are synchronous to the nominal 2D map.
+
+If all above look good, the code MCStatCal.C will use mean/RMS as the MC stat systematics. They will be printed out as
+
+<1/acc eff> Stat Syst: 0.0121105
+
+<1/acc eff> Stat Syst: 0.00857881
+
+<1/acc eff> Stat Syst: 0.00443399
+
+<1/acc eff> Stat Syst: 0.00627536
+
+<1/acc eff> Stat Syst: 0.00750213
+
+<1/acc eff> Stat Syst: 0.0223612
+
+<1/acc eff> Stat Syst: 0.0957221
+
+for each pT bin.
+
+The histigram for MC stat systematics in terms of percentage just like the MC-Data discrepancy, TnP, and Bpt shape systematics, is also saved as 
+
+Plots/MCStatSyst.png
+
+
 
 
 ## Report the Systematic Uncertanties to the Final Results

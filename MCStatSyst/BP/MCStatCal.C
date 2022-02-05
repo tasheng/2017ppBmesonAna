@@ -24,7 +24,7 @@ using std::endl;
 
 void MCStatCal(){
 
-	const int NFiles = 10;
+	const int NFiles = 10000;
 	const int NBins = 7;
 	//const int NBins = 6;
 
@@ -213,13 +213,13 @@ void MCStatCal(){
 
 
 
-		minvec.push_back(0);
-		minvec.push_back(0);
-		minvec.push_back(0);
-		minvec.push_back(0);
-		minvec.push_back(0);
-		minvec.push_back(0);
-		minvec.push_back(0);
+		minvec.push_back(45);
+		minvec.push_back(22);
+		minvec.push_back(11.3);
+		minvec.push_back(5);
+		minvec.push_back(3.5);
+		minvec.push_back(2);
+		minvec.push_back(1.5);
 
 
 		minaccvec.push_back(4);
@@ -231,24 +231,24 @@ void MCStatCal(){
 		minaccvec.push_back(1.57);
 
 
+		minselvec.push_back(30);
+		minselvec.push_back(10);
+		minselvec.push_back(5);
 		minselvec.push_back(0);
 		minselvec.push_back(0);
 		minselvec.push_back(0);
-		minselvec.push_back(0);
-		minselvec.push_back(0);
-		minselvec.push_back(0);
-		minselvec.push_back(0);
+		minselvec.push_back(80);
 
 
 
 
-		maxvec.push_back(100);
-		maxvec.push_back(100);
-		maxvec.push_back(100);
-		maxvec.push_back(100);
-		maxvec.push_back(100);
-		maxvec.push_back(100);
-		maxvec.push_back(100);
+		maxvec.push_back(60);
+		maxvec.push_back(26);
+		maxvec.push_back(13.5);
+		maxvec.push_back(8);
+		maxvec.push_back(5.5);
+		maxvec.push_back(5);
+		maxvec.push_back(8);
 
 
 		maxaccvec.push_back(20);
@@ -273,13 +273,13 @@ void MCStatCal(){
 
 
 
-		meanvec.push_back(30);
-		meanvec.push_back(30);
-		meanvec.push_back(30);
-		meanvec.push_back(30);
-		meanvec.push_back(30);
-		meanvec.push_back(30);
-		meanvec.push_back(30);
+		meanvec.push_back(53.538932);
+		meanvec.push_back(23.943692);
+		meanvec.push_back(12.038493);
+		meanvec.push_back(5.7727937);
+		meanvec.push_back(3.7848080);
+		meanvec.push_back(3.0837052);
+		meanvec.push_back(2.9782204);
 
 
 
@@ -524,6 +524,9 @@ void MCStatCal(){
 
 		}
 
+		finEff->Close();
+	
+
 	}
 
 
@@ -540,6 +543,22 @@ void MCStatCal(){
 
 	//Efficiency//
 
+
+	float RMS;
+	float MeanValue;
+	float Error;
+
+	TH1D * MCSystStatHis = new TH1D("MCSystStatHis","",NBins,ptBins);
+	MCSystStatHis->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+	MCSystStatHis->GetYaxis()->SetTitle("MC Stat Syst (%)");
+	MCSystStatHis->GetYaxis()->SetTitleOffset(1.4);
+	MCSystStatHis->GetXaxis()->CenterTitle();
+	MCSystStatHis->GetYaxis()->CenterTitle();
+
+	MCSystStatHis->SetMarkerSize(1);
+	MCSystStatHis->SetMarkerColor(1);
+	MCSystStatHis->SetMarkerStyle(20);
+	MCSystStatHis->SetLineColor(1);
 
 
 	for(int i = 0; i < NBins; i++){
@@ -563,11 +582,21 @@ void MCStatCal(){
 		l4[i]->Draw("SAME");
 
 		c->SaveAs(Form("Plots/Eff/MCStatEff_%d.png",i));
+		
 
+		RMS = EffInvDistribution[i]->GetRMS();
+		MeanValue = EffInvDistribution[i]->GetMean();
+		Error = RMS/MeanValue;
+
+		MCSystStatHis->SetBinContent(i+1,Error);
+		MCSystStatHis->SetBinError(i+1,Error/100);
+	
+		cout << "<1/acc eff> Stat Syst: " <<  Error << endl;
 	}
 
 
-
+	MCSystStatHis->Draw("ep");
+	c->SaveAs("Plots/MCStatSyst.png");
 
 
 
@@ -592,6 +621,12 @@ void MCStatCal(){
 		texChi[i]->Draw("SAME");
 		c->SaveAs(Form("Plots/Acc/MCStatAcc_%d.png",i));
 
+		RMS = SelInvDistribution[i]->GetRMS();
+		MeanValue = SelInvDistribution[i]->GetMean();
+		Error = RMS/MeanValue;
+
+
+		cout << "<1/eff> Stat Syst: " <<  Error << endl;
 	}
 
 
@@ -612,6 +647,14 @@ void MCStatCal(){
 
 		texChi[i]->Draw("SAME");
 		c->SaveAs(Form("Plots/Sel/MCStatSel_%d.png",i));
+	
+	
+		RMS = AccInvDistribution[i]->GetRMS();
+		MeanValue = AccInvDistribution[i]->GetMean();
+		Error = RMS/MeanValue;
+
+		cout << "<1/acc> Stat Syst: " <<  Error << endl;
+
 
 	}
 
