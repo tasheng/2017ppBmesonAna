@@ -449,7 +449,7 @@ void CrossSectionAna(int DoTnP){
 
 
 					XBin = invAcc2D->GetXaxis()->FindBin( BptNew[j]);
-					YBin = invAcc2D->GetXaxis()->FindBin( TMath::Abs(ByNew[j]));
+					YBin = invAcc2D->GetYaxis()->FindBin( TMath::Abs(ByNew[j]));
 					BEffInv[j] = invAcc2D->GetBinContent(XBin,YBin);
 					BEffInvErr[j] = invAcc2D->GetBinError(XBin,YBin);
 					BEff[j] = 1.0/invAcc2D->GetBinContent(XBin,YBin);
