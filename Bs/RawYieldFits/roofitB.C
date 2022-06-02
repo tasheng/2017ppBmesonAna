@@ -768,14 +768,14 @@ cout << "TESTE 123__"<< i<< "  " << ptBins_check[i] << endl;
 	std::vector<std::string> col_name_back;
 	if(tree=="ntphi"&&_varExp=="Bpt") col_name_back= {"Background Model","5$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$50"};
 	if(_varExp=="HiBin") col_name_back= {"Background Model","0\\%$<Cent<$30\\%", "30\\%$<Cent<$90\\%"};
-	if(tree=="ntKp" && _varExp=="Bpt") col_name_back= {"Background Model","5$<p_T<$7", "7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$30", "30$<p_T<$40", "40$<p_T<$50", "50$<p_T<$60" };
+	if(tree=="ntKp" && _varExp=="Bpt") col_name_back= {"Background Model", "7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$50" };
 
 	std::vector<std::string> labels_signal = {"Triple Gaussian", "Fixed Mean", "Increased $\\sigma$ scaling factor", "Decreased $\\sigma$ scaling factor"};
 	//		std::vector<std::string> labels_signal = {"Triple Gaussian", "Fixed Mean","Double Gaussian + $\\sigma$ scaling factor" , "Increased $\\sigma$ scaling factor", "Decreased $\\sigma$ scaling factor"};
 	std::vector<std::string> col_name_signal;
 	if(tree=="ntphi"&&_varExp=="Bpt") col_name_signal= {"Signal Model","5$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$50"};
 	if(_varExp=="HiBin") col_name_signal = {"Signal Model","0\\%$<Cent<$30\\%", "30\\%$<Cent<$90\\%"};
-	if(tree=="ntKp" && _varExp=="Bpt") col_name_signal= {"Signal Model","5$<p_T<$7", "7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$30", "30$<p_T<$40", "40$<p_T<$50", "50$<p_T<$60" };
+	if(tree=="ntKp" && _varExp=="Bpt") col_name_back= {"Signal Model", "7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$50" };
 
 
 
@@ -783,7 +783,7 @@ cout << "TESTE 123__"<< i<< "  " << ptBins_check[i] << endl;
 	std::vector<std::string> col_name_general;
 	if(tree=="ntphi"&&_varExp=="Bpt") col_name_general= {"Systematic Source","5$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$50"};
 	if(_varExp=="HiBin") col_name_general = {"Systematic Source","0\\%$<Cent<$30\\%", "30\\%$<Cent<$90\\%"};
-	if(tree=="ntKp" && _varExp=="Bpt") col_name_general= {"Systematic Source","5$<p_T<$7", "7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$30", "30$<p_T<$40", "40$<p_T<$50", "50$<p_T<$60" };
+	if(tree=="ntKp" && _varExp=="Bpt") col_name_signal= {"Systematic Source", "5$<p_T<$7", "7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$30", "30$<p_T<$40", "40$<p_T<$50", "50$<p_T<$60" };
 
 
 	if(syst==1 && full==0){
