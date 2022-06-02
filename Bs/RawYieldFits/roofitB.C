@@ -302,7 +302,8 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 	
 	//    TString ptbinning;
 
-	std::vector<std::string> background = {"1st", "2nd", "3rd"};
+	// std::vector<std::string> background = {"1st", "2nd", "3rd"};
+	std::vector<std::string> background = {"1st", "2nd"};
 	std::vector<std::vector<double>> background_syst;
 	// std::vector<std::string> signal = {"3gauss", "fixed", "scal", "perr", "merr", "scal+", "scal-"};
 	//std::vector<std::string> signal = {"3gauss", "fixed","scal+", "scal-"};
