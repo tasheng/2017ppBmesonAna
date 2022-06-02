@@ -66,20 +66,21 @@ RooWorkspace* w_val= new RooWorkspace("w_vl");
 RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanvas* cMC, RooDataSet* ds, RooDataSet* dsMC, RooDataHist* dh, RooDataHist* dhMC, RooRealVar* mass, RooPlot* &outframe, Double_t ptmin, Double_t ptmax, int isMC, bool isPbPb, Float_t centmin, Float_t centmax, TString npfit)
 {
 
+
 	cout<<"total data: "<<ds->numEntries()<<endl;
 	TH1* h = dh->createHistogram("Bmass");
 	h->Sumw2(kFALSE);
 	h->SetBinErrorOption(TH1::kPoisson);
-	h->SetMarkerSize(1.55);
+	h->SetMarkerSize(1);
 	h->SetMarkerStyle(20);
 	h->SetLineColor(1);
-	h->SetLineWidth(4);
-	//	RooPlot* frameMC = mass->frame(5.2, 5.5);
+	h->SetLineWidth(2);
+	//RooPlot* frameMC = mass->frame(5.2, 5.5);
 	RooPlot* frameMC = mass->frame();
 	frameMC->SetTitle("");
 	//frameMC->SetXTitle("m_{B} (GeV/c^{2})");
-	//	if(tree=="ntKp")frameMC->SetXTitle("m_{J/#psi(#mu#muK^{#pm})} (GeV/c^{2})");
-	//	if(tree=="ntphi")frameMC->SetXTitle("m_{J/#psi(#mu#mu)#it{#phi}(KK)} (GeV/c^{2})");
+	//if(tree=="ntKp")frameMC->SetXTitle("m_{J/#psi(#mu#muK^{#pm})} (GeV/c^{2})");
+	//if(tree=="ntphi")frameMC->SetXTitle("m_{J/#psi(#mu#mu)#it{#phi}(KK)} (GeV/c^{2})");
 	if(tree=="ntKp")frameMC->SetXTitle("m_{J/#psiK^{#pm}} (GeV/c^{2})");
 	//if(tree=="ntphi")frameMC->SetXTitle("m_{J/#psi#it{#phi}} (GeV/c^{2})");
 	if(tree=="ntphi")frameMC->SetXTitle("m_{J/#psi{K^{+}K^{-}}} (GeV/c^{2})");
@@ -239,11 +240,7 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	RooGaussian sig2(Form("sig2%d",_count),"",*mass,mean,sigma2);  
 	RooGaussian sig3(Form("sig3%d",_count),"",*mass,mean,sigma3);  
 
-
-
-
 	RooRealVar c1(Form("c1%d",_count),"",1.,0.,5.);
-
 
 
 	//RooRealVar c2(Form("c2%d",_count),"",1.,0.,5.) ;
@@ -262,9 +259,9 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	//RooRealVar a1(Form("a1%d",_count),"a1",0.1,0.,1.);
 	//RooRealVar a2(Form("a2%d",_count),"a2",0.1,0.,1.);
 	//RooChebychev bkg(Form("bkg%d",_count),"",*mass,RooArgSet(a0,a1,a2));
-	RooRealVar a0(Form("a0%d",_count),"",0.1,-1e4,1e4);
-	RooRealVar a1(Form("a1%d",_count),"",0.1,-1e4,1e4);
-	RooRealVar a2(Form("a2%d",_count),"",1e0,-1e4,1e4);
+	RooRealVar a0(Form("a0%d",_count),"",1,-5,5);
+	RooRealVar a1(Form("a1%d",_count),"",1,-5,5);
+	RooRealVar a2(Form("a2%d",_count),"",1,-5e3,5e3);
 	//	RooRealVar a3(Form("a3%d",_count),"",1e0,-1e4,1e4);
 	RooPolynomial bkg_1st(Form("bkg%d",_count),"",*mass,RooArgSet(a0));//2nd orderpoly
 	RooPolynomial bkg_2nd(Form("bkg%d",_count),"",*mass,RooArgSet(a0,a1));//2nd orderpoly
@@ -295,6 +292,8 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	if(variation=="" && pdf=="") model = new RooAddPdf(Form("model%d",_count),"",RooArgList(*sig,bkg),RooArgList(nsig,nbkg));
 	if(npfit != "1" && variation=="" && pdf=="") model = new RooAddPdf(Form("model%d",_count),"",RooArgList(bkg,*sig,peakbg),RooArgList(nbkg,nsig,npeakbg));
 	if(variation=="background" && pdf=="1st") model = new RooAddPdf(Form("model%d",_count),"",RooArgList(*sig,bkg_1st),RooArgList(nsig,nbkg));
+	if(variation=="background" && pdf=="2nd") model = new RooAddPdf(Form("model%d",_count),"",RooArgList(*sig,bkg_2nd),RooArgList(nsig,nbkg));
+	if(variation=="background" && pdf=="3rd") model = new RooAddPdf(Form("model%d",_count),"",RooArgList(*sig,bkg_3rd),RooArgList(nsig,nbkg));
 	//if(variation=="sigonly" && pdf=="") model = new RooAddPdf(Form("model%d",_count),"",RooArgList(*sig),RooArgList(nsig)); //added signal only//
 	//	if(variation=="" && pdf=="")  model = new RooAddPdf(Form("model%d",_count),"",RooArgList(*sig),RooArgList(nsig));
 	//model = new RooAddPdf(Form("model%d",_count),"",RooArgList(*sig),RooArgList(nsig));
@@ -457,37 +456,37 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 
 	//  a0.setVal(0.);
 	// a0.setConstant();
-	ds->plotOn(frame,Name(Form("ds_cut%d",_count)),Binning(nbinsmasshisto),MarkerSize(1),MarkerStyle(20),MarkerColor(1),LineColor(1),LineWidth(4),LineColor(1));//draw an transparent hist
+	ds->plotOn(frame,Name(Form("ds_cut%d",_count)),Binning(nbinsmasshisto),MarkerSize(1),MarkerStyle(20),MarkerColor(1),LineColor(1),LineWidth(2),LineColor(1));//draw an transparent hist
 	//std::cout<<"GETS hERE?"<<std::endl;
 
-	if(npfit != "1") model->plotOn(frame,Name(Form("peakbg%d",_count)),Components(peakbg),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),FillStyle(3005),FillColor(kGreen+4),LineStyle(1),LineColor(kGreen+4),LineWidth(4));
-	if(npfit != "1") model->plotOn(frame,Name(Form("peakbgF%d",_count)),Components(peakbg),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("F"),FillStyle(3005),FillColor(kGreen+4),LineStyle(1),LineColor(kGreen+4),LineWidth(4));
-	model->plotOn(frame,Name(Form("bkg%d",_count)),Components(bkg),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),LineStyle(7),LineColor(4),LineWidth(4));
+	if(npfit != "1") model->plotOn(frame,Name(Form("peakbg%d",_count)),Components(peakbg),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),FillStyle(3005),FillColor(kGreen+4),LineStyle(1),LineColor(kGreen+4),LineWidth(3));
+	if(npfit != "1") model->plotOn(frame,Name(Form("peakbgF%d",_count)),Components(peakbg),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("F"),FillStyle(3005),FillColor(kGreen+4),LineStyle(1),LineColor(kGreen+4),LineWidth(3));
+	model->plotOn(frame,Name(Form("bkg%d",_count)),Components(bkg),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),LineStyle(7),LineColor(4),LineWidth(3));
 	std::cout<<"GETS hERE?"<<std::endl;
 	if(pdf!="1gauss"){
-		model->plotOn(frame,Name(Form("sig%d",_count)),Components(*sig),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(4));
+		model->plotOn(frame,Name(Form("sig%d",_count)),Components(*sig),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(3));
 		std::cout<<"GETS hERE not 1gauss?"<<std::endl;
-		model->plotOn(frame,Name(Form("sigF%d",_count)),Components(*sig),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("F"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(4));
+		model->plotOn(frame,Name(Form("sigF%d",_count)),Components(*sig),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("F"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(3));
 		std::cout<<"GETS hERE not 1gauss?"<<std::endl;
 	}
 	else{
-		model->plotOn(frame,Name(Form("sig%d",_count)),Components(sig1),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(4));
+		model->plotOn(frame,Name(Form("sig%d",_count)),Components(sig1),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(3));
 		std::cout<<"GETS hERE else?"<<std::endl;
-		model->plotOn(frame,Name(Form("sigF%d",_count)),Components(sig1),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("F"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(4));
+		model->plotOn(frame,Name(Form("sigF%d",_count)),Components(sig1),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("F"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(3));
 		std::cout<<"GETS hERE else?"<<std::endl;
 	}
-	model->plotOn(frame,Name(Form("model%d",_count)),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),LineColor(2),LineWidth(4));
+	model->plotOn(frame,Name(Form("model%d",_count)),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),LineColor(2),LineWidth(3));
 
 	std::cout<<"GETS hERE?"<<std::endl;
 	//ds->plotOn(frame,Name(Form("ds%d",_count)),Binning(nbinsmasshisto),MarkerSize(1.55),MarkerStyle(20),LineColor(1),LineWidth(4));
 	if(tree=="ntphi")frame->SetMaximum(nsig.getVal()*1.1);
 	if(tree=="ntKp")frame->SetMaximum(nsig.getVal()*0.9);
 	//	frame->SetMaximum((h->GetBinContent(h->GetMaximumBin())+h->GetBinError(h->GetMaximumBin()))*1.8);
-	model->paramOn(frame,Layout(x_2+0.5, x_2+0.5, y_1+0.16), Format("NEU",AutoPrecision(3)));
-	// model->paramOn(frame,Layout(0.65, x_2, y_1-0.06), Format("NEU",AutoPrecision(3)));
+	//model->paramOn(frame,Layout(x_2+0.5, x_2+0.5, y_1+0.16), Format("NEU",AutoPrecision(3)));
+	model->paramOn(frame,Layout(0.65, x_2, y_1-0.06), Format("NEU",AutoPrecision(3)));
 	frame->getAttText()->SetTextSize(0.00);
-	/*  frame->getAttFill()->SetFillStyle(0);
-		frame->getAttLine()->SetLineWidth(0);*/
+	frame->getAttFill()->SetFillStyle(0);
+	frame->getAttLine()->SetLineWidth(0);
 	frame->SetTitle("");
 	//frameMC->SetXTitle("m_{B} (GeV/c^{2})");
 	//frame->SetXTitle("m_{J/#psi(#mu#mu)#it{#phi}(KK)} (GeV/c^{2})");
@@ -535,13 +534,30 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	//  frameMC->GetYaxis()->SetMaxDigits(2);
 	frame->SetStats(0);
 	(frame->GetXaxis())->SetRangeUser(minhisto,maxhisto);
+
+
+
+
+//BsBsBsBsBsBsBs
+if(ptmin==7 && ptmax==50){ (frame->GetYaxis())->SetRangeUser(0,1200);}
+else if (ptmin == 7) { (frame->GetYaxis())->SetRangeUser(0,100);}
+else if (ptmin == 10) { (frame->GetYaxis())->SetRangeUser(0,510);}
+else if (ptmin == 15) { (frame->GetYaxis())->SetRangeUser(0,300);}
+else if (ptmin == 20) { (frame->GetYaxis())->SetRangeUser(0,330);}
+//TEST TESTE TEST
+
+
+
+
+
+
 	frame->GetXaxis()->SetNdivisions(-50205);	
 	frame->Draw();
 	RooHist* pull_hist = frame->pullHist(Form("ds_cut%d",_count),Form("model%d",_count));
 	//  RooHist* pull_hist = frame->pullHist("Data","Fit");
 
 	RooPlot* pull_plot = mass->frame();
-	(pull_plot->GetXaxis())->SetRangeUser(minhisto,maxhisto);
+	(pull_plot->GetXaxis())->SetRangeUser(minhisto,maxhisto); //maxhisto
 	RooRealVar x("x","",1e3,0,1e6);
 	x.setVal(0.);
 	RooGenericPdf* line_ref = new RooGenericPdf("ref_0", "ref_0", "x", RooArgList(x));

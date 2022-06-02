@@ -59,7 +59,14 @@ double ptBinsFine[nBinsFine+1]={5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 const int nBinshi=1;
 double Binshi[nBinshi+1] = {0.*2,90.*2};
 //const int nBins_full=1;
-double ptBins_full[nBins_full+1] = {15,20};
+
+
+//////BPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPB
+
+double ptBins_full[nBins_full+1] = {5,60};
+
+//////BPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPB
+
 double hiBins_full[nBins_full+1] = {0,90.*2};
 //const int nBins_bp = 10;
 //double ptBins_bp[nBins_bp+1] = {1.0,2.0,3.0,5.0,7,10,15,20,30,50,100};

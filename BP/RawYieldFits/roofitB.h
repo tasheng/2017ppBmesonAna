@@ -265,8 +265,8 @@ RooRealVar sig1fracMC(Form("sig1fracMC%d_%s",_count, pdf.Data()),"",0.5,0.2,0.8)
 	//RooRealVar a1(Form("a1%d",_count),"a1",0.1,0.,1.);
 	//RooRealVar a2(Form("a2%d",_count),"a2",0.1,0.,1.);
 	//RooChebychev bkg(Form("bkg%d",_count),"",*mass,RooArgSet(a0,a1,a2));
-  RooRealVar a0(Form("a0%d",_count),"",0.1,-1e4,1e4);
-  RooRealVar a1(Form("a1%d",_count),"",0.1,-1e4,1e4);
+  RooRealVar a0(Form("a0%d",_count),"",1,-50,50);
+  RooRealVar a1(Form("a1%d",_count),"",0.1,-50,50);
   RooRealVar a2(Form("a2%d",_count),"",1e0,-1e4,1e4);
 //	RooRealVar a3(Form("a3%d",_count),"",1e0,-1e4,1e4);
    	RooPolynomial bkg_1st(Form("bkg%d",_count),"",*mass,RooArgSet(a0));//2nd orderpoly
@@ -411,26 +411,26 @@ RooRealVar sig1fracMC(Form("sig1fracMC%d_%s",_count, pdf.Data()),"",0.5,0.2,0.8)
 
  //  a0.setVal(0.);
  // a0.setConstant();
-  ds->plotOn(frame,Name(Form("ds_cut%d",_count)),Binning(nbinsmasshisto),MarkerSize(1),MarkerStyle(20),MarkerColor(1),LineColor(1),LineWidth(4),LineColor(1));//draw an transparent hist
+  ds->plotOn(frame,Name(Form("ds_cut%d",_count)),Binning(nbinsmasshisto),MarkerSize(1),MarkerStyle(20),MarkerColor(1),LineColor(1),LineWidth(2),LineColor(1));//draw an transparent hist
   //std::cout<<"GETS hERE?"<<std::endl;
 
-  if(npfit != "1") model->plotOn(frame,Name(Form("peakbg%d",_count)),Components(peakbg),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),FillStyle(3005),FillColor(kGreen+4),LineStyle(1),LineColor(kGreen+4),LineWidth(4));
-  if(npfit != "1") model->plotOn(frame,Name(Form("peakbgF%d",_count)),Components(peakbg),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("F"),FillStyle(3005),FillColor(kGreen+4),LineStyle(1),LineColor(kGreen+4),LineWidth(4));
-  model->plotOn(frame,Name(Form("bkg%d",_count)),Components(bkg),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),LineStyle(7),LineColor(4),LineWidth(4));
+  if(npfit != "1") model->plotOn(frame,Name(Form("peakbg%d",_count)),Components(peakbg),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),FillStyle(3005),FillColor(kGreen+4),LineStyle(1),LineColor(kGreen+4),LineWidth(3));
+  if(npfit != "1") model->plotOn(frame,Name(Form("peakbgF%d",_count)),Components(peakbg),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("F"),FillStyle(3005),FillColor(kGreen+4),LineStyle(1),LineColor(kGreen+4),LineWidth(3));
+  model->plotOn(frame,Name(Form("bkg%d",_count)),Components(bkg),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),LineStyle(7),LineColor(4),LineWidth(3));
   std::cout<<"GETS hERE?"<<std::endl;
   if(pdf!="1gauss"){
-    model->plotOn(frame,Name(Form("sig%d",_count)),Components(*sig),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(4));
+    model->plotOn(frame,Name(Form("sig%d",_count)),Components(*sig),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(3));
     std::cout<<"GETS hERE not 1gauss?"<<std::endl;
-    model->plotOn(frame,Name(Form("sigF%d",_count)),Components(*sig),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("F"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(4));
+    model->plotOn(frame,Name(Form("sigF%d",_count)),Components(*sig),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("F"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(3));
     std::cout<<"GETS hERE not 1gauss?"<<std::endl;
   }
   else{
-    model->plotOn(frame,Name(Form("sig%d",_count)),Components(sig1),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(4));
+    model->plotOn(frame,Name(Form("sig%d",_count)),Components(sig1),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(3));
     std::cout<<"GETS hERE else?"<<std::endl;
-    model->plotOn(frame,Name(Form("sigF%d",_count)),Components(sig1),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("F"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(4));
+    model->plotOn(frame,Name(Form("sigF%d",_count)),Components(sig1),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("F"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(3));
     std::cout<<"GETS hERE else?"<<std::endl;
   }
-  model->plotOn(frame,Name(Form("model%d",_count)),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),LineColor(2),LineWidth(4));
+  model->plotOn(frame,Name(Form("model%d",_count)),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),LineColor(2),LineWidth(3));
 
   std::cout<<"GETS hERE?"<<std::endl;
 	//ds->plotOn(frame,Name(Form("ds%d",_count)),Binning(nbinsmasshisto),MarkerSize(1.55),MarkerStyle(20),LineColor(1),LineWidth(4));
@@ -452,12 +452,12 @@ RooRealVar sig1fracMC(Form("sig1fracMC%d_%s",_count, pdf.Data()),"",0.5,0.2,0.8)
 //	if(tree=="ntKp")frame->SetMaximum(nsig.getVal()*0.57);
  //   if(tree=="ntKp")frame->SetMaximum(nsig.getVal()*1.2);
 //	frame->SetMaximum((h->GetBinContent(h->GetMaximumBin())+h->GetBinError(h->GetMaximumBin()))*1.8);
-//	model->paramOn(frame,Layout(0.65, x_2, y_1-0.15), Format("NEU",AutoPrecision(3)));
-	model->paramOn(frame,Layout(x_2+0.5, x_2+0.5, y_1+0.16), Format("NEU",AutoPrecision(3)));
+	model->paramOn(frame,Layout(0.65, x_2, y_1-0.05), Format("NEU",AutoPrecision(3)));
+	//model->paramOn(frame,Layout(x_2+0.5, x_2+0.5, y_1+0.16), Format("NEU",AutoPrecision(3)));
 
-  frame->getAttText()->SetTextSize(0.02);
-/*  frame->getAttFill()->SetFillStyle(0);
-  frame->getAttLine()->SetLineWidth(0);*/
+  frame->getAttText()->SetTextSize(0.00);
+  frame->getAttFill()->SetFillStyle(0);
+  frame->getAttLine()->SetLineWidth(0);
   frame->SetTitle("");
   //frameMC->SetXTitle("m_{B} (GeV/c^{2})");
   //frame->SetXTitle("m_{J/#psi(#mu#mu)#it{#phi}(KK)} (GeV/c^{2})");
@@ -488,7 +488,18 @@ RooRealVar sig1fracMC(Form("sig1fracMC%d_%s",_count, pdf.Data()),"",0.5,0.2,0.8)
   //  frameMC->GetYaxis()->SetMaxDigits(2);
   frame->SetStats(0);
   (frame->GetXaxis())->SetRangeUser(minhisto,maxhisto);
-  frame->GetXaxis()->SetNdivisions(-50205);	
+ 
+//BPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBPBP
+if(ptmin==5 && ptmax==60){ (frame->GetYaxis())->SetRangeUser(0,12100);}
+else if (ptmin == 5) { (frame->GetYaxis())->SetRangeUser(0,900);}
+else if (ptmin == 7) { (frame->GetYaxis())->SetRangeUser(0,1200);}
+else if (ptmin == 10) { (frame->GetYaxis())->SetRangeUser(0,5000);}
+else if (ptmin == 15) { (frame->GetYaxis())->SetRangeUser(0,3000);}
+else if (ptmin == 20) { (frame->GetYaxis())->SetRangeUser(0,2000);}
+else if (ptmin == 30) { (frame->GetYaxis())->SetRangeUser(0,600);}
+else if (ptmin == 50) { (frame->GetYaxis())->SetRangeUser(0,55);}
+
+ frame->GetXaxis()->SetNdivisions(-50205);	
   frame->Draw();
  
   RooHist* pull_hist = frame->pullHist(Form("ds_cut%d",_count),Form("model%d",_count));

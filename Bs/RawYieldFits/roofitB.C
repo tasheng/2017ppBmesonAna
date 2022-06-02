@@ -397,8 +397,10 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 		  }*/
 
 
+cout << "TESTE 123__"<< i<< "  " << ptBins_check[i] << endl;
+
 		//RooFitResult* f = fit(c, cMC, ds, dsMC, dh, dhMC, mass, frame, _ptBins[i], _ptBins[i+1], isMC, isPbPb, centmin, centmax, npfit);
-		RooFitResult* f = fit("", "", tree, c, cMC, ds_cut, dsMC_cut, dh, dhMC, mass, frame, ptBins_check[i], ptBins_check[i+1], isMC, isPbPb, centmin, centmax, npfit);
+		RooFitResult* f = fit("background", "3rd", tree, c, cMC, ds_cut, dsMC_cut, dh, dhMC, mass, frame, ptBins_check[i], ptBins_check[i+1], isMC, isPbPb, centmin, centmax, npfit);
 		//RooFitResult* f = fit("sigonly", "", tree, c, cMC, ds_cut, dsMC_cut, dh, dhMC, mass, frame, ptBins_check[i], ptBins_check[i+1], isMC, isPbPb, centmin, centmax, npfit);
 
 		//  return;
@@ -474,6 +476,9 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 		TLatex* tex_nMult;
 		
 		TLatex* tex_y;
+		TLatex* tex_y1;
+		TLatex* tex_y11;
+		TLatex* tex_y2;
 		//tex = new TLatex(0.55,0.85,Form("%.0f < p_{T} < %.0f GeV/c",_ptBins[i],_ptBins[i+1]));
 		//if(varExp=="abs(By)") tex = new TLatex(0.55,0.85,Form("%.1f < y < %.1f",_ptBins[i],_ptBins[i+1]));
 		if(varExp=="Bpt"){
@@ -481,7 +486,10 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 		//	if(centmin==0&&centmax==90)tex_hibin = new TLatex(0.21,0.62,"Cent. 0-90%");
 		//	if(centmin==0&&centmax==30)tex_hibin = new TLatex(0.21,0.62,"Cent. 0-30%");
 		//	if(centmin==30&&centmax==90)tex_hibin = new TLatex(0.21,0.62,"Cent. 30-90%");
-			tex_y = new TLatex(0.21,0.69,"|y| < 2.4"); 
+			tex_y = new TLatex(0.21,0.69,"p_{T} > 10 GeV/c : |y| < 2.4"); 
+			tex_y2 = new TLatex(0.21,0.63,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4"); 
+			tex_y1 = new TLatex(0.21,0.69,"1.5 < |y| < 2.4"); 
+			tex_y11 =new TLatex(0.21,0.69,"|y| < 2.4"); 
 			//	    tex = new TLatex(0.21,0.72,Form("%.0f < p_{T} < %.0f GeV/c",_ptBins[i],_ptBins[i+1]));
 
 		}
@@ -531,13 +539,28 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 
 		//tex = new TLatex(0.75,0.80,"|y| < 2.4");
 		//if(varExp=="abs(By)") tex = new TLatex(0.75,0.80,"15 < p_{T} < 50 GeV.c");
+		tex_y1->SetNDC();
+		tex_y1->SetTextFont(42);
+		tex_y1->SetTextSize(0.045);
+		tex_y1->SetLineWidth(2);
+		tex_y11->SetNDC();
+		tex_y11->SetTextFont(42);
+		tex_y11->SetTextSize(0.045);
+		tex_y11->SetLineWidth(2);
 		tex_y->SetNDC();
 		tex_y->SetTextFont(42);
 		tex_y->SetTextSize(0.045);
 		tex_y->SetLineWidth(2);
-		if(drawOpt ==1)	tex_y->Draw();
-		tex_y->Draw();
-
+		tex_y2->SetNDC();
+		tex_y2->SetTextFont(42);
+		tex_y2->SetTextSize(0.045);
+		tex_y2->SetLineWidth(2);
+		//if(drawOpt ==1)	tex_y->Draw();
+		if(ptBins_check[i] >= 10){tex_y11->Draw();}
+		else if(ptBins_check[i+1]==50){tex_y->Draw();
+					    tex_y2->Draw();}
+		else{tex_y1->Draw();}
+		
 		std::cout<<"CHEGUEI AQUI"<<std::endl;
 
 		CMS_lumi(c,19011,0);
@@ -547,22 +570,22 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 		TLatex *lat = new TLatex();
 		lat->SetNDC();
 		lat->SetTextSize(0.035);
-	
+/*	
 		lat->DrawLatex(0.64,0.85,Form("S = %.1f", yield));
 		lat->DrawLatex(0.64,0.80,Form("S_err = %.1f", yieldErr));		
 		lat->DrawLatex(0.64,0.75,Form("B = %.1f", bkgd));
 		//lat->DrawLatex(0.48,0.70,Form("Significance: S/#sqrt{S+B} = %.1f", Significance));
 		lat->DrawLatex(0.64,0.70,Form("Significance: %.1f", real_significance));
-
+*/
 		std::cout<<"Canvas Updated"<<std::endl;
-		c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_doubly%d_%.0f_%0.f",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".pdf");
+	//	c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_doubly%d_%.0f_%0.f",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".pdf");
 		c->Update();
-		c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_doubly%d_%.0f_%0.f",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".png");
+		c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_doubly%d_%.0f_%0.f",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".png");
 		//c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_doubly%d_%.0f_%0.f",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".C");
 		// c->SaveAs(Form("%s%s/%s_%s_%d%s_%d%d.png",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(), (int)ptBins_check[i],(int)ptBins_check[i+1]));
 		// c->SaveAs(Form("%s%s/%s_%s_%d%s_%d%d.C",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(), (int)ptBins_check[i],(int)ptBins_check[i+1]));
-		cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_doubly%d_%.0f_%0.f",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(), (int)ptBins_check[i], (int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".pdf");
-		cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_doubly%d_%.0f_%0.f",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(), (int)ptBins_check[i], (int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".png");
+		cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_doubly%d_%.0f_%0.f",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(), (int)ptBins_check[i], (int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".pdf");
+	//	cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_doubly%d_%.0f_%0.f",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(), (int)ptBins_check[i], (int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".png");
 
 		// cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%d%d.png",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_count,_postfix.Data(), (int)ptBins_check[i], (int)ptBins_check[i+1]));
 		//cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%d%d.C",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_count,_postfix.Data(), (int)ptBins_check[i], (int)ptBins_check[i+1]));
