@@ -186,7 +186,9 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 			ptBins_check = ptBins;
 			if(tree=="ntKp" && bp_bs==0){
 				nBins_check = nBins_bp;
-				ptBins_check = ptBins_bp;
+        for (auto iPt = 0; iPt < nBins_bp + 1; ++iPt) {
+          ptBins_check[iPt] = ptBins_bp[iPt];
+        }
 
 			}
 		}

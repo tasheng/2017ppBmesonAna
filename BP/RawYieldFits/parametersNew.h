@@ -5,12 +5,12 @@
 //double ptBins[nBins+1]={3,100};
 
 
-//const int nBins=7;
-//double ptBins[nBins+1] = {3,5,7,10,15,20,50,100};
+const int nBins=7;
+double ptBins[nBins+1] = {5,7,10,15,20,30,50,60};
 
 
-const int nBins = 3;
-double ptBins[nBins+1] = {0,0.5,1.0,2.0};
+/* const int nBins = 3; */
+/* double ptBins[nBins+1] = {0,0.5,1.0,2.0}; */
 
 //const int nBins=4;
 //double ptBins[nBins+1] = {5,10,15,20,50};
