@@ -885,7 +885,7 @@ void latex_table(std::string filename, int n_col, int n_lin, std::vector<std::st
 	file_check << "\\documentclass{article}" << std::endl;
 	//file << "\\usepackage[utf8]{inputenc}" << std::endl;     
 	file_check << "\\usepackage{rotating}" << std::endl;                                                                                   
-	file_check << "\\usepackage{cancel}" << std::endl;
+	// file_check << "\\usepackage{cancel}" << std::endl;
 	file_check << "\\usepackage{geometry}" << std::endl;
 	file_check << "\\usepackage{booktabs}" << std::endl;
 	file_check << "\\geometry{a4paper, total={170mm,257mm}, left=20mm, top=20mm,}" << std::endl;
