@@ -401,7 +401,7 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 cout << "TESTE 123__"<< i<< "  " << ptBins_check[i] << endl;
 
 		//RooFitResult* f = fit(c, cMC, ds, dsMC, dh, dhMC, mass, frame, _ptBins[i], _ptBins[i+1], isMC, isPbPb, centmin, centmax, npfit);
-		RooFitResult* f = fit("background", "3rd", tree, c, cMC, ds_cut, dsMC_cut, dh, dhMC, mass, frame, ptBins_check[i], ptBins_check[i+1], isMC, isPbPb, centmin, centmax, npfit);
+		RooFitResult* f = fit("", "", tree, c, cMC, ds_cut, dsMC_cut, dh, dhMC, mass, frame, ptBins_check[i], ptBins_check[i+1], isMC, isPbPb, centmin, centmax, npfit);
 		//RooFitResult* f = fit("sigonly", "", tree, c, cMC, ds_cut, dsMC_cut, dh, dhMC, mass, frame, ptBins_check[i], ptBins_check[i+1], isMC, isPbPb, centmin, centmax, npfit);
 
 		//  return;
@@ -483,21 +483,23 @@ cout << "TESTE 123__"<< i<< "  " << ptBins_check[i] << endl;
 		//tex = new TLatex(0.55,0.85,Form("%.0f < p_{T} < %.0f GeV/c",_ptBins[i],_ptBins[i+1]));
 		//if(varExp=="abs(By)") tex = new TLatex(0.55,0.85,Form("%.1f < y < %.1f",_ptBins[i],_ptBins[i+1]));
 		if(varExp=="Bpt"){
-			tex_pt = new TLatex(0.21,0.75,Form("%d < p_{T} < %d GeV/c",(int)ptBins_check[i],(int)ptBins_check[i+1]));
-		//	if(centmin==0&&centmax==90)tex_hibin = new TLatex(0.21,0.62,"Cent. 0-90%");
-		//	if(centmin==0&&centmax==30)tex_hibin = new TLatex(0.21,0.62,"Cent. 0-30%");
-		//	if(centmin==30&&centmax==90)tex_hibin = new TLatex(0.21,0.62,"Cent. 30-90%");
-			tex_y = new TLatex(0.21,0.69,"p_{T} > 10 GeV/c : |y| < 2.4"); 
-			tex_y2 = new TLatex(0.21,0.63,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4"); 
-			tex_y1 = new TLatex(0.21,0.69,"1.5 < |y| < 2.4"); 
-			tex_y11 =new TLatex(0.21,0.69,"|y| < 2.4"); 
-			//	    tex = new TLatex(0.21,0.72,Form("%.0f < p_{T} < %.0f GeV/c",_ptBins[i],_ptBins[i+1]));
-
+					//fr the AN run these
+			//tex_pt = new TLatex(0.55,0.8,Form("%d < p_{T} < %d GeV/c",(int)ptBins_check[i],(int)ptBins_check[i+1]));
+			//tex_y = new TLatex(0.55,0.74,"p_{T} > 10 GeV/c : |y| < 2.4"); 
+			//tex_y2 = new TLatex(0.55,0.68,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4"); 
+			//tex_y1 = new TLatex(0.55,0.74,"1.5 < |y| < 2.4"); 
+			//tex_y11 =new TLatex(0.55,0.74,"|y| < 2.4"); 
+			
+			
+					//for the paper run these			
+			tex_pt = new TLatex(0.55,0.4,Form("%d < p_{T} < %d GeV/c",(int)ptBins_check[i],(int)ptBins_check[i+1]));
+			tex_y = new TLatex(0.55,0.34,"p_{T} > 10 GeV/c : |y| < 2.4"); 
+			tex_y2 = new TLatex(0.55,0.28,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4"); 
+			tex_y1 = new TLatex(0.55,0.34,"1.5 < |y| < 2.4"); 
+			tex_y11 =new TLatex(0.55,0.34,"|y| < 2.4"); 
 		}
 
 		std::cout<<"CHEGUEI AQUI"<<std::endl;
-
-
 		if(varExp=="nMult"){
 			tex_pt = new TLatex(0.21,0.75,"0 < p_{T} < 100 GeV/c");
 			tex_nMult = new TLatex(0.21,0.62,Form("%d < nTrks < %d%%",(int)ptBins_check[i],(int)ptBins_check[i+1]));
@@ -520,14 +522,7 @@ cout << "TESTE 123__"<< i<< "  " << ptBins_check[i] << endl;
 		if(drawOpt ==1) tex_pt->Draw();
 		tex_pt->Draw();
 
-		/*
-		tex_hibin->SetNDC();
-		tex_hibin->SetTextFont(42);
-		tex_hibin->SetTextSize(0.045);
-		tex_hibin->SetLineWidth(2);
-		if(drawOpt ==1) tex_hibin->Draw();
-		tex_hibin->Draw();
-		*/
+
 		std::cout<<"CHEGUEI AQUI"<<std::endl;
 
 
@@ -556,12 +551,13 @@ cout << "TESTE 123__"<< i<< "  " << ptBins_check[i] << endl;
 		tex_y2->SetTextFont(42);
 		tex_y2->SetTextSize(0.045);
 		tex_y2->SetLineWidth(2);
-		//if(drawOpt ==1)	tex_y->Draw();
+
+
 		if(ptBins_check[i] >= 10){tex_y11->Draw();}
 		else if(ptBins_check[i+1]==50){tex_y->Draw();
 					    tex_y2->Draw();}
 		else{tex_y1->Draw();}
-		
+
 		std::cout<<"CHEGUEI AQUI"<<std::endl;
 
 		CMS_lumi(c,19011,0);
