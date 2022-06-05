@@ -27,7 +27,8 @@
 #include "RooMCStudy.h"
 #include <RooMinuit.h>
 
-
+// draw legend and suppress parameters
+const bool drawLegend = false;
 using namespace RooFit;
 using namespace std;
 
@@ -499,9 +500,11 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	if(tree=="ntKp")frame->SetMaximum(nsig.getVal()*0.9);
 	//	frame->SetMaximum((h->GetBinContent(h->GetMaximumBin())+h->GetBinError(h->GetMaximumBin()))*1.8);
 
-	//model->paramOn(frame,Layout(0.65, x_2, y_1-0.06), Format("NEU",AutoPrecision(3)));
+  if (drawLegend) {
 		model->paramOn(frame,Layout(1, 1, 1), Format("NEU",AutoPrecision(3)));
-	//uncomment the second and comment the first paramON when we want a nice legend to appear
+  } else {
+    model->paramOn(frame,Layout(0.65, x_2, y_1-0.06), Format("NEU",AutoPrecision(3)));
+  }
 
 
 	frame->getAttText()->SetTextSize(0.00);
@@ -710,7 +713,9 @@ else if (ptmin == 20) { (frame->GetYaxis())->SetRangeUser(0,330);}
 	//leg->AddEntry(frame->findObject(Form("bkg%d",_count)),"Combinatorial","l");
 	leg->AddEntry(frame->findObject(Form("bkg%d",_count)),"Background","l");
 	if(npfit != "1") leg->AddEntry(frame->findObject(Form("peakbg%d",_count)),"B #rightarrow J/#psi X","f");
-	leg->Draw();
+  if (drawLegend) {
+    leg->Draw();
+  }
 
 	
 	TLatex* texcms = new TLatex(0.21,0.88,"CMS");

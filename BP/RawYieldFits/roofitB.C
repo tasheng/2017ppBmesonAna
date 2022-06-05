@@ -482,20 +482,21 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 		//tex = new TLatex(0.55,0.85,Form("%.0f < p_{T} < %.0f GeV/c",_ptBins[i],_ptBins[i+1]));
 		//if(varExp=="abs(By)") tex = new TLatex(0.55,0.85,Form("%.1f < y < %.1f",_ptBins[i],_ptBins[i+1]));
 		if(varExp=="Bpt"){
-/*					//for the AN rune the top texs
-			tex_pt = new TLatex(0.55,0.8,Form("%d < p_{T} < %d GeV/c",(int)ptBins_check[i],(int)ptBins_check[i+1]));
-			tex_y = new TLatex(0.55,0.74,"p_{T} > 10 GeV/c : |y| < 2.4"); 
-			tex_y2 = new TLatex(0.55,0.88,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4"); 
-			tex_y1 = new TLatex(0.55,0.74,"1.5 < |y| < 2.4"); 
-			tex_y11 =new TLatex(0.55,0.74,"|y| < 2.4"); 
-*/
-					//for the paper run these
-
-			tex_pt = new TLatex(0.55,0.4,Form("%d < p_{T} < %d GeV/c",(int)ptBins_check[i],(int)ptBins_check[i+1]));
-			tex_y = new TLatex(0.55,0.34,"p_{T} > 10 GeV/c : |y| < 2.4"); 
-			tex_y2 = new TLatex(0.55,0.28,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4"); 
-			tex_y1 = new TLatex(0.55,0.34,"1.5 < |y| < 2.4"); 
-			tex_y11 =new TLatex(0.55,0.34,"|y| < 2.4"); 
+      if (drawLegend) {
+        //for the paper run these
+        tex_pt = new TLatex(0.55,0.4,Form("%d < p_{T} < %d GeV/c",(int)ptBins_check[i],(int)ptBins_check[i+1]));
+        tex_y = new TLatex(0.55,0.34,"p_{T} > 10 GeV/c : |y| < 2.4");
+        tex_y2 = new TLatex(0.55,0.28,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4");
+        tex_y1 = new TLatex(0.55,0.34,"1.5 < |y| < 2.4");
+        tex_y11 =new TLatex(0.55,0.34,"|y| < 2.4");
+      } else {
+        //for the AN rune the top texs
+        tex_pt = new TLatex(0.55,0.8,Form("%d < p_{T} < %d GeV/c",(int)ptBins_check[i],(int)ptBins_check[i+1]));
+        tex_y = new TLatex(0.55,0.74,"p_{T} > 10 GeV/c : |y| < 2.4");
+        tex_y2 = new TLatex(0.55,0.88,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4");
+        tex_y1 = new TLatex(0.55,0.74,"1.5 < |y| < 2.4");
+        tex_y11 =new TLatex(0.55,0.74,"|y| < 2.4");
+      }
 
 		}
 
