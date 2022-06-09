@@ -36,8 +36,9 @@ void ReweightBpt(int Opt){
 	if(Opt == 0){
 
 		ParName = "BP";
-		inputMC = "../UnskimmedSamples/OfficialMC/BPMC.root";
+		inputMC =  "../Unskimmed/NewOfficialMC/BPMC.root";
 		inputFONLL = "FONLLFine/BPFONLLFine.root";
+		// inputFONLL = "FONLLFine/fonllOutput_pp_Bplus_5p03TeV_yFid.root";
 		GenCut = "TMath::Abs(Gy)<2.4 && TMath::Abs(GpdgId)==521 && GisSignal==1 && GcollisionId==0";
 
 	}
@@ -45,8 +46,9 @@ void ReweightBpt(int Opt){
 	if(Opt == 1){
 
 		ParName = "Bs";
-		inputMC = "../UnskimmedSamples/OfficialMC/BsMC.root";
+		inputMC =  "../Unskimmed/NewOfficialMC/BsMC.root";
 		inputFONLL = "FONLLFine/BPFONLLFine.root";
+		// inputFONLL = "FONLLFine/fonllOutput_pp_Bplus_5p03TeV_yFid.root";
 		GenCut = "(TMath::Abs(Gy)<2.4&&TMath::Abs(GpdgId)==531&&GisSignal>0)";
 
 	}
@@ -67,7 +69,8 @@ void ReweightBpt(int Opt){
 	tMC->AddFriend("hiEvtAnalyzer/HiTree");  
 	tMC->AddFriend("skimanalysis/HltTree");
 
-	const int nBinsReweight = 180;
+	// const int nBinsReweight = 180;
+	const int nBinsReweight = 220;
 	float ptBinsReweight[nBinsReweight + 1];
 	float BptMin = 5.0;
 
@@ -235,7 +238,7 @@ void ReweightBpt(int Opt){
 	c->SaveAs(Form("plotReweight/%sBptReweigt%s.pdf",ParName.Data(),MethodLabel.Data()));
 
 
-	ofstream foutResults(Form("ResultFile/ReweightBpt.tex"));
+	ofstream foutResults(Form("ResultFile/ReweightBpt_%s.txt", ParName.Data()));
 	foutResults	<< "([0]-x)*TMath::Exp(-[1]*x)+[2]" << endl;
 	foutResults	<< "Fitting Results: " << BptReweightFunc.Data() << endl;
 	foutResults << "Paramater 0 = " << f1->GetParameter(0) << endl;
