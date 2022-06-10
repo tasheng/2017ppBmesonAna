@@ -1,7 +1,8 @@
 /*
    Macro to plot xsec and ratio vs pt for Bs and Bp)
 
-Input: txt files in inputDir, with 8 columns: ptmin, ptmax, central val, stat, systUp, systDown, glbUp,glbDown
+Input: txt files in inputDir, with 10 columns:
+ptmin, ptmax, central val, statUp, statDown, systUp, systDown, glbUp, glbDown, abscissae
 
 Output: xsec vs pt, ratio vs pt.
 
@@ -31,6 +32,7 @@ Output: xsec vs pt, ratio vs pt.
 #include "TString.h"
 #include "TStyle.h"
 #include "TSystem.h"
+#include "TPad.h"
 
 #include "CMS_lumi.C"
 #include "tdrstyle.C"
@@ -38,10 +40,40 @@ Output: xsec vs pt, ratio vs pt.
 
 #include "auxiliaryPt.h"
 #include "auxiliaryRef.h"
+#include "../../../parameter.h"
 
 //#include "outsideSource/lhcb.C"
 #endif
 using namespace std;
+
+void makePlot(int mes,
+              TString fonFull,
+              TString fonFid,
+              TString outputDir,
+              TGraphAsymmErrors* gLow,
+              TGraphAsymmErrors* gSystLow,
+              TGraphAsymmErrors* gLowWhite,
+              TGraphAsymmErrors* gHigh,
+              TGraphAsymmErrors* gSystHigh,
+              unsigned int nBins,
+              unsigned int nBinsLow,
+              double* xLow,
+              double* xHigh,
+              double* xErrLeftLow,
+              double* xErrRightLow,
+              double* xErrLeftHigh,
+              double* xErrRightHigh,
+              double* yLow,
+              double* yStatDownLow,
+              double* yStatUpLow,
+              double* ySystDownLow,
+              double* ySystUpLow,
+              double* yHigh,
+              double* yStatDownHigh,
+              double* yStatUpHigh,
+              double* ySystDownHigh,
+              double* ySystUpHigh,
+              double glbSyst);
 
 void plotPt(bool bSavePlots       = 1,
 		bool bDoDebug         = 0, //  figure out if things are read properly
@@ -67,6 +99,7 @@ void plotPt(bool bSavePlots       = 1,
 
 		Int_t endMes = nMes;
 
+    std::vector<int> nlines = {4, 7};
 		for (Int_t ib=0; ib<endMes; ib++){
 			ifstream in;
 			string inputFileName = Form("%s/%s_%s_New.txt",inputDir,inputFileType[whichPlot],mesonName[ib]);
@@ -85,12 +118,17 @@ void plotPt(bool bSavePlots       = 1,
 			string tmpstrg;
 			getline(in,tmpstrg);//ignore first line/ the header
 
+      cout << "start reading" << endl;
 			int nEntry=0;
-			while(in >> x[0] >> x[1] >> x[2] >> x[3] >> x[4] >> x[5] >> x[6] >> x[7] >> x[8] >> x[9])
+			// while(in >> x[0] >> x[1] >> x[2] >> x[3] >> x[4] >> x[5] >> x[6] >> x[7] >> x[8] >> x[9])
+			// {
+			for (auto iline = 0; iline < nlines[ib]; ++iline)
 			{
+        in >> x[0] >> x[1] >> x[2] >> x[3] >> x[4] >> x[5] >> x[6] >> x[7] >> x[8] >> x[9];
 				glbSystDown = x[8]*100;
 				glbSystUp   = x[7]*100;
 
+        cout << x[0] << ", " << x[1] << ", " << x[2] << ", " << x[3] << ", " << x[4] << ", " << x[5] << ", " << x[6] << ", " << x[7] << ", " << x[8] << ", " << x[9] << endl;
 
 					if(ib==0){//bs
 						if(nEntry==0){
@@ -181,6 +219,9 @@ void plotPt(bool bSavePlots       = 1,
 						bpl_high_ySystL[nEntry-2] = x[6]*x[2];
 						bpl_high_ySystH[nEntry-2] = x[5]*x[2];
 
+            cout << "ysyst:" << bpl_high_ySystL[nEntry-2] << ", ratio: " <<
+              bpl_high_ySystL[nEntry-2] / bpl_high[nEntry-2] << "\n";
+
 
 						}
 					
@@ -258,7 +299,7 @@ void plotPt(bool bSavePlots       = 1,
 				bpl_low_ySystL, bpl_low_ySystH);
 		TGraphAsymmErrors *pgBpl_syst_high   = new TGraphAsymmErrors(nBinsHighNew,binHighNew, bpl_high,
 				bpl_high_xErrL,bpl_high_xErrH,
-				bpl_high_ySystL,bpl_high_ySystH);
+				bpl_high_ySystL, bpl_high_ySystH);
 		// pgBs_syst_high->Draw("APL");
 		//==========================================
 		//------------------------------------------
@@ -451,396 +492,449 @@ void plotPt(bool bSavePlots       = 1,
 		CAOTheory->SetLineColor(kGreen+1);
 
 
-
-		//-------------------------------------------
-		TF1 *f4 = new TF1("f4","1",5,60);
-		f4->SetLineWidth(1);
-		f4->SetLineColor(1);
-		f4->SetLineStyle(1);
-		f4->GetYaxis()->SetTitle(yAxName[whichPlot]);
-		f4->GetXaxis()->SetTitle(xAxName[0]);
-		f4->GetXaxis()->CenterTitle(kTRUE);
-		f4->GetYaxis()->CenterTitle();
-		if(whichPlot==1){
-			f4->GetYaxis()->SetTitleSize(0.06*0.83);
-			f4->GetXaxis()->SetTitleSize(0.06*0.83);
-		
-			f4->GetYaxis()->SetTitleOffset(1.40);
-			f4->GetXaxis()->SetTitleOffset(1.20);
-
-
-		}
-
-		if(whichPlot==0){
-			f4->GetYaxis()->SetTitleSize(0.06*0.80);
-			f4->GetYaxis()->SetTitleOffset(1.5);
-			f4->GetXaxis()->SetTitleOffset(1.05);
-			f4->GetXaxis()->SetTitleSize(f4->GetXaxis()->GetTitleSize() * 0.77);
-			f4->GetXaxis()->SetTitleOffset(1.18);
-		
-			f4->GetXaxis()->SetTitleSize(0.06*0.83);  //Unify Textsize
-			f4->GetYaxis()->SetTitleSize(0.06*0.83);
-			f4->GetYaxis()->SetTitleOffset(1.40);
-			f4->GetXaxis()->SetTitleOffset(1.20);
-		
-
-			cout << "Offset = " << f4->GetYaxis()->GetTitleOffset() << endl;
-
-
-		}
-
-		f4->GetYaxis()->SetRangeUser(1e2,2e7);
-		//if(whichPlot==1) f4->GetYaxis()->SetRangeUser(0.0,1.8);
-		if(whichPlot==1) f4->GetYaxis()->SetRangeUser(0.0,0.90);
-		if(whichPlot==0) f4->GetYaxis()->SetRangeUser(100.0,2000000); //1.8 -> 0.9
-
-		//f4->GetXaxis()->SetNdivisions(-6);
-
-		//---------------- general stuff
-		TLatex *lat = new TLatex();
-		lat->SetNDC();
-
-		// // ##################################################### x-sec canvas
-		TCanvas *pc1 = new TCanvas("pc1","pc1");
-		f4->Draw();// axis
-		//pc1->SetBottomMargin(0.10);
-	
-	//	cout << "pc1->GetBottomMargin() = " << pc1->GetBottomMargin() << endl;
-	
-		pc1->SetBottomMargin(0.135); //Enlarge Margin
-
-		CMS_lumi(pc1,19011,0);
-
-		//Added to fix//
 		pgBs_syst_high->SetLineColor(kBlue-9);
 		pgBs_syst_low->SetLineColor(kBlue-9);
 		pgBpl_syst_high->SetLineColor(kGreen-9);
 		pgBpl_syst_low->SetLineColor(kGreen-9);
 
 
-
-		if(whichPlot==0)// x-section
-		{
-			gPad->SetLogy();
-
-			pgBs_syst_high->SetLineWidth(1);
-
-			pgBs_syst_high->Draw("5same");
-			pgBs_syst_low->Draw("5same");	
-
-		//	pgBs_low->SetMarkerStyle(24);
-			
-			
-			pgBs_lowWhite->Draw("P");
-		
-			pgBs_low->Draw("P");
-			pgBs_high->Draw("P");
-
-			pgBpl_syst_low->Draw("5same");
-			pgBpl_syst_high->Draw("5same");
-			
-			pgBs_lowWhite->Draw("P");
-		
-			
-			pgBpl_lowWhite->Draw("P");
-			pgBpl_low->Draw("P");
-
-			pgBpl_high->Draw("P");
-			pgBpl_lowWhite->Draw("P");
-		
-
-		}
-		else{//ratio plot
-			if(drawRef){
-				//		FragBand->Draw("5same");
-				TAMUTheory->Draw("l");
-				CAOTheory->Draw("l");
-				LHCb7TeVRef->Draw("P");
-			}
-
-			pgRatio_syst_low->SetLineColor(colorRatio[0]);
-			pgRatio_syst_high->SetLineColor(colorRatio[1]);
-
-			pgRatio_syst_low->Draw("5same");
-			pgRatio_low->Draw("P");
-			pgRatio_lowWhite->Draw("P");
-			
-			pgRatio_syst_high->Draw("5same");
-			pgRatio_high->Draw("P");
-
-
-		}
-
-		//supplemental info on plot:
-		if(whichPlot==0){
-
-
-			lat->SetTextFont(42);
-			lat->SetTextSize(ltxSetTextSize2 * 1.3);
-			lat->SetTextSize(ltxSetTextSize4); //Enlarge Labels
-			
-			//lat->DrawLatex(xsec_ltxText1_xStart,xsec_ltxText1_yStart,"Cent. 0-90%");
-			//lat->DrawLatex(xsec_ltxText1_xStart,xsec_ltxText1_yStart,"Centrality 0-90%"); //Expand Cent.
-			//lat->DrawLatex(xsec_ltxText1_xStart + 0.25,xsec_ltxText1_yStart,"Centrality 0-90%"); // Move Cent
-	//		lat->DrawLatex(xsec_ltxText1_xStart + 0.34,xsec_ltxText1_yStart - 0.22,"Centrality 0-90%"); // Move Cent
-
-			lat->SetTextFont(42);
-			lat->SetTextSize(ltxSetTextSize2 * 1.3);
-			lat->SetTextSize(ltxSetTextSize4); //Enlarge Labels
-		
-			cout << "ltxSetTextSize4 = " << ltxSetTextSize4 << endl;
-
-
-
-	//		lat->DrawLatex(xsec_ltxText1_xStart,xsec_ltxText1_yStart-0.65,Form("B_{s}^{0} global uncert.: #pm %.1f %%",glbSystUpBs));
-	//		lat->DrawLatex(xsec_ltxText1_xStart,xsec_ltxText1_yStart-0.70,Form("B^{+} global uncert.: #pm %.1f %%",glbSystUpBp));
-
-			lat->DrawLatex(xsec_ltxText1_xStart + 0.02,xsec_ltxText1_yStart-0.65+0.037,Form("B_{s}^{0} global uncertainty: #pm %.1f%%",glbSystUpBs));
-			lat->DrawLatex(xsec_ltxText1_xStart + 0.02,xsec_ltxText1_yStart-0.70 + 0.037,Form("B^{+} global uncertainty: #pm %.1f%%",glbSystUpBp));
-			
-		//	cout << "X1 = " << xsec_ltxText1_xStart + 0.02 << "    Y1 = " << xsec_ltxText1_yStart-0.65+0.037 << endl;
-
-		//	cout << "X2 = " << xsec_ltxText1_xStart + 0.02 << "    Y2 = " << xsec_ltxText1_yStart-0.65+0.037 << endl;
-
-			// lat->DrawLatex(xsec_ltxText1_xStart,xsec_ltxText1_yStart-0.7,Form("- %.2f %%",glbSystDown));
-
-			// legend
-			//			TLegend *legXSec = new TLegend(legXsec_xLowStart,legXsec_y,legXsec_xLowEnd,legXsec_y+0.15,"B_{s}^{0}                    B^{+}","brNDC");
-			//			legXSec->SetBorderSize(0);
-
-
-			//		TLegend *legXSec = new TLegend(legXsec_xLowStart+0.01,legXsec_y-0.05,legXsec_xLowEnd+0.18,legXsec_y+0.05,"B_{s}^{0}   B^{+}","brNDC");
-			//		legXSec->SetBorderSize(0);
-
-			//	TLegend *legXSec = new TLegend(legXsec_xLowStart,legXsec_y,legXsec_xLowEnd,legXsec_y+0.15,"B_{s}^{0}                    B^{+}",
-
-
-
-			//		TLegend *legXSec = new TLegend(legXsec_xLowStart+0.01,legXsec_y-0.05,legXsec_xLowEnd+0.18,legXsec_y+0.05,NULL,"brNDC");
-			//		legXSec->SetBorderSize(0);
-
-
-
-			double ShiftX = 0.05;
-			double ShiftY = 0.13;
-
-			lat->SetTextSize(0.05);
-			lat->SetTextSize(0.05 * ltxSetTextSize4/ltxSetTextSize2);  //Enlarge Labels
-			
-			lat->SetTextSize(0.048 * 1.15);  //Enlarge Labels
-		//	lat->SetTextSize(0.025);  //Enlarge Labels
-		
-			//lat->DrawLatex(legXsec_xLowStart- ShiftX,legXsec_y,"#bf{B_{s}^{0}              B^{+}}");
-
-		//	lat->DrawLatex(legXsec_xLowStart+ShiftX,legXsec_y,"#bf{B_{s}^{0}}");
-		//	lat->DrawLatex(legXsec_xLowStart+ ShiftX + 0.080,legXsec_y,"#bf{B^{+}}");
-
-
-			lat->DrawLatex(legXsec_xLowStart+ShiftX+0.02 + 0.009,legXsec_y + 0.07,"#bf{B_{s}^{0}}"); //Enlarge Label
-			lat->DrawLatex(legXsec_xLowStart+ ShiftX + 0.125 + 0.003,legXsec_y+ 0.07,"#bf{B^{+}}");  //Enlarge Label
-
-
-		//	lat->DrawLatex(legXsec_xLowStart+ShiftX+0.02 - 0.01,legXsec_y + 0.08,"#bf{Rebinned}"); //Enlarge Label + Shift up
-		//	lat->DrawLatex(legXsec_xLowStart+ ShiftX + 0.125 + 0.00,legXsec_y  + 0.08,"#bf{Submitted}");  //Enlarge Label + Shift up
-			
-
-			cout << "Bs B+ Y Location = " << legXsec_y + 0.08 << endl;
-
-
-			lat->SetTextSize(ltxSetTextSize2 * 1.3);
-			lat->SetTextSize(ltxSetTextSize4); //Enlarge Labels
-
-			
-		//	lat->DrawLatex(legXsec_xLowStart-0.15,legXsec_y+0.062-ShiftY,"1.5 < |y| < 2.4");
-		//	lat->DrawLatex(legXsec_xLowStart-0.10,legXsec_y+0.017-ShiftY,"|y| < 2.4 ");
-
-
-
-
-//			lat->DrawLatex(legXsec_xLowStart-0.18,legXsec_y+0.062-ShiftY,"1.5 < |y| < 2.4"); //Enlarge Label
-//			lat->DrawLatex(legXsec_xLowStart-0.13,legXsec_y+0.017-ShiftY,"|y| < 2.4 "); //Enlarge Label
-
-
-			lat->DrawLatex(legXsec_xLowStart-0.18-0.02,legXsec_y+0.062-ShiftY + 0.08,"1.5 < |y| < 2.4"); //Enlarge Label + Shift up
-			lat->DrawLatex(legXsec_xLowStart-0.13-0.02,legXsec_y+0.017-ShiftY + 0.08,"|y| < 2.4 "); //Enlarge Label + Shift up
-
-
-
-
-//			TLegend *legXSec = new TLegend(legXsec_xLowStart + ShiftX + 0.04,legXsec_y-ShiftY,legXsec_xLowEnd+ShiftX-0.10+0.06,legXsec_y+0.15-ShiftY,"                    ","brNDC");
-			TLegend *legXSec = new TLegend(legXsec_xLowStart + ShiftX + 0.04,legXsec_y-ShiftY + 0.08,legXsec_xLowEnd+ShiftX-0.10+0.06,legXsec_y+0.15-ShiftY + 0.08,"                    ","brNDC");
-		
-			legXSec->SetBorderSize(0);
-
-			cout << "legXsec_xLowStart + ShiftX + 0.04 = " << legXsec_xLowStart + ShiftX + 0.04 << endl;
-			cout << "legXsec_y+0.15-ShiftY + 0.08 = " << legXsec_y+0.15-ShiftY + 0.08 << endl;
-			cout << "legXsec_y-ShiftY + 0.08 = " << legXsec_y-ShiftY + 0.08 << endl;
-			legXSec->SetTextSize(ltxSetTextSize2);
-			legXSec->SetLineColor(1);
-			legXSec->SetLineStyle(1);
-			legXSec->SetLineWidth(1);
-			legXSec->SetFillColor(19);
-			legXSec->SetFillStyle(0);
-			legXSec->SetTextFont(42);
-			legXSec->SetNColumns(2);
-			legXSec->SetColumnSeparation(0.0);
-			//legXSec->AddEntry(pgBs_low,"1.5 < |y| < 2.4","p");
-			legXSec->AddEntry(pgBs_low," ","p");
-			legXSec->SetTextFont(42);
-			legXSec->AddEntry(pgBpl_low," ","p");
-			//legXSec->AddEntry(pgBs_high,"|y| < 2.4","p");
-			legXSec->AddEntry(pgBs_high," ","p");
-			legXSec->SetTextFont(42);
-			legXSec->AddEntry(pgBpl_high," ","p");
-				
-
-
-			legXSec->Draw();
-
-		}else{
-			//			lat->SetTextSize(ltxSetTextSize1 * 0.64);
-
-			lat->SetTextSize(ltxSetTextSize2*1.7);
-			lat->SetTextSize(ltxSetTextSize2*1.7/1.3 *1.17 * ltxSetTextSize4/ltxSetTextSize2); //Enlarge Labels
-			lat->SetTextSize(ltxSetTextSize2*1.7/1.3 *1.17 * ltxSetTextSize4/ltxSetTextSize2 /1.05); //Enlarge Labels - Reduce by 8% to match
-			
-
-			lat->SetTextFont(42);
-			//lat->DrawLatex(ratio_ltxText1_xStart,ratio_ltxText1_yStart,"#bf{#frac{B_{s}^{0}}{B^{+}}}");
-
-			//cout << "ltxSetTextSize1 = " << ltxSetTextSize1 << endl;
-
-			lat->SetTextFont(42);
-			lat->SetTextSize(ltxSetTextSize2 * 1.3);
-			lat->SetTextSize(ltxSetTextSize4*1.08/1.08); //Enlarge Labels
-	
-			//lat->DrawLatex(ratio_ltxText2_xStart-0.04,ratio_ltxText2_yStart,"Cent. 0-90%");
-	//		lat->DrawLatex(ratio_ltxText2_xStart-0.04,ratio_ltxText2_yStart,"Cent. 0-90%");
-	//		lat->DrawLatex(ratio_ltxText2_xStart-0.06,ratio_ltxText2_yStart,"Centrality 0-90%"); //Expand Cent.
-
-			lat->SetTextFont(42);
-			lat->SetTextSize(ltxSetTextSize2 * 1.3);
-			lat->SetTextSize(ltxSetTextSize4*1.08); //Enlarge Labels
-			lat->SetTextSize(ltxSetTextSize4*1.08/1.08); //Enlarge Labels - Reduce 8%
-	
-		//	lat->DrawLatex(legRatio_xLowStart-0.14,legRatio_y-0.15 - 0.30,Form("global uncert.: #pm %.1f %%",glbSystDown));
-		//	lat->DrawLatex(legRatio_xLowStart-0.20,legRatio_y-0.15 - 0.30,Form("global uncertainty: #pm %.1f%%",glbSystDown));
-
-			cout << "legRatio_xLowStart = " << legRatio_xLowStart << "   legRatio_y = " << legRatio_y << endl; 
-
-			// legend
-			TLegend *legRatio = new TLegend(legRatio_xLowStart-0.04,legRatio_y+0.08,legRatio_xLowEnd-0.04,legRatio_y+0.18,NULL,"brNDC");
-			legRatio->SetBorderSize(0);
-			legRatio->SetTextFont(42);
-			legRatio->SetTextSize(ltxSetTextSize2 * 1.3);
-			legRatio->SetTextSize(ltxSetTextSize4*1.08); //Enlarge Labels
-			legRatio->SetTextSize(ltxSetTextSize4*1.08/1.08); //Enlarge Labels - Reduce by 6% to match
-
-			
-			legRatio->SetLineColor(1);
-			legRatio->SetLineStyle(1);
-			legRatio->SetLineWidth(1);
-			legRatio->SetFillColor(19);
-			legRatio->SetFillStyle(0);
-			TLegendEntry *entry1 = legRatio->AddEntry("pgRatio_low","1.5 < |y| < 2.4","p");
-			entry1->SetTextFont(42);
-			entry1->SetMarkerStyle(markerRatio[0]);
-			entry1->SetMarkerSize(1.7);
-			entry1->SetMarkerColor(kRed+3);
-			
-			entry1->SetFillStyle(1001);
-
-			TLegendEntry *entry2 = legRatio->AddEntry("pgRatio_high","|y| < 2.4","p");
-			entry2->SetTextFont(42);
-			entry2->SetMarkerStyle(markerRatio[1]);
-			entry2->SetMarkerColor(kRed+3);
-		
-			entry2->SetMarkerSize(1.7);
-			entry2->SetFillStyle(1001);
-
-			legRatio->Draw();
-			//---------------
-			if(drawRef)
-			{
-				TLegend *legRatioRef = new TLegend(legRatioRef_xLowStart-0.06 + 0.09,legRatioRef_y-0.09,legRatioRef_xLowEnd-0.03+ 0.09,legRatio_y+0.11,NULL,"brNDC");
-				legRatioRef->SetBorderSize(0);
-				legRatioRef->SetTextFont(42);
-
-				legRatioRef->SetTextSize(ltxSetTextSize2*1.3);
-				legRatioRef->SetTextSize(ltxSetTextSize4*1.08); //Enlarge Labels
-				legRatioRef->SetTextSize(ltxSetTextSize4*1.08/1.08); //Enlarge Labels - Reduced by 8% to Match
-		
-				legRatioRef->SetLineColor(1);
-				legRatioRef->SetLineStyle(1);
-				legRatioRef->SetLineWidth(1);
-				legRatioRef->SetFillColor(19);
-				legRatioRef->SetFillStyle(0);
-				//		TLegendEntry *entry1Ref = legRatioRef->AddEntry("FragBand","f_{s}/f_{u} reference: PDG","P");
-
-				/*
-				   TLegendEntry *entry1Ref = legRatioRef->AddEntry("FragBand","f_{s}/f_{u} LCHb 13TeV","P");
-				   entry1Ref->SetTextFont(42);
-				   entry1Ref->SetFillStyle(1001);
-				   entry1Ref->SetMarkerStyle(25);
-				   entry1Ref->SetMarkerSize(1.4);
-				   entry1Ref->SetMarkerColor(kGreen);
-				   entry1Ref->SetLineWidth(5);
-				   */
-
-				//		TLegendEntry *entry4Ref = legRatioRef->AddEntry(pgRatio_high,"PbPb: CMS 5.02 TeV","p");
-				//		entry4Ref->SetTextFont(42);
-				//		entry4Ref->SetLineColor(colorRatio[1]);
-				//		entry4Ref->SetLineWidth(3);
-
-				TLegendEntry *entry2Ref = legRatioRef->AddEntry("TAMUTheory","PbPb: TAMU","l");
-				entry2Ref->SetTextFont(42);
-				entry2Ref->SetLineColor(kOrange+1);
-				entry2Ref->SetLineWidth(3);
-
-
-			//	TLegendEntry *entry5Ref = legRatioRef->AddEntry("CAOTheory","PbPb: Cao, Sun, Ko (Cent. 0-80%)","l");
-			//	TLegendEntry *entry5Ref = legRatioRef->AddEntry("CAOTheory","PbPb: Langevin (Cent. 0-80%)","l");
-				TLegendEntry *entry5Ref = legRatioRef->AddEntry("CAOTheory","PbPb: Langevin (Centrality 0-80%)","l"); //Expand Cent.
-
-				entry5Ref->SetTextFont(42);
-				entry5Ref->SetLineColor(kGreen+1);
-				entry5Ref->SetLineWidth(3);
-
-
-
-				if(drawlhcb){
-
-
-					TLegendEntry *entry6Ref = legRatioRef->AddEntry("LHCb7TeVRef","pp: LHCb 7 TeV","Pl");
-					entry6Ref->SetTextFont(42);
-					entry6Ref->SetLineColor(kBlue);
-					entry6Ref->SetLineWidth(3);
-
-
-				}
-
-
-				legRatioRef->Draw();
-
-			}
-
-
-		}
-
-
-		// gPad->RedrawAxis();
-		pc1->Update();
-
-		if(bSavePlots)
-		{
-			if (whichPlot==0)
-			{
-				pc1->SaveAs(Form("%s/pdf/xsec_vsPt.pdf",outputDir));
-				pc1->SaveAs(Form("%s/png/xsec_vsPt.png",outputDir));
-			}else{
-				pc1->SaveAs(Form("%s/pdf/ratio_vsPt_ref%d_%d.pdf",outputDir,drawRef,drawlhcb));
-				pc1->SaveAs(Form("%s/png/ratio_vsPt_ref%d_%d.png",outputDir,drawRef,drawlhcb));
-			}
-		}
-
-		}
+    TString bpFonDir = "../../../BsBPFinalResults/Comparisons/Fiducial/FONLLs/forTzuAn/";
+    TString bsFonDir = "../../../BsBPFinalResults/Comparisons/Fiducial/FONLLs/";
+
+    makePlot(0,
+             bsFonDir + "BsFONLL.root",
+             bsFonDir + "BsFONLLFid.root",
+             outputDir,
+             pgBs_low, pgBs_syst_low, pgBs_lowWhite,
+             pgBs_high, pgBs_syst_high,
+             nBinsLow + nBinsHigh,
+             nBinsLow,
+             binLow, binHigh,
+             bs_low_xErrL, bs_low_xErrH,
+             bs_high_xErrL, bs_high_xErrH,
+             bs_low, bs_low_yStatL, bs_low_yStatH, bs_low_ySystL, bs_low_ySystH,
+             bs_high, bs_high_yStatL, bs_high_yStatH, bs_high_ySystL, bs_high_ySystH,
+             glbSystUpBs);
+
+    makePlot(1, bpFonDir + "fonllOutput_pp_Bplus_5p03TeV_y2p4.root",
+             bpFonDir + "fonllOutput_pp_Bplus_5p03TeV_yFid.root",
+             outputDir,
+             pgBpl_low, pgBpl_syst_low, pgBpl_lowWhite,
+             pgBpl_high, pgBpl_syst_high,
+             nBinsLowNew + nBinsHighNew,
+             nBinsLowNew,
+             binLowNew, binHighNew,
+             bpl_low_xErrL, bpl_low_xErrH,
+             bpl_high_xErrL, bpl_high_xErrH,
+             bpl_low, bpl_low_yStatL, bpl_low_yStatH, bpl_low_ySystL, bpl_low_ySystH,
+             bpl_high, bpl_high_yStatL, bpl_high_yStatH, bpl_high_ySystL, bpl_high_ySystH,
+             glbSystUpBp);
+
+    }
+
+
+// compute ratio and plot them
+void makePlot(int mes,
+              TString fonFull,
+              TString fonFid,
+              TString outputDir,
+              TGraphAsymmErrors* gLow,
+              TGraphAsymmErrors* gSystLow,
+              TGraphAsymmErrors* gLowWhite,
+              TGraphAsymmErrors* gHigh,
+              TGraphAsymmErrors* gSystHigh,
+              unsigned int nBins,
+              unsigned int nBinsLow,
+              double* xLow,
+              double* xHigh,
+              double* xErrLeftLow,
+              double* xErrRightLow,
+              double* xErrLeftHigh,
+              double* xErrRightHigh,
+              double* yLow,
+              double* yStatDownLow,
+              double* yStatUpLow,
+              double* ySystDownLow,
+              double* ySystUpLow,
+              double* yHigh,
+              double* yStatDownHigh,
+              double* yStatUpHigh,
+              double* ySystDownHigh,
+              double* ySystUpHigh,
+              double glbSyst) {
+  cout << "nbins" << nBins << "\n";
+
+  unsigned int nBinsHigh = nBins - nBinsLow;
+  int whichPlot = 0;
+
+  TFile * finFONLLBs = new TFile(fonFull);
+  TFile * finFONLLBs2 = new TFile(fonFid);
+
+  TGraphAsymmErrors *BsFONLL = (TGraphAsymmErrors*) finFONLLBs->Get("gaeSigmaBplus");
+  BsFONLL->SetLineColor(kRed+2);
+  BsFONLL->SetLineWidth(2);
+  BsFONLL->SetFillStyle(0);
+
+  finFONLLBs2->cd();
+  TGraphAsymmErrors *BsFONLL2 = (TGraphAsymmErrors*) finFONLLBs2->Get("gaeSigmaBplus");
+  BsFONLL2->SetLineColor(kRed+2);
+
+
+  BsFONLL->SetFillColorAlpha(kRed+2, 0.5);
+
+  double XTempChange;
+  double YTempChange;
+  double YErrLowTemp;
+  double YErrHighTemp;
+
+  for(int i = 0; i < nBinsLow; i ++){
+    BsFONLL2->GetPoint(i,XTempChange,YTempChange);
+    YErrLowTemp = BsFONLL2->GetErrorYlow(i);
+    YErrHighTemp = BsFONLL2->GetErrorYhigh(i);
+    BsFONLL->SetPoint(i,XTempChange,YTempChange);
+    BsFONLL->SetPointEYhigh(i,YErrHighTemp);
+    BsFONLL->SetPointEYlow(i,YErrLowTemp);
+  }
+
+  // Get ratio plots
+  vector<double> BsXsec;
+  vector<double> BsXsecStat;
+  vector<double> BsXsecSyst;
+  vector<double> FONLL;
+  vector<double> FONLLUp;
+  vector<double> FONLLDown;
+  double XTempFONLL;
+  double YTempFONLL;
+  for (auto i = 0; i < nBinsLow; ++i) {
+    BsXsec.push_back(yLow[i]);
+    BsXsecStat.push_back(yStatDownLow[i]);
+    BsXsecSyst.push_back(ySystDownLow[i]);
+  }
+  for (auto i = 0; i < nBinsHigh; ++i) {
+    BsXsec.push_back(yHigh[i]);
+    BsXsecStat.push_back(yStatDownHigh[i]);
+    BsXsecSyst.push_back(ySystDownHigh[i]);
+  }
+
+  double RatioBs[nBins];
+  double RatioBsStat[nBins];
+  double RatioBsSyst[nBins];
+
+  double RatioBsFonErrHigh[nBins];
+  double RatioBsFonErrLow[nBins];
+  std::vector<double> Unity(nBins, 1);
+
+  for (auto i = 0; i < nBins; ++i) {
+    BsFONLL->GetPoint(i, XTempFONLL, YTempFONLL);
+    FONLL.push_back(YTempFONLL);
+    FONLLUp.push_back(BsFONLL->GetErrorYhigh(i));
+    FONLLDown.push_back(BsFONLL->GetErrorYlow(i));
+
+    cout << "bs xsex:" << BsXsec[i] << "\n";
+    cout << "FONLL:" << FONLL[i] << "\n";
+    RatioBs[i] = BsXsec[i] / FONLL[i];
+    RatioBsStat[i] = BsXsecStat[i] / FONLL[i];
+    RatioBsSyst[i] = BsXsecSyst[i] / FONLL[i];
+    cout << "ratio:" << RatioBs[i] << "\n";
+
+    RatioBsFonErrHigh[i] = FONLLUp[i] / FONLL[i];
+    RatioBsFonErrLow[i] = FONLLDown[i] / FONLL[i];
+  }
+
+  TGraphAsymmErrors gRatioBs_low(nBinsLow,
+                                 xLow,
+                                 RatioBs,
+                                 xErrLeftLow, xErrRightLow,
+                                 RatioBsStat, RatioBsStat);
+
+  TGraphAsymmErrors gRatioBs_high(nBinsHigh,
+                                  xHigh,
+                                  RatioBs + nBinsLow,
+                                  xErrLeftHigh, xErrRightHigh,
+                                  RatioBsStat + nBinsLow, RatioBsStat + nBinsLow);
+
+  TGraphAsymmErrors gRatioBs_syst_low(nBinsLow,
+                                      xLow,
+                                      RatioBs,
+                                      xErrLeftLow, xErrRightLow,
+                                      RatioBsSyst, RatioBsSyst);
+
+  TGraphAsymmErrors gRatioBs_syst_high(nBinsHigh,
+                                       xHigh,
+                                       RatioBs + nBinsLow,
+                                       xErrLeftHigh, xErrRightHigh,
+                                       RatioBsSyst + nBinsLow, RatioBsSyst + nBinsLow);
+
+  TGraphAsymmErrors gRatioBs_Fon_low(nBinsLow,
+                                     xLow,
+                                     Unity.data(),
+                                     xErrLeftLow, xErrRightLow,
+                                     RatioBsFonErrLow, RatioBsFonErrHigh);
+
+  TGraphAsymmErrors gRatioBs_Fon_high(nBinsHigh,
+                                      xHigh,
+                                      Unity.data(),
+                                      xErrLeftHigh, xErrRightHigh,
+                                      RatioBsFonErrLow + nBinsLow,
+                                      RatioBsFonErrHigh + nBinsLow);
+
+  gRatioBs_low.SetMarkerStyle(markerLow[mes]);
+  gRatioBs_high.SetMarkerStyle(markerHigh[mes]);
+
+  int hcolor = kBlue - 9;
+  double halpha = 0.5;
+  if (mes == 1) {
+    hcolor = kGreen - 9;
+  }
+  gRatioBs_syst_low.SetFillColorAlpha(hcolor, halpha);
+  gRatioBs_syst_high.SetFillColorAlpha(hcolor, halpha);
+
+  gRatioBs_Fon_low.SetLineColor(kRed+2);
+  gRatioBs_Fon_high.SetLineColor(kRed+2);
+  gRatioBs_Fon_low.SetLineWidth(2);
+  gRatioBs_Fon_high.SetLineWidth(2);
+  // gRatioBs_Fon_low.SetFillColorAlpha(kRed+2, 0.5);
+  // gRatioBs_Fon_high.SetFillColorAlpha(kRed+2, 0.5);
+
+
+
+  //---------------- general stuff
+  TLatex *lat = new TLatex();
+  lat->SetNDC();
+
+  // // ##################################################### x-sec canvas
+  TCanvas *pc1 = new TCanvas("pc1","pc1");
+  //pc1->SetBottomMargin(0.10);
+  
+  //	cout << "pc1->GetBottomMargin() = " << pc1->GetBottomMargin() << endl;
+  
+  pc1->SetBottomMargin(0.135); //Enlarge Margin
+
+  //Added to fix//
+
+
+  // TCanvas * cRatio = new TCanvas("cRatio","cRatio",800, 1200);
+  TPad * dataPad = new TPad("MyPad1","",0,0.3,1, 0.96);
+  dataPad->SetBottomMargin(0);
+  dataPad->SetLogy();
+  dataPad->Draw();
+
+  TPad * ratioPad = new TPad("MyPad2","",0,0.0,1,0.3);
+  ratioPad->SetTopMargin(0);
+  ratioPad->SetBottomMargin(0.3);
+  ratioPad->Draw();
+
+
+  //supplemental info on plot:
+  lat->SetTextFont(42);
+  lat->SetTextSize(ltxSetTextSize2 * 1.3);
+  lat->SetTextSize(ltxSetTextSize4); //Enlarge Labels
+
+  cout << "ltxSetTextSize4 = " << ltxSetTextSize4 << endl;
+
+
+
+
+  dataPad->cd();
+  double xmin = 5;
+  double xmax = 60;
+  if (mes == 0) {
+    xmin = 7;
+    xmax = 50;
+  }
+  //-------------------------------------------
+  TF1 *f4 = new TF1("f4","1", xmin, xmax);
+  f4->SetLineWidth(1);
+  f4->SetLineColor(1);
+  f4->SetLineStyle(1);
+  f4->GetYaxis()->SetTitle(yAxName[whichPlot]);
+  f4->GetXaxis()->SetTitle(xAxName[0]);
+  f4->GetXaxis()->CenterTitle(kTRUE);
+  f4->GetYaxis()->CenterTitle();
+  if(whichPlot==1){
+    f4->GetYaxis()->SetTitleSize(0.06*0.83);
+    f4->GetXaxis()->SetTitleSize(0.06*0.83);
+
+    f4->GetYaxis()->SetTitleOffset(1.40);
+    f4->GetXaxis()->SetTitleOffset(1.20);
+  }
+  if(whichPlot==0){
+    f4->GetYaxis()->SetTitleSize(0.06*0.80);
+    f4->GetYaxis()->SetTitleOffset(1.5);
+    f4->GetXaxis()->SetTitleOffset(1.05);
+    f4->GetXaxis()->SetTitleSize(f4->GetXaxis()->GetTitleSize() * 0.77);
+    f4->GetXaxis()->SetTitleOffset(1.18);
+
+    f4->GetXaxis()->SetTitleSize(0.06*0.83);  //Unify Textsize
+    f4->GetYaxis()->SetTitleSize(0.06*0.83);
+    f4->GetYaxis()->SetTitleOffset(1.40);
+    f4->GetXaxis()->SetTitleOffset(1.20);
+
+    cout << "Offset = " << f4->GetYaxis()->GetTitleOffset() << endl;
+
+
+  }
+
+  f4->GetYaxis()->SetRangeUser(1e2,2e7);
+  //if(whichPlot==1) f4->GetYaxis()->SetRangeUser(0.0,1.8);
+  if(whichPlot==1) f4->GetYaxis()->SetRangeUser(0.0,0.90);
+  if(whichPlot==0) f4->GetYaxis()->SetRangeUser(100.0,2000000); //1.8 -> 0.9
+
+  //f4->GetXaxis()->SetNdivisions(-6);
+  f4->Draw();// axis
+
+  TH2D * HisEmpty = new TH2D("HisEmpty","",100, xmin, xmax, 100, 100.0, 2000000);
+  // HisEmpty->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+  // HisEmpty->GetYaxis()->SetTitle("d#sigma/dp_{T} (pb c/GeV)");
+  // HisEmpty->GetXaxis()->CenterTitle();
+  // HisEmpty->GetYaxis()->CenterTitle();
+  // HisEmpty->GetYaxis()->SetTitleOffset(1.8);
+  // HisEmpty->GetXaxis()->SetTitleOffset(1.3);		
+  // HisEmpty->Draw();
+
+  // TH1D test0("test0", "", 10, 0, 10);
+  // test0.Fill(2);
+  // test0.Draw();
+  BsFONLL->Draw("5");
+  gSystHigh->Draw("5");
+  gHigh->Draw("P");
+  gSystLow->Draw("5");
+  gLow->Draw("P");
+  gLowWhite->Draw("P");
+  if (mes == 0) {
+    // pgBs_lowWhite->Draw("Psame");
+    lat->DrawLatex(xsec_ltxText1_xStart + 0.02,xsec_ltxText1_yStart-0.65+0.037,Form("B_{s}^{0} global uncertainty: #pm %.1f%%",glbSystUpBs));
+  } else {
+    lat->DrawLatex(xsec_ltxText1_xStart + 0.02,xsec_ltxText1_yStart-0.70 + 0.037,Form("B^{+} global uncertainty: #pm %.1f%%",glbSystUpBp));
+
+  }
+
+
+  double ShiftX = 0.05;
+  double ShiftY = 0.13;
+
+  lat->SetTextSize(0.05);
+  lat->SetTextSize(0.05 * ltxSetTextSize4/ltxSetTextSize2);  //Enlarge Labels
+      
+  lat->SetTextSize(0.048 * 1.15);  //Enlarge Labels
+  if (mes == 0) {
+    lat->DrawLatex(legXsec_xLowStart+ShiftX+0.02 + 0.009,legXsec_y + 0.07,"#bf{B_{s}^{0}}"); //Enlarge Label
+  } else {
+    // lat->DrawLatex(legXsec_xLowStart+ ShiftX + 0.125 + 0.003,legXsec_y+ 0.07,"#bf{B^{+}}");  //Enlarge Label
+    lat->DrawLatex(legXsec_xLowStart+ ShiftX + 0.02 + 0.009,legXsec_y+ 0.07,"#bf{B^{+}}");  //Enlarge Label
+  }
+
+  cout << "Bs B+ Y Location = " << legXsec_y + 0.08 << endl;
+
+
+  lat->SetTextSize(ltxSetTextSize2 * 1.3);
+  lat->SetTextSize(ltxSetTextSize4); //Enlarge Labels
+
+  lat->DrawLatex(legXsec_xLowStart-0.18-0.02,legXsec_y+0.062-ShiftY + 0.08,"1.5 < |y| < 2.4"); //Enlarge Label + Shift up
+  lat->DrawLatex(legXsec_xLowStart-0.13-0.02,legXsec_y+0.017-ShiftY + 0.08,"|y| < 2.4 "); //Enlarge Label + Shift up
+
+
+
+
+  TLegend *legXSec = new TLegend(legXsec_xLowStart + ShiftX + 0.04,legXsec_y-ShiftY + 0.08,legXsec_xLowEnd+ShiftX-0.10+0.06,legXsec_y+0.15-ShiftY + 0.08,"                    ","brNDC");
+    
+  legXSec->SetBorderSize(0);
+
+  cout << "legXsec_xLowStart + ShiftX + 0.04 = " << legXsec_xLowStart + ShiftX + 0.04 << endl;
+  cout << "legXsec_y+0.15-ShiftY + 0.08 = " << legXsec_y+0.15-ShiftY + 0.08 << endl;
+  cout << "legXsec_y-ShiftY + 0.08 = " << legXsec_y-ShiftY + 0.08 << endl;
+  legXSec->SetTextSize(ltxSetTextSize2);
+  legXSec->SetLineColor(1);
+  legXSec->SetLineStyle(1);
+  legXSec->SetLineWidth(1);
+  legXSec->SetFillColor(19);
+  legXSec->SetFillStyle(0);
+  legXSec->SetTextFont(42);
+  legXSec->SetNColumns(2);
+  legXSec->SetColumnSeparation(0.0);
+  //legXSec->AddEntry(pgBs_low,"1.5 < |y| < 2.4","p");
+  legXSec->AddEntry(gLow,"Data","p");
+  // legXSec->SetTextFont(42);
+  // legXSec->AddEntry(pgBpl_low," ","p");
+  legXSec->AddEntry(BsFONLL,"FONLL","f");
+  // legXSec->AddEntry(pgBpl_low," ","");
+  //legXSec->AddEntry(pgBs_high,"|y| < 2.4","p");
+  legXSec->AddEntry(gHigh," ","p");
+  legXSec->SetTextFont(42);
+  legXSec->AddEntry(gHigh," ","");
+
+
+
+  legXSec->Draw("same");
+
+
+  ratioPad->cd();
+  // TH2D * HisEmpty4 = new TH2D("HisEmpty4","",100, xmin, xmax, 100, 0.5, 1.5);
+  // HisEmpty4->GetXaxis()->SetTitle("B^{0}_{s} p_{T} (GeV/c)");
+  // HisEmpty4->GetYaxis()->SetTitle("Data/FONLL");
+  // HisEmpty4->GetXaxis()->CenterTitle();
+  // HisEmpty4->GetYaxis()->CenterTitle();
+  // HisEmpty4->GetYaxis()->SetTitleOffset(0);
+  // HisEmpty4->GetYaxis()->SetTitleSize(0.1);
+  // HisEmpty4->GetYaxis()->SetLabelSize(0.1);
+
+  // HisEmpty4->GetXaxis()->SetTitleSize(0.1);
+  // HisEmpty4->GetXaxis()->SetLabelSize(0.1);
+
+  double rRange = 0.55;
+  TF1 fRatio("fRatio","1", xmin, xmax);
+  fRatio.GetYaxis()->SetRangeUser(1 - rRange, 1 + rRange);
+  fRatio.GetYaxis()->SetTitle("Data / FONLL");
+  fRatio.GetXaxis()->SetTitle(xAxName[0]);
+  fRatio.GetXaxis()->CenterTitle();
+  fRatio.GetYaxis()->CenterTitle();
+  fRatio.GetXaxis()->SetTitleSize(0.1);  //Unify Textsize
+  fRatio.GetXaxis()->SetTitleOffset(1.2);
+  fRatio.GetYaxis()->SetTitleSize(0.1);
+  fRatio.GetYaxis()->SetTitleOffset(0.68);
+
+  fRatio.GetYaxis()->SetLabelSize(0.10);
+  fRatio.GetXaxis()->SetLabelSize(0.10);
+
+
+  // HisEmpty4->Draw();
+  fRatio.Draw();
+
+  gRatioBs_Fon_low.Draw("5");
+  gRatioBs_Fon_high.Draw("5");
+
+  gRatioBs_syst_low.Draw("5");
+  gRatioBs_syst_high.Draw("5");
+  gRatioBs_low.Draw("ep");
+  gRatioBs_high.Draw("ep");
+
+  auto gRatio_white = (TGraphAsymmErrors*) gRatioBs_low.Clone();
+  gRatio_white->SetMarkerSize(markerSizeRatio[0]);
+  gRatio_white->SetMarkerSize(markerSizeLow[1]*0.86);
+  gRatio_white->SetMarkerColor(kWhite);
+  // gRatio_white->Draw("P");
+
+  TLine * UnityLine = new TLine(xmin, 1, xmax, 1);
+  UnityLine->SetLineWidth(2);
+  UnityLine->SetLineStyle(2);
+  UnityLine->SetLineColor(1);
+  UnityLine->Draw("SAME");
+
+
+  dataPad->Update();
+  ratioPad->Update();
+
+  CMS_lumi(pc1,19011,0);
+
+  pc1->Update();
+
+
+  if (mes == 0) {
+    pc1->SaveAs(Form("%s/pdf/xsec_vsPt_Bs.pdf", outputDir.Data()));
+    pc1->SaveAs(Form("%s/png/xsec_vsPt_Bs.png", outputDir.Data()));
+  } else {
+    pc1->SaveAs(Form("%s/pdf/xsec_vsPt_BP.pdf", outputDir.Data()));
+    pc1->SaveAs(Form("%s/png/xsec_vsPt_BP.png", outputDir.Data()));
+  }
+
+}

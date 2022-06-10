@@ -1,7 +1,8 @@
 /*
    Macro to plot xsec and ratio vs pt for Bs and Bp)
 
-Input: txt files in inputDir, with 8 columns: ptmin, ptmax, central val, stat, systUp, systDown, glbUp,glbDown
+Input: txt files in inputDir, with 10 columns:
+ptmin, ptmax, central val, statUp, statDown, systUp, systDown, glbUp, glbDown, abscissae
 
 Output: xsec vs pt, ratio vs pt.
 
@@ -67,9 +68,10 @@ void plotPt(bool bSavePlots       = 1,
 
 		Int_t endMes = nMes;
 
+    std::vector<int> nlines = {4, 7};
 		for (Int_t ib=0; ib<endMes; ib++){
 			ifstream in;
-			string inputFileName = Form("%s/%s_%s.txt",inputDir,inputFileType[whichPlot],mesonName[ib]);
+			string inputFileName = Form("%s/%s_%s_New.txt",inputDir,inputFileType[whichPlot],mesonName[ib]);
 			//if(whichPlot==1) inputFileName = Form("%s/%s.txt",inputDir,inputFileType[whichPlot]);
 	//		if(whichPlot==1)  inputFileName = Form("%s/%s_%s.txt",inputDir,inputFileType[whichPlot],mesonName[ib]);		
 			cout << "########## Input file name: " << inputFileName << endl;
@@ -85,12 +87,17 @@ void plotPt(bool bSavePlots       = 1,
 			string tmpstrg;
 			getline(in,tmpstrg);//ignore first line/ the header
 
+      cout << "start reading" << endl;
 			int nEntry=0;
-			while(in >> x[0] >> x[1] >> x[2] >> x[3] >> x[4] >> x[5] >> x[6] >> x[7] >> x[8] >> x[9])
+			// while(in >> x[0] >> x[1] >> x[2] >> x[3] >> x[4] >> x[5] >> x[6] >> x[7] >> x[8] >> x[9])
+			// {
+			for (auto iline = 0; iline < nlines[ib]; ++iline)
 			{
+        in >> x[0] >> x[1] >> x[2] >> x[3] >> x[4] >> x[5] >> x[6] >> x[7] >> x[8] >> x[9];
 				glbSystDown = x[8]*100;
 				glbSystUp   = x[7]*100;
 
+        cout << x[0] << ", " << x[1] << ", " << x[2] << ", " << x[3] << ", " << x[4] << ", " << x[5] << ", " << x[6] << ", " << x[7] << ", " << x[8] << ", " << x[9] << endl;
 
 					if(ib==0){//bs
 						if(nEntry==0){
@@ -180,6 +187,9 @@ void plotPt(bool bSavePlots       = 1,
 						//systm. uncert
 						bpl_high_ySystL[nEntry-2] = x[6]*x[2];
 						bpl_high_ySystH[nEntry-2] = x[5]*x[2];
+
+            cout << "ysyst:" << bpl_high_ySystL[nEntry-2] << ", ratio: " <<
+              bpl_high_ySystL[nEntry-2] / bpl_high[nEntry-2] << "\n";
 
 
 						}
@@ -525,6 +535,7 @@ void plotPt(bool bSavePlots       = 1,
 		if(whichPlot==0)// x-section
 		{
 			//gPad->SetLogy();
+
 
 			pgBs_syst_high->SetLineWidth(1);
 
