@@ -38,7 +38,7 @@ void CrossSectionAnaMult(int DoTnP){
 
 	TString FileName;
 
-	FileName = "../../SkimmedSamples/BPData.root";
+	FileName = "../../CutSkim/BPData.root";
 	TFile * fin = new TFile(FileName.Data());
 	fin->cd();
 
