@@ -1,5 +1,6 @@
 #include "CMS_lumi.C"
 #include "roofitB.h"
+#include <iostream>
 
 int _nBins = nBins;
 double *_ptBins = ptBins;
@@ -298,12 +299,12 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 	
 	cout << "Pass Here Bro" << endl;
 
-	std::vector<std::string> background = {"1st", "2nd", "3rd"};
+	// std::vector<std::string> background = {"1st", "2nd", "3rd"};
+	std::vector<std::string> background = {"1st", "2nd"};
 	std::vector<std::vector<double>> background_syst;
 	// std::vector<std::string> signal = {"3gauss", "fixed", "scal", "perr", "merr", "scal+", "scal-"};
 	 //std::vector<std::string> signal = {"3gauss", "fixed","scal+", "scal-"};
-//	 std::vector<std::string> signal = {"3gauss"};
-	std::vector<std::string> signal = {"3gauss", "fixed", "scal+", "scal-"};
+	std::vector<std::string> signal = {"3gauss", "fixed"};
 	 //std::vector<std::string> signal = {"3gauss", "1gauss","fixed", "scal", "perr", "merr"};
 	// std::vector<std::string> signal = {"3gauss", "1gauss", "fixed_mean", "scaling", "-_error", "+_error"};
 	std::vector<std::vector<double>> signal_syst;
@@ -586,7 +587,7 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 					    tex_y2->Draw();}
 		else{tex_y1->Draw();}
 		std::cout<<"CHEGUEI AQUI"<<std::endl;
-		
+			
 		CMS_lumi(c,19011,0);
 		cout << "----------------------------------------------------------------------------------------------------" << endl;
 		cout << "pt:  " << _ptBins[i] << "  -  " <<  _ptBins[i+1]  << " S = " << yield << "   Serr = " << yieldErr <<  "   B = " << bkgd << endl;
@@ -604,7 +605,7 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 		lat->DrawLatex(0.64,0.70,Form("Significance: %.1f", real_significance));
 */
 
-		//c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_doubly%d_%.0f_%0.f_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".pdf");
+		c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_doubly%d_%.0f_%0.f_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".pdf");
 		c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_doubly%d_%.0f_%0.f_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".png");		
 	       // c->SaveAs(Form("%s%s/%s_%s_%d%s_%d%d.png",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(), (int)ptBins_check[i],(int)ptBins_check[i+1]));
 	       // c->SaveAs(Form("%s%s/%s_%s_%d%s_%d%d.C",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(), (int)ptBins_check[i],(int)ptBins_check[i+1]));
