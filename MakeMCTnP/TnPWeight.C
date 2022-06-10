@@ -35,7 +35,9 @@ void TnPWeight(int Opt){
 
 
 	//	infile = "../UnskimmedSamples/OfficialMC/BPMC.root";
-		infile = "/data/szhaozho/NewOfficialMCMore/BP/BDTMCBDT.root";
+		// infile = "../../bmva/TMVA/BP/sample/BPMC_5_60.root";
+		// infile = "../../dat/BP_MC_all.root";
+		infile = "../../dat/Unskimmed_gen/BP_MC_merged.root";
 
 		
 		TreeName = "Bfinder/ntKp";
@@ -44,7 +46,10 @@ void TnPWeight(int Opt){
 	}
 	if(Opt == 1){
 
-		infile = "../UnskimmedSamples/OfficialMC/BsMC.root";
+		// infile = "../UnskimmedSamples/OfficialMC/BsMC.root";
+		// infile = "../../bmva/TMVA/Bs/sample/BsMC_7_50.root";
+		// infile = "../../dat/Bs_MC_all.root";
+		infile = "../../dat/Unskimmed_gen/Bs_MC_merged.root";
 		TreeName = "Bfinder/ntphi";
 		//	outfile = "BsTnPInfo.root";
 		outfile = "BsTnPInfo.root";
