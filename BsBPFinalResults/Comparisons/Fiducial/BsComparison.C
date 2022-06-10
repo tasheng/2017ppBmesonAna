@@ -12,6 +12,7 @@
 #include "TRandom.h"
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 
 #include "TCanvas.h"
 #include "TF1.h"
@@ -24,6 +25,7 @@
 #include "TLegend.h"
 #include "TLegendEntry.h"
 #include "TMath.h"
+#include "scale.h"
 //#include "tnp_weight_lowptPBsb.h"
 
 
@@ -73,7 +75,7 @@ void BsComparison(){
 //	const int NBins = 7;
 	const int NBins = 4;
 
-	float BsXsecPPY[NBins];
+	// float BsXsecPPY[NBins];
 //	float BsXsecPPX[NBins] = {6,8.5,12.5,17.5,25,40,55};
 	float BsXsecPPX[NBins] = {8.5,12.5,17.5,35};
 
@@ -82,25 +84,31 @@ void BsComparison(){
 	float BsXSecPPYErrDown[NBins];
 
 
-	float BsXSecPPYErrUpPercent[NBins];
-	float BsXSecPPYErrDownPercent[NBins];
+	float BsXSecPPYErrUpRatio[NBins];
+	float BsXSecPPYErrDownRatio[NBins];
 
 
-	for(int i = 0; i < NBins; i++){
+	// for(int i = 0; i < NBins; i++){
 
-		BsXsecPPY[i] = BsCross->GetBinContent(i+1);
-		BsXSecPPYErrUp[i] = BsCross->GetBinError(i+1);
-		BsXSecPPYErrDown[i] = BsCross->GetBinError(i+1);
-		BsXSecPPYErrUpPercent[i] = BsXSecPPYErrUp[i]/BsXsecPPY[i];
-		BsXSecPPYErrDownPercent[i] = BsXSecPPYErrDown[i]/BsXsecPPY[i];
-		cout << "BsXsecPPY[i] = " << BsXsecPPY[i]  << "   Stat[i]  = " << BsXSecPPYErrUpPercent[i] << endl;
+	// 	BsXsecPPY[i] = BsCross->GetBinContent(i+1);
+	// 	BsXSecPPYErrUp[i] = BsCross->GetBinError(i+1);
+	// 	BsXSecPPYErrDown[i] = BsCross->GetBinError(i+1);
+	// 	BsXSecPPYErrUpRatio[i] = BsXSecPPYErrUp[i]/BsXsecPPY[i];
+	// 	BsXSecPPYErrDownRatio[i] = BsXSecPPYErrDown[i]/BsXsecPPY[i];
+	// 	cout << "BsXsecPPY[i] = " << BsXsecPPY[i]  << "   Stat[i]  = " << BsXSecPPYErrUpRatio[i] << endl;
 		
-	}
+	// }
 
 
 	float BsXsecPPY2D[NBins];
 	float BsXSecPPY2DErrUp[NBins];
 	float BsXSecPPY2DErrDown[NBins];
+	float BsXSecPPY2DErrUpRatio[NBins];
+	float BsXSecPPY2DErrDownRatio[NBins];
+  // cross section with pT < 10 scaled to full y
+	float BsXsecPPY2DScaled[NBins];
+	float BsXSecPPY2DErrUpScaled[NBins];
+	float BsXSecPPY2DErrDownScaled[NBins];
 
 	TH1D * BsCross2D = (TH1D *) FileBs->Get("hPtSigma");
 	BsCross2D->SetMarkerStyle(20);
@@ -115,10 +123,22 @@ void BsComparison(){
 		BsXsecPPY2D[i] = BsCross2D->GetBinContent(i+1);
 		BsXSecPPY2DErrUp[i] = BsCross2D->GetBinError(i+1);
 		BsXSecPPY2DErrDown[i] = BsCross2D->GetBinError(i+1);
-		
+		BsXSecPPY2DErrUpRatio[i] = BsXSecPPY2DErrUp[i] / BsXsecPPY2D[i];
+		BsXSecPPY2DErrDownRatio[i] = BsXSecPPY2DErrDown[i] / BsXsecPPY2D[i];
 
+		BsXsecPPY2DScaled[i] = BsCross2D->GetBinContent(i+1);
+		BsXSecPPY2DErrUpScaled[i] = BsCross2D->GetBinError(i+1);
+		BsXSecPPY2DErrDownScaled[i] = BsCross2D->GetBinError(i+1);
 	}
 
+  std::vector<double> scaledPt = {7, 10};
+  std::vector<double> factor = scaleFactor("../../../CutSkim/BsMC.root", "ntphi", scaledPt);
+  for (auto i = 0; i < factor.size(); ++i) {
+    cout << "applying scaling factor: " << factor[i] << "\n";
+    BsXsecPPY2DScaled[i] *= factor[i];
+		BsXSecPPY2DErrUpScaled[i] *= factor[i];
+		BsXSecPPY2DErrDownScaled[i] *= factor[i];
+  }
 
 
 
@@ -157,39 +177,66 @@ void BsComparison(){
 */
 
 	//Syst Add Up PP//
+  TString errorFile = "../../../2DMapSyst/OutFiles/BsError2D.root";
+  TFile fError(errorFile);
 
+	TH1D * TnPSyst = (TH1D *) fError.Get("TnPSyst");
+	TH1D * BptSyst = (TH1D *) fError.Get("BptSyst");
+	TH1D * BDTSyst = (TH1D *) fError.Get("BDTSyst");
 
+  TString pdfErrorFile = "../../../bs_pdf.root";
+  TFile fPdfError(pdfErrorFile);
+  TGraph* pdfSyst = (TGraph *) fPdfError.Get("bs_error");
 
 	float BsXSecPPYSystUp[NBins];
 	float BsXSecPPYSystDown[NBins];
 
+	float BsXSecPPYSystUpScaled[NBins];
+	float BsXSecPPYSystDownScaled[NBins];
 
-	float BsTrackingSyst[NBins] = {0.10,0.10,0.10,0.10};
-	float BsMDDataSyst[NBins] = {0.0466,0.0870,0.0725,0.0495};
-	float BsPtShapeSyst[NBins] = {0.0194,0.00607,0.00100,0.000312};	
-	float BsPDFSyst[NBins] = {0.0545,0.012,0.0213,0.0395};
 
-	float BsTnPSystDown[NBins] = {0.00412,0.00385,0.00376,0.00457};
-	float BsTnPSystUp[NBins] = {0.00412,0.00385,0.00376,0.00457};
+  // percent error
+	float BsTrackingSyst[NBins] = {[0 ... NBins - 1] = 10};
+	float BsMCDataSyst[NBins];
+	float BsPtShapeSyst[NBins];
+	float BsPDFSyst[NBins];
 
-	float BsTotalSystDown[NBins];
-	float BsTotalSystUp[NBins];
+	float BsTnPSystDown[NBins];
+	float BsTnPSystUp[NBins];
+
+  for (auto ibin = 0; ibin < NBins; ++ibin) {
+    BsMCDataSyst[ibin] = BDTSyst->GetBinContent(ibin + 1);
+    BsPtShapeSyst[ibin] = BptSyst->GetBinContent(ibin + 1);
+    BsTnPSystDown[ibin] = TnPSyst->GetBinContent(ibin + 1);
+    // TnP systematics are symmetric in the binned pT case
+    BsTnPSystUp[ibin] = BsTnPSystDown[ibin];
+    BsPDFSyst[ibin] = pdfSyst->GetY()[ibin];
+  }
+
+  // RMS of all the errors
+	float BsTotalSystDownRatio[NBins];
+	float BsTotalSystUpRatio[NBins];
 
 	for(int i = 0; i < NBins; i++){
 
-		
-		BsTotalSystDown[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] + BsMDDataSyst[i] * BsMDDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystDown[i] * BsTnPSystDown[i]);
-		BsTotalSystUp[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] +BsMDDataSyst[i] * BsMDDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystUp[i] * BsTnPSystUp[i]);
+
+		BsTotalSystDownRatio[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] + BsMCDataSyst[i] * BsMCDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystDown[i] * BsTnPSystDown[i]) / 100;
+		BsTotalSystUpRatio[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] +BsMCDataSyst[i] * BsMCDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystUp[i] * BsTnPSystUp[i]) / 100;
 
 
 	}
-	
-	for(int i = 0; i < NBins; i++){
 
-		BsXSecPPYSystUp[i] = BsXsecPPY[i] * ( BsTotalSystUp[i]);
-		BsXSecPPYSystDown[i] = BsXsecPPY[i] * (BsTotalSystDown[i] );
-		//cout << "i = " << i << "     BPXSecPPYSystDown[i] = " << BPXSecPPYSystDown[i] << "  BPXSecPPYErrDown[i] =  " << BPXSecPPYErrDown[i] << endl;
-		
+  std::vector<float> globUncert(NBins, 0.077);
+	for(int i = 0; i < NBins; i++){
+		BsXSecPPYSystUp[i] = BsXsecPPY2D[i] * BsTotalSystUpRatio[i];
+		BsXSecPPYSystDown[i] = BsXsecPPY2D[i] * BsTotalSystDownRatio[i];
+    std::cout << "i = " << i << "     BsXSecPPYSyst[i] = " <<
+      BsTotalSystUpRatio[i] << "\n";
+    std::cout << "components " << BsTrackingSyst[i] << ", " << BsMCDataSyst[i]
+              << ", " << BsPDFSyst[i] << ", " << BsPtShapeSyst[i] << ", "
+              << BsTnPSystDown[i] << "\n";
+    BsXSecPPYSystDownScaled[i] = BsXsecPPY2DScaled[i] * BsTotalSystDownRatio[i];
+    BsXSecPPYSystUpScaled[i] = BsXsecPPY2DScaled[i] * BsTotalSystUpRatio[i];
 	}
 
 
@@ -207,38 +254,84 @@ void BsComparison(){
 	HisEmpty->GetXaxis()->SetTitleOffset(1.3);	
 	HisEmpty->Draw();
 
-	TGraphAsymmErrors *BsPPCrossGraph = new TGraphAsymmErrors(NBins, BsXsecPPX, BsXsecPPY,BsXSecPPXErrDown, BsXSecPPXErrUp,BsXSecPPYErrDown,BsXSecPPYErrUp);
+  // separate plots for different fiducial regions
+  int NBinsLow = 1;
+  int NBinsHigh = 3;
+  vector<double> BsXsecPPXLow = {BsXsecPPX, BsXsecPPX + NBinsLow};
+  vector<double> BsXsecPPXHigh = {BsXsecPPX + NBinsLow, BsXsecPPX + NBins};
+  vector<double> BsXsecPPXErrDownLow = {BsXSecPPXErrDown, BsXSecPPXErrDown + NBinsLow};
+  vector<double> BsXsecPPXErrDownHigh = {BsXSecPPXErrDown + NBinsLow, BsXSecPPXErrDown + NBins};
+  vector<double> BsXsecPPXErrUpLow = {BsXSecPPXErrUp, BsXSecPPXErrUp + NBinsLow};
+  vector<double> BsXsecPPXErrUpHigh = {BsXSecPPXErrUp + NBinsLow, BsXSecPPXErrUp + NBins};
+
+  vector<double> BsXsecPPYLow = {BsXsecPPY2DScaled, BsXsecPPY2DScaled + NBinsLow};
+  vector<double> BsXsecPPYHigh = {BsXsecPPY2D + NBinsLow, BsXsecPPY2D + NBins};
+  vector<double> BsXsecPPYErrDownLow = {BsXSecPPY2DErrDownScaled,
+                                        BsXSecPPY2DErrDownScaled + NBinsLow};
+  vector<double> BsXsecPPYErrDownHigh = {BsXSecPPY2DErrDown + NBinsLow, BsXSecPPY2DErrDown + NBins};
+  vector<double> BsXsecPPYErrUpLow = {BsXSecPPY2DErrUpScaled,
+                                      BsXSecPPY2DErrUpScaled + NBinsLow};
+  vector<double> BsXsecPPYErrUpHigh = {BsXSecPPY2DErrUp + NBinsLow, BsXSecPPY2DErrUp + NBins};
+
+	// TGraphAsymmErrors *BsPPCrossGraph = new TGraphAsymmErrors(NBins, BsXsecPPX, BsXsecPPY,BsXSecPPXErrDown, BsXSecPPXErrUp,BsXSecPPYErrDown,BsXSecPPYErrUp);
 	
 
-	TGraphAsymmErrors *BsPPCrossGraphSyst  = new TGraphAsymmErrors(NBins, BsXsecPPX, BsXsecPPY, BsXSecPPXErrDown, BsXSecPPXErrUp, BsXSecPPYSystDown,BsXSecPPYSystUp);
+	// TGraphAsymmErrors *BsPPCrossGraphSyst  = new TGraphAsymmErrors(NBins, BsXsecPPX, BsXsecPPY, BsXSecPPXErrDown, BsXSecPPXErrUp, BsXSecPPYSystDown,BsXSecPPYSystUp);
 
 
-	TGraphAsymmErrors *BsPPCrossGraph2D = new TGraphAsymmErrors(NBins, BsXsecPPX, BsXsecPPY2D,BsXSecPPXErrDown, BsXSecPPXErrUp,BsXSecPPY2DErrDown,BsXSecPPY2DErrUp);
+	TGraphAsymmErrors *BsPPCrossGraph2D =
+    new TGraphAsymmErrors(NBins, BsXsecPPX, BsXsecPPY2D,
+                          BsXSecPPXErrDown, BsXSecPPXErrUp,
+                          BsXSecPPY2DErrDown,BsXSecPPY2DErrUp);
+	TGraphAsymmErrors *BsPPCrossGraph2DLow = new TGraphAsymmErrors(NBinsLow,
+                                                                 BsXsecPPXLow.data(),
+                                                                 BsXsecPPYLow.data(),
+                                                                 BsXsecPPXErrDownLow.data(),
+                                                                 BsXsecPPXErrUpLow.data(),
+                                                                 BsXsecPPYErrDownLow.data(),
+                                                                 BsXsecPPYErrUpLow.data());
+	TGraphAsymmErrors *BsPPCrossGraph2DHigh = new TGraphAsymmErrors(NBinsHigh,
+                                                                 BsXsecPPXHigh.data(),
+                                                                 BsXsecPPYHigh.data(),
+                                                                 BsXsecPPXErrDownHigh.data(),
+                                                                 BsXsecPPXErrUpHigh.data(),
+                                                                 BsXsecPPYErrDownHigh.data(),
+                                                                 BsXsecPPYErrUpHigh.data());
+
+	TGraphAsymmErrors *BsPPCrossGraph2DSyst  =
+    new TGraphAsymmErrors(NBins, BsXsecPPX, BsXsecPPY2D,
+                          BsXSecPPXErrDown, BsXSecPPXErrUp,
+                          BsXSecPPYSystDown,BsXSecPPYSystUp);
+	TGraphAsymmErrors *BsPPCrossGraph2DScaledSyst  =
+    new TGraphAsymmErrors(NBins, BsXsecPPX, BsXsecPPY2DScaled,
+                          BsXSecPPXErrDown, BsXSecPPXErrUp,
+                          BsXSecPPYSystDownScaled, BsXSecPPYSystUpScaled);
+
+// //	TGraphAsymmErrors *BsPBsbCrossGraph = new TGraphAsymmErrors(NBins, BsXsecPBsbX, BsXsecPBsbY,BsXSecPBsbXErrDown, BsXSecPbPbXErrUp,BsXSecPbPbYErrDown,BsXSecPbPbYErrUp);
+// /*
+// 	BsPBsbCrossGraph->SetLineColor(kGreen+2);
+// //	BsPBsbCrossGraph->SetFillColorAlpha(kGreen-9,0.5);
+// 	BsPBsbCrossGraph->SetMarkerStyle(20);
+// 	BsPBsbCrossGraph->SetMarkerSize(1);
+// 	BsPBsbCrossGraph->SetMarkerColor(kGreen+2);
+// */
+// 	BsPPCrossGraph->SetLineColor(kBlue+2);
+// //	BsPPCrossGraph->SetFillColorAlpha(kBlue-9,0.5);
+// 	BsPPCrossGraph->SetMarkerStyle(21);
+// 	BsPPCrossGraph->SetMarkerSize(1);
+// 	BsPPCrossGraph->SetMarkerColor(kBlue+2);
 
 
-//	TGraphAsymmErrors *BsPBsbCrossGraph = new TGraphAsymmErrors(NBins, BsXsecPBsbX, BsXsecPBsbY,BsXSecPBsbXErrDown, BsXSecPbPbXErrUp,BsXSecPbPbYErrDown,BsXSecPbPbYErrUp);
-/*
-	BsPBsbCrossGraph->SetLineColor(kGreen+2);
-//	BsPBsbCrossGraph->SetFillColorAlpha(kGreen-9,0.5);
-	BsPBsbCrossGraph->SetMarkerStyle(20);
-	BsPBsbCrossGraph->SetMarkerSize(1);
-	BsPBsbCrossGraph->SetMarkerColor(kGreen+2);
-*/
-	BsPPCrossGraph->SetLineColor(kBlue+2);
-//	BsPPCrossGraph->SetFillColorAlpha(kBlue-9,0.5);
-	BsPPCrossGraph->SetMarkerStyle(21);
-	BsPPCrossGraph->SetMarkerSize(1);
-	BsPPCrossGraph->SetMarkerColor(kBlue+2);
 
-
-
-	BsPPCrossGraphSyst->SetFillColorAlpha(kBlue-9,0.5);
-	BsPPCrossGraphSyst->SetLineColor(kBlue-9);
+	BsPPCrossGraph2DSyst->SetFillColorAlpha(kBlue-9,0.5);
+	BsPPCrossGraph2DSyst->SetLineColor(kBlue-9);
 	
+	BsPPCrossGraph2DScaledSyst->SetFillColorAlpha(kOrange+1, 0.3);
+	BsPPCrossGraph2DScaledSyst->SetLineColor(kOrange+1);
 
 
-	BsPPCrossGraph->Draw("ep");	
-	BsPPCrossGraphSyst->Draw("5same");	
+	BsPPCrossGraph2D->Draw("ep");	
+	BsPPCrossGraph2DSyst->Draw("5same");	
 	
 	c->SaveAs("Plots/Bs/BsCrossONLY.png");
 	c->SaveAs("Plots/Bs/BsCrossONLY.pdf");
@@ -286,7 +379,7 @@ void BsComparison(){
 	HisEmpty2->SetTitle("B^{0}_{s} Cross Section With Fiducial Region");	
 	HisEmpty2->Draw();
 
-	BsPPCrossGraph->Draw("ep");
+	// BsPPCrossGraph->Draw("ep");
 
 /*
 	const int NBins2015 = 5;
@@ -329,16 +422,17 @@ void BsComparison(){
 	BsPPCrossGraph2015->Draw("epSAME");
 
 
+	BsPPCrossGraph2DScaledSyst->Draw("5SAME");
 	BsPPCrossGraph2015Syst->Draw("5same");	
 
 
 
 
-	BsPPCrossGraph2D->SetLineColor(kOrange+1);
-	BsPPCrossGraph2D->SetMarkerStyle(34);
-	BsPPCrossGraph2D->SetMarkerSize(1);
-	BsPPCrossGraph2D->SetMarkerColor(kOrange+1);
-	BsPPCrossGraph2D->Draw("epSAME");
+	// BsPPCrossGraph2D->SetLineColor(kOrange+1);
+	// BsPPCrossGraph2D->SetMarkerStyle(34);
+	// BsPPCrossGraph2D->SetMarkerSize(1);
+	// BsPPCrossGraph2D->SetMarkerColor(kOrange+1);
+	// BsPPCrossGraph2D->Draw("epSAME");
 
 
 
@@ -364,7 +458,7 @@ void BsComparison(){
 	BsFONLL2->SetMarkerStyle(20);
 	BsFONLL2->SetMarkerSize(1);
 	BsFONLL2->SetMarkerColor(kRed+2);
-	BsFONLL2->Draw("epSAME");
+	// BsFONLL2->Draw("epSAME");
 
 
 	double XTempChange;
@@ -372,28 +466,41 @@ void BsComparison(){
 	double YErrLowTemp;
 	double YErrHighTemp;
 
-	for(int i = 0; i < 1; i ++){
+	// for(int i = 0; i < 1; i ++){
 
-		BsFONLL2->GetPoint(i,XTempChange,YTempChange);
-		YErrLowTemp = BsFONLL2->GetErrorYlow(i);
-		YErrHighTemp = BsFONLL2->GetErrorYhigh(i);
+	// 	BsFONLL2->GetPoint(i,XTempChange,YTempChange);
+	// 	YErrLowTemp = BsFONLL2->GetErrorYlow(i);
+	// 	YErrHighTemp = BsFONLL2->GetErrorYhigh(i);
 
-		BsFONLL->SetPoint(i,XTempChange,YTempChange);
-		BsFONLL->SetPointEYhigh(i,YErrHighTemp);
-		BsFONLL->SetPointEYlow(i,YErrLowTemp);
+	// 	BsFONLL->SetPoint(i,XTempChange,YTempChange);
+	// 	BsFONLL->SetPointEYhigh(i,YErrHighTemp);
+	// 	BsFONLL->SetPointEYlow(i,YErrLowTemp);
 
 
 
-	}
+	// }
 
-	TLegend* leg3 = new TLegend(0.37,0.50,0.70,0.80,NULL,"brNDC");
+	BsPPCrossGraph2DLow->SetLineColor(kOrange+1);
+	BsPPCrossGraph2DLow->SetMarkerStyle(25);
+	BsPPCrossGraph2DLow->SetMarkerSize(1);
+	BsPPCrossGraph2DLow->SetMarkerColor(kOrange+1);
+	BsPPCrossGraph2DLow->Draw("epSAME");
+
+	BsPPCrossGraph2DHigh->SetLineColor(kOrange+1);
+	BsPPCrossGraph2DHigh->SetMarkerStyle(34);
+	BsPPCrossGraph2DHigh->SetMarkerSize(1);
+	BsPPCrossGraph2DHigh->SetMarkerColor(kOrange+1);
+	BsPPCrossGraph2DHigh->Draw("epSAME");
+
+	TLegend* leg3 = new TLegend(0.35,0.55,0.70,0.85,NULL,"brNDC");
 	leg3->SetBorderSize(0);
 	leg3->SetTextSize(0.040);
 	leg3->SetTextFont(42);
 	leg3->SetFillStyle(0);
 	leg3->SetLineWidth(3);
-	leg3->AddEntry(BsPPCrossGraph,"2017 pp 5.02 TeV","PL");
-	leg3->AddEntry(BsPPCrossGraph2D,"2017 pp 5.02 TeV (2D Map)","PL");	
+	// leg3->AddEntry(BsPPCrossGraph,"2017 pp 5.02 TeV","PL");
+	leg3->AddEntry(BsPPCrossGraph2DLow,"2017 pp 5.02 TeV (scaled to |y| < 2.4)","PL");
+	leg3->AddEntry(BsPPCrossGraph2DHigh,"2017 pp 5.02 TeV","PL");
 	leg3->AddEntry(BsPPCrossGraph2015,"2015 pp 5.02 TeV","PL");
 	leg3->AddEntry(BsFONLL,"FONLL Calculations","PL");
 	leg3->Draw("same");
@@ -417,8 +524,8 @@ void BsComparison(){
 
 	for(int i = 1; i < NBins2015; i++){
 
-		Ratio1Y[i] = BsXsecPPY[i+1]/BsXsecPPY2015[i];
-		Ratio1YErr[i] = Ratio1Y[i] * sqrt(BsXSecPPYErrDown[i+1]/BsXsecPPY[i+1] * BsXSecPPYErrDown[i+1]/BsXsecPPY[i+1] + BsXSecPPYErrDown2015[i]/BsXsecPPY2015[i] * BsXSecPPYErrDown2015[i]/BsXsecPPY2015[i]);
+		// Ratio1Y[i] = BsXsecPPY[i+1]/BsXsecPPY2015[i];
+		// Ratio1YErr[i] = Ratio1Y[i] * sqrt(BsXSecPPYErrDown[i+1]/BsXsecPPY[i+1] * BsXSecPPYErrDown[i+1]/BsXsecPPY[i+1] + BsXSecPPYErrDown2015[i]/BsXsecPPY2015[i] * BsXSecPPYErrDown2015[i]/BsXsecPPY2015[i]);
 
 	//	cout << "BsXSecPPYErrDown2015[i]/BsXsecPPY2015[i] = " << BsXSecPPYErrDown[i+1]/BsXsecPPY[i+1]  << endl;
 			
@@ -453,15 +560,15 @@ void BsComparison(){
 	HisEmpty3->Draw();
 
 
-	TGraphAsymmErrors *Ratio1 = new TGraphAsymmErrors(NBins2015, BsXsecPPX2015, Ratio1Y ,BsXSecPPXErrDown2015, BsXSecPPXErrUp2015,Ratio1YErr,Ratio1YErr);
+	// TGraphAsymmErrors *Ratio1 = new TGraphAsymmErrors(NBins2015, BsXsecPPX2015, Ratio1Y ,BsXSecPPXErrDown2015, BsXSecPPXErrUp2015,Ratio1YErr,Ratio1YErr);
 	
 	TGraphAsymmErrors *Ratio2 = new TGraphAsymmErrors(NBins2015, BsXsecPPX2015, Ratio2Y,BsXSecPPXErrDown2015, BsXSecPPXErrUp2015,Ratio2YErr,Ratio2YErr);
 
-	Ratio1->SetLineColor(kBlue+2);
-	Ratio1->SetMarkerStyle(21);
-	Ratio1->SetMarkerSize(1);
-	Ratio1->SetMarkerColor(kBlue+2);
-	Ratio1->Draw("epSAME");
+	// Ratio1->SetLineColor(kBlue+2);
+	// Ratio1->SetMarkerStyle(21);
+	// Ratio1->SetMarkerSize(1);
+	// Ratio1->SetMarkerColor(kBlue+2);
+	// // Ratio1->Draw("epSAME");
 
 
 
@@ -515,13 +622,13 @@ void BsComparison(){
 	//	FONLLY[i] = BsFONLL->GetPointY(i);
 	//	FONLLYErr[i] = BsFONLL->GetErrorYhigh (i);
 
-		Ratio3Y[i] = BsXsecPPY[i]/FONLLY[i];
-		Ratio3YErr[i] = Ratio3Y[i] * sqrt(BsXSecPPYErrDown[i]/BsXsecPPY[i] * BsXSecPPYErrDown[i]/BsXsecPPY[i] + FONLLYErr[i]/FONLLY[i] * FONLLYErr[i]/FONLLY[i]);
+		// Ratio3Y[i] = BsXsecPPY[i]/FONLLY[i];
+		// Ratio3YErr[i] = Ratio3Y[i] * sqrt(BsXSecPPYErrDown[i]/BsXsecPPY[i] * BsXSecPPYErrDown[i]/BsXsecPPY[i] + FONLLYErr[i]/FONLLY[i] * FONLLYErr[i]/FONLLY[i]);
 
-		Ratio4Y[i] = BsXsecPPY2D[i]/FONLLY[i];
-		Ratio4YErr[i] = Ratio4Y[i] *TMath::Sqrt(BsXSecPPY2DErrDown[i]/BsXsecPPY2D[i] * BsXSecPPY2DErrDown[i]/BsXsecPPY2D[i] + FONLLYErr[i]/FONLLY[i] * FONLLYErr[i]/FONLLY[i] );
-
-
+		Ratio4Y[i] = BsXsecPPY2DScaled[i]/FONLLY[i];
+    Ratio4YErr[i] = Ratio4Y[i] *
+      TMath::Sqrt(TMath::Power(BsXSecPPY2DErrDownScaled[i]/BsXsecPPY2DScaled[i], 2) +
+                  FONLLYErr[i]/FONLLY[i] * FONLLYErr[i]/FONLLY[i] );
 	}
 
 	cRatio->cd();
@@ -541,24 +648,41 @@ void BsComparison(){
 	HisEmpty4->Draw();
 
 
-	TGraphAsymmErrors *Ratio3 = new TGraphAsymmErrors(NBins, BsXsecPPX, Ratio3Y ,BsXSecPPXErrDown, BsXSecPPXErrUp,Ratio3YErr,Ratio3YErr);
+	// TGraphAsymmErrors *Ratio3 = new TGraphAsymmErrors(NBins, BsXsecPPX, Ratio3Y ,BsXSecPPXErrDown, BsXSecPPXErrUp,Ratio3YErr,Ratio3YErr);
 
 	TGraphAsymmErrors *Ratio4 = new TGraphAsymmErrors(NBins, BsXsecPPX, Ratio4Y,BsXSecPPXErrDown, BsXSecPPXErrUp,Ratio4YErr,Ratio4YErr);
 
-	Ratio3->SetLineColor(kBlue+2);
-	Ratio3->SetMarkerStyle(21);
-	Ratio3->SetMarkerSize(1);
-	Ratio3->SetMarkerColor(kBlue+2);
-	Ratio3->Draw("epSAME");
+  // low pT graph
+  TGraphAsymmErrors *RatioFonLow = new TGraphAsymmErrors(NBinsLow, BsXsecPPX, Ratio4Y,
+                                                         BsXSecPPXErrDown, BsXSecPPXErrUp,
+                                                         Ratio4YErr,Ratio4YErr);
+  // high pT graph
+  TGraphAsymmErrors *RatioFonHigh = new TGraphAsymmErrors(NBinsHigh, BsXsecPPX + NBinsLow,
+                                                          Ratio4Y + NBinsLow,
+                                                          BsXSecPPXErrDown + NBinsLow,
+                                                          BsXSecPPXErrUp + NBinsLow,
+                                                          Ratio4YErr + NBinsLow,
+                                                          Ratio4YErr + NBinsLow);
+
+	// Ratio3->SetLineColor(kBlue+2);
+	// Ratio3->SetMarkerStyle(21);
+	// Ratio3->SetMarkerSize(1);
+	// Ratio3->SetMarkerColor(kBlue+2);
+	// Ratio3->Draw("epSAME");
 
 
+	RatioFonHigh->SetLineColor(kOrange+1);
+	RatioFonHigh->SetMarkerStyle(34);
+	RatioFonHigh->SetMarkerSize(1);
+	RatioFonHigh->SetMarkerColor(kOrange+1);
+	RatioFonHigh->Draw("epSAME");
 
+	RatioFonLow->SetLineColor(kOrange+1);
+	RatioFonLow->SetMarkerStyle(25);
+	RatioFonLow->SetMarkerSize(1);
+	RatioFonLow->SetMarkerColor(kOrange+1);
+	RatioFonLow->Draw("epSAME");
 
-	Ratio4->SetLineColor(kOrange+1);
-	Ratio4->SetMarkerStyle(34);
-	Ratio4->SetMarkerSize(1);
-	Ratio4->SetMarkerColor(kOrange+1);
-	Ratio4->Draw("epSAME");
 
 
 
@@ -595,7 +719,33 @@ void BsComparison(){
 
 
 
+  // summary of errors (in ratio, not percent)
+  std::vector<int> ptbins = {7, 10, 15, 20, 50};
+  std::vector<float> abscissae = {8.5, 12.5, 17.5, 35.0};
 
-
+  string outFile = "../../../MakeFinalPlots/NominalPlots/CrossSection/dataSource/corryield_pt_Bs_New.txt";
+  ofstream out;
+  out.open(outFile);
+  unsigned columnWidth = 14;
+  out << std::left << std::setw(columnWidth) <<
+    "ptmin" << std::setw(columnWidth) << "ptmax" << std::setw(columnWidth) <<
+    "central val" << std::setw(columnWidth) <<
+    "statUp" << std::setw(columnWidth) << "statDown" << std::setw(columnWidth) <<
+    "systUp" << std::setw(columnWidth) << "systDown" << std::setw(columnWidth) <<
+    "glbUp" << std::setw(columnWidth) << "glbDown" << std::setw(columnWidth) <<
+    "abscissae" << endl;
+  for (auto i = 0; i < NBins; ++i ) {
+    out << std::setw(columnWidth) <<
+      ptbins[i] << std::setw(columnWidth) << ptbins[i + 1] << std::setw(columnWidth) <<
+      setprecision(0) << std::fixed << BsXsecPPY2D[i] << std::setw(columnWidth) <<
+      setprecision(2) << std::defaultfloat <<
+      BsXSecPPY2DErrUpRatio[i] << std::setw(columnWidth) <<
+      BsXSecPPY2DErrDownRatio[i] << std::setw(columnWidth) <<
+      BsTotalSystDownRatio[i] << std::setw(columnWidth) <<
+      BsTotalSystDownRatio[i] << std::setw(columnWidth) <<
+      globUncert[i] << std::setw(columnWidth) <<
+      globUncert[i] << std::setw(columnWidth) << abscissae[i] << "\n";
+  }
+  out.close();
 
 }

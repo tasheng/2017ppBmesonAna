@@ -133,34 +133,50 @@ void BsRAA(){
 
 
 
+  TString errorFile = "../../2DMapSyst/OutFiles/BsError2D.root";
+  TFile fError(errorFile);
 
-	float BsTrackingSyst[NBins] = {0.10,0.10,0.10,0.10};
-	float BsMDDataSyst[NBins] = {0.0466,0.0870,0.0725,0.0495};
-	float BsPtShapeSyst[NBins] = {0.0194,0.00607,0.00100,0.000312};	
-	float BsPDFSyst[NBins] = {0.0545,0.012,0.0213,0.0395};
+	TH1D * TnPSyst = (TH1D *) fError.Get("TnPSyst");
+	TH1D * BptSyst = (TH1D *) fError.Get("BptSyst");
+	TH1D * BDTSyst = (TH1D *) fError.Get("BDTSyst");
 
-	float BsTnPSystDown[NBins] = {0.00412,0.00385,0.00376,0.00457};
-	float BsTnPSystUp[NBins] = {0.00412,0.00385,0.00376,0.00457};
+  TString pdfErrorFile = "../../bs_pdf.root";
+  TFile fPdfError(pdfErrorFile);
+  TGraph* pdfSyst = (TGraph *) fPdfError.Get("bs_error");
 
-	float BsTotalSystDown[NBins];
-	float BsTotalSystUp[NBins];
+  // percent error
+	float BsTrackingSyst[NBins] = {10};
+	float BsMCDataSyst[NBins];
+	float BsPtShapeSyst[NBins];
+	float BsPDFSyst[NBins];
+
+	float BsTnPSystDown[NBins];
+	float BsTnPSystUp[NBins];
+
+  for (auto ibin = 0; ibin < NBins; ++ibin) {
+    BsMCDataSyst[ibin] = BDTSyst->GetBinContent(ibin + 1);
+    BsPtShapeSyst[ibin] = BptSyst->GetBinContent(ibin + 1);
+    BsTnPSystDown[ibin] = TnPSyst->GetBinContent(ibin + 1);
+    // TnP systematics are symmetric in the binned pT case
+    BsTnPSystUp[ibin] = BsTnPSystDown[ibin];
+    BsPDFSyst[ibin] = pdfSyst->GetY()[ibin];
+  }
+
+  // RMS of all the errors
+	float BsTotalSystDownRatio[NBins];
+	float BsTotalSystUpRatio[NBins];
 
 	for(int i = 0; i < NBins; i++){
-
-		
-		BsTotalSystDown[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] + BsMDDataSyst[i] * BsMDDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystDown[i] * BsTnPSystDown[i]);
-		BsTotalSystUp[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] +BsMDDataSyst[i] * BsMDDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystUp[i] * BsTnPSystUp[i]);
-
-
+		BsTotalSystDownRatio[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] + BsMCDataSyst[i] * BsMCDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystDown[i] * BsTnPSystDown[i]) / 100;
+		BsTotalSystUpRatio[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] +BsMCDataSyst[i] * BsMCDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystUp[i] * BsTnPSystUp[i]) / 100;
 	}
 
-	
-	for(int i = 0; i < NBins; i++){
 
-		BsXSecPPYSystUp[i] = BsXsecPPY[i] * ( BsTotalSystUp[i]);
-		BsXSecPPYSystDown[i] = BsXsecPPY[i] * (BsTotalSystDown[i] );
-		//cout << "i = " << i << "     BsXSecPPYSystDown[i] = " << BsXSecPPYSystDown[i] << "  BsXSecPPYErrDown[i] =  " << BsXSecPPYErrDown[i] << endl;
-		
+	for(int i = 0; i < NBins; i++){
+		BsXSecPPYSystUp[i] = BsXsecPPY[i] * BsTotalSystUpRatio[i];
+		BsXSecPPYSystDown[i] = BsXsecPPY[i] * BsTotalSystDownRatio[i];
+    std::cout << "i = " << i << "     BsXSecPPYSyst[i] = " <<
+      BsTotalSystUpRatio[i] << "%\n";
 	}
 
 
@@ -411,7 +427,7 @@ void BsRAA(){
 
 
 
-	TH2D * HisEmptyRAA = new TH2D("HisEmpty","",100,7,50,100,0,5.5);
+	TH2D * HisEmptyRAA = new TH2D("HisEmptyRAA","",100,7,50,100,0,5.5);
 	HisEmptyRAA->GetXaxis()->SetTitle("B^{0}_{s} p_{T} (GeV/c)");
 	HisEmptyRAA->GetYaxis()->SetTitle("RAA = #frac{1}{TAA} #frac{dN_{PbPb}/dp_{T}}{d #sigma_{pp}/d p_{T}}");
 	HisEmptyRAA->GetXaxis()->CenterTitle();
@@ -459,6 +475,10 @@ void BsRAA(){
 	float BsRAAYSystUp[NBins] ;
 	float BsRAAYSystDown[NBins];
 
+  float BsRAAYErrUpRatio[NBins];
+  float BsRAAYErrDownRatio[NBins];
+  float BsRAAYSystUpRatio[NBins];
+  float BsRAAYSystDownRatio[NBins];
 
 	for(int i = 0; i < NBins; i++){
 
@@ -470,11 +490,19 @@ void BsRAA(){
 		BsRAAYErrDown[i] = BsRAAY[i] * TMath::Sqrt(BsXSecPbPbYErrDownPercent[i] * BsXSecPbPbYErrDownPercent[i] + BsXSecPPYErrDownPercent[i] * BsXSecPPYErrDownPercent[i]);
 		
 
-		BsRAAYSystDown[i] = BsRAAY[i] * TMath::Sqrt(BsXSecPbPbYSystDownPercent[i] * BsXSecPbPbYSystDownPercent[i] + BsTotalSystDown[i] * BsTotalSystDown[i]);
-		BsRAAYSystUp[i] = BsRAAY[i] * TMath::Sqrt(BsXSecPbPbYSystUpPercent[i] * BsXSecPbPbYSystUpPercent[i] + BsTotalSystUp[i] * BsTotalSystUp[i]);
+		BsRAAYSystDown[i] = BsRAAY[i] * TMath::Sqrt(BsXSecPbPbYSystDownPercent[i] * BsXSecPbPbYSystDownPercent[i] + BsTotalSystDownRatio[i] * BsTotalSystDownRatio[i]);
+		BsRAAYSystUp[i] = BsRAAY[i] * TMath::Sqrt(BsXSecPbPbYSystUpPercent[i] * BsXSecPbPbYSystUpPercent[i] + BsTotalSystUpRatio[i] * BsTotalSystUpRatio[i]);
 
+    BsRAAYErrUpRatio[i] = BsRAAYErrUp[i]/BsRAAY[i];
+    BsRAAYErrDownRatio[i] = BsRAAYErrDown[i]/BsRAAY[i];
+    BsRAAYSystUpRatio[i] = BsRAAYSystUp[i]/BsRAAY[i];
+    BsRAAYSystDownRatio[i] = BsRAAYSystDown[i]/BsRAAY[i];
 
-		cout << "i = " << i <<  "    BPRAAY[i] = " << BsRAAY[i] << "   BPRAAYErrUp[i]  = "  << BsRAAYErrUp[i]/BsRAAY[i]   << "  BPRAAYErrDown[i] =   " << BsRAAYErrDown[i]/BsRAAY[i] <<   "   BPRAAYSystUp[i]  = "  << BsRAAYSystUp[i]/BsRAAY[i]   << "  BPRAAYSystDown[i] =   " << BsRAAYSystDown[i]/BsRAAY[i]  << endl;
+		cout << "i = " << i <<  "    BsRAAY[i] = " << BsRAAY[i] <<
+      "   BsRAAYErrUp[i]  = "  << BsRAAYErrDownRatio[i] <<
+      "  BsRAAYErrDown[i] =   " << BsRAAYErrDownRatio[i] <<
+      "   BsRAAYSystUp[i]  = "  << BsRAAYSystUpRatio[i]   <<
+      "  BsRAAYSystDown[i] =   " << BsRAAYSystDownRatio[i] << endl;
 
 
 			
@@ -571,4 +599,33 @@ void BsRAA(){
 	fout->Close();
 
 
+  std::vector<float> globUncert(NBins, 0.077);
+  // summary of errors (in ratio, not percent)
+  std::vector<int> ptbins = {7, 10, 15, 20, 50};
+  std::vector<float> abscissae = {8.75, 12.5, 17.5, 35.0};
+
+  string outFile = "../../MakeFinalPlots/NominalPlots/RAA/dataSource/RAA_pt_Bs_New.txt";
+  ofstream out;
+  out.open(outFile);
+  unsigned columnWidth = 14;
+  out << std::left << std::setw(columnWidth) <<
+    "ptmin" << std::setw(columnWidth) << "ptmax" << std::setw(columnWidth) <<
+    "central val" << std::setw(columnWidth) <<
+    "statUp" << std::setw(columnWidth) << "statDown" << std::setw(columnWidth) <<
+    "systUp" << std::setw(columnWidth) << "systDown" << std::setw(columnWidth) <<
+    "glbUp" << std::setw(columnWidth) << "glbDown" << std::setw(columnWidth) <<
+    "abscissae" << endl;
+  for (auto i = 0; i < NBins; ++i ) {
+    out << std::setw(columnWidth) <<
+      ptbins[i] << std::setw(columnWidth) << ptbins[i + 1] << std::setw(columnWidth) <<
+      setprecision(3) << BsRAAY[i] << std::setw(columnWidth) <<
+      setprecision(2) << std::defaultfloat <<
+      BsRAAYErrUpRatio[i] << std::setw(columnWidth) <<
+      BsRAAYErrDownRatio[i] << std::setw(columnWidth) <<
+      BsRAAYSystUpRatio[i] << std::setw(columnWidth) <<
+      BsRAAYSystDownRatio[i] << std::setw(columnWidth) <<
+      globUncert[i] << std::setw(columnWidth) <<
+      globUncert[i] << std::setw(columnWidth) << abscissae[i] << "\n";
+  }
+  out.close();
 }
