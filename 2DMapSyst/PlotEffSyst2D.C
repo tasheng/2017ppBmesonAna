@@ -29,10 +29,16 @@ void PlotEffSyst2D(int Opt){
 	gStyle->SetOptStat(0);
 
 	TString infile;
+  TString outFile;
 
 
-	if(Opt == 0) infile =  "OutFiles/BPSyst2D.root";
-	if(Opt == 1) infile =  "OutFiles/BsSyst2D.root";
+	if(Opt == 0) {
+    infile =  "OutFiles/BPSyst2D.root";
+    outFile =  "OutFiles/BPError2D.root";
+  } else if(Opt == 1) {
+    infile =  "OutFiles/BsSyst2D.root";
+    outFile =  "OutFiles/BsError2D.root";
+  }
 
 
 	TString BmesonName;
@@ -48,13 +54,11 @@ void PlotEffSyst2D(int Opt){
 
 	TH1D * Eff1DHis = (TH1D * ) fin->Get("Eff2DHis");
 	TH1D * Eff1DHisTnPUp = (TH1D * ) fin->Get("Eff2DTnPUpSystHis");
+	TH1D * Eff1DHisTnPDown = (TH1D * ) fin->Get("Eff2DTnPDownSystHis");
 	TH1D * Eff1DHisBpt = (TH1D * ) fin->Get("Eff2DBptHis");
 	TH1D * Eff1DHisBDT = (TH1D * ) fin->Get("Eff2DBDTHis");
 
-
-	TH1D * Eff1DHisTnPDown = (TH1D * ) fin->Get("Eff2DTnPDownSystHis");
-
-
+  TFile fout(outFile, "recreate");
 
 
 	//Draw Systematic Uncertainties
@@ -222,6 +226,8 @@ void PlotEffSyst2D(int Opt){
 		BDTSyst->SetBinError(i+1,0.001);
 
 		cout << "BDT Syst: " << SystValue << endl;
+    cout << SystValue << "\n";
+
 
 
 
@@ -249,6 +255,11 @@ void PlotEffSyst2D(int Opt){
 
 	c->SaveAs(Form("SystPlots/%s/Pt/MCDataSystRatio.png",BmesonName.Data()));
 
+
+
+  TnPSyst->Write();
+  BptSyst->Write();
+  BDTSyst->Write();
 
 
 /*
