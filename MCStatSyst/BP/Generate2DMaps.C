@@ -65,7 +65,8 @@ void Generate2DMaps(){
 
 
 
-	TString FileName = "2DMaps/EffFineBDT.root";
+	// TString FileName = "2DMaps/EffFineBDT.root";
+	TString FileName = "../../BP/EffAna/NewEff2DMaps/EffFineBDT.root";
 
 	TFile * fin = new TFile(FileName.Data());
 	fin->cd();
