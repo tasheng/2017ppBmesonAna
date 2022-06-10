@@ -149,12 +149,13 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	if((variation=="signal"&& (pdf=="3gauss" || pdf=="fixed" || pdf=="scal" || pdf=="merr" || pdf == "perr" || pdf=="scal+" || pdf=="scal-"))||(variation==""&& pdf=="")||variation=="background") modelMC = new RooAddPdf(Form("modelMC%d_%s",_count, pdf.Data()),"",RooArgList(*sigMC),RooArgList(nsigMC));
 	//RooAddPdf* modelMC = new RooAddPdf(Form("modelMC%d",_count),"",RooArgList(bkgMC,sigMC),RooArgList(nbkgMC,nsigMC));
 
+	mass->setRange("signal",init_mean-SignalWidth, init_mean+SignalWidth);
 	std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
 	std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
 	std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
 
 	scale->setConstant();
-	RooFitResult* fitResultMC = modelMC->fitTo(*dsMC,Save());
+	RooFitResult* fitResultMC = modelMC->fitTo(*dsMC,Save(), Range("signal"));
 	scale->setConstant(false);
 	
 	
@@ -324,9 +325,9 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 
 	   if(variation=="signal" && pdf=="1gauss") model = new RooAddPdf(Form("model%d",_count),"",RooArgList(sig1,bkg),RooArgList(nsig,nbkg));
 	   if(npfit != "1" && variation=="signal" && pdf=="1gauss") model = new RooAddPdf(Form("model%d",_count),"",RooArgList(bkg,sig1,peakbg),RooArgList(nbkg,nsig,npeakbg));
+  */
 	   if((variation=="signal"&& (pdf=="3gauss"|| pdf=="fixed" || pdf=="scal" || pdf=="merr" || pdf == "perr" || pdf=="scal+" || pdf=="scal-"))||(variation==""&&pdf=="")) model = new RooAddPdf(Form("model%d",_count),"",RooArgList(*sig, bkg),RooArgList(nsig, nbkg));
 	   if(npfit!= "1" && ((variation=="signal"&&(pdf=="3gauss"|| pdf=="fixed" || pdf=="scal" || pdf=="merr" || pdf == "perr" || pdf=="scal+" || pdf=="scal-"))||(variation==""&&pdf==""))) model = new RooAddPdf(Form("model%d",_count),"",RooArgList(*sig, bkg, peakbg),RooArgList(nsig, nbkg, npeakbg));
-	   */
 
 	//	mean.setConstant();
 	sigma1.setConstant();
@@ -382,6 +383,8 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	//cout << "-----------------------------------------------------------------------" << endl;
 
 	cout << "Begin FitTo AAAAAA" << endl;
+  cout << "variation:" << variation << "pdf:" << pdf << "\n";
+
 
 	RooFitResult* fitResult = model->fitTo(*ds,Save(), Minos(),  RooFit::PrintLevel(0) , Extended(kTRUE));
 	//RooFitResult* fitResult = model->fitTo(*ds,Save(), Minos() , Extended(kTRUE),Range(5.34,5.40));

@@ -147,11 +147,16 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
   if((variation=="signal"&& (pdf=="3gauss" || pdf=="fixed" || pdf=="scal" || pdf=="merr" || pdf == "perr" || pdf=="scal+" || pdf=="scal-"))||(variation==""&& pdf=="")||variation=="background") modelMC = new RooAddPdf(Form("modelMC%d_%s",_count, pdf.Data()),"",RooArgList(*sigMC),RooArgList(nsigMC));
 	//RooAddPdf* modelMC = new RooAddPdf(Form("modelMC%d",_count),"",RooArgList(bkgMC,sigMC),RooArgList(nbkgMC,nsigMC));
 
+  double width = 0.08;
+  double BmassH = BP_MASS + width;
+  double BmassL = BP_MASS - width;
+  mass->setRange("signal",BmassL,BmassH);
+
   std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
   std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
   std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
   scale->setConstant();
-	RooFitResult* fitResultMC = modelMC->fitTo(*dsMC,Save()); 
+	RooFitResult* fitResultMC = modelMC->fitTo(*dsMC,Save(), Range("signal"));
   scale->setConstant(false);
   std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
   std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
@@ -782,10 +787,6 @@ else if (ptmin == 50) { (frame->GetYaxis())->SetRangeUser(0,55);}
   sigma2_new.setConstant();
   sig1frac_new.setConstant();*/
 
-  double width = 0.08;
-  double BmassH = BP_MASS + width;
-  double BmassL = BP_MASS - width;
-  mass->setRange("signal",BmassL,BmassH);
   RooAbsReal *bkgIntegral = bkg.createIntegral(*mass,NormSet(*mass),Range("signal"));
 // bkgIntegralErr = bkgIntegral->getPropagatedError(*fitResult);	
   cout<<"bkg integral: "<<bkgIntegral->getVal()<<endl;
