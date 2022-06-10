@@ -35,8 +35,8 @@ void PlotGen(int Opt){
 	TString infile;
 
 
-	if(Opt == 0) infile = "../../UnskimmedSamples/OfficialMC/BPMC.root";
-	if(Opt == 1)  infile = "/data/szhaozho/ppNewTMVA/CMSSW_10_3_2/src/Bs/ComputBDTOfficial/BsMC.root";
+	if(Opt == 0) infile = "../../Unskimmed/NewOfficialMC/BPMC.root";
+	if(Opt == 1) infile = "../../Unskimmed/NewOfficialMC/BsMC.root";
 
 	TString Part;
 
@@ -52,7 +52,7 @@ void PlotGen(int Opt){
 	
 	ntGen->AddFriend("hiEvtAnalyzer/HiTree");
 
-	TH1D * Gpt = new TH1D("Gpt","",100,0,100);
+	TH1D * Gpt = new TH1D("Gpt","After reweighting",100,0,100);
 	Gpt->GetXaxis()->SetTitle("Generated B p_{T}");
 	Gpt->GetYaxis()->SetTitle("Normalized Counts");
 	Gpt->GetYaxis()->SetTitleOffset(1.4);
@@ -65,7 +65,7 @@ void PlotGen(int Opt){
 	Gpt->SetLineColor(1);
 
 
-	TH1D * JPsiPt = new TH1D("JPsiPt","",100,0,25);
+	TH1D * JPsiPt = new TH1D("JPsiPt","After reweighting",100,0,25);
 	JPsiPt->GetXaxis()->SetTitle("Generated J/#psi p_{T}");
 	JPsiPt->GetYaxis()->SetTitle("Normalized Counts");
 	JPsiPt->GetYaxis()->SetTitleOffset(1.4);
@@ -79,7 +79,7 @@ void PlotGen(int Opt){
 	JPsiPt->SetLineColor(1);
 
 
-	TH1D * pthat = new TH1D("pthat","",100,0,100);
+	TH1D * pthat = new TH1D("pthat","After reweighting",100,0,100);
 	pthat->GetXaxis()->SetTitle("pthat");
 	pthat->GetYaxis()->SetTitle("Normalized Counts");
 	pthat->GetYaxis()->SetTitleOffset(1.4);
@@ -92,6 +92,24 @@ void PlotGen(int Opt){
 	pthat->SetMarkerColor(1);
 	pthat->SetLineColor(1);
 
+	// TH1D * Gpt_noweight = new TH1D("Gpt_nw","Before reweighting",100,0,100);
+  // Gpt->Copy(*Gpt_noweight);
+	TH1D * Gpt_noweight = (TH1D*) Gpt->Clone("Gpt_nw");
+  Gpt_noweight->SetTitle("Before reweighting");
+  Gpt_noweight->SetLineColor(kRed);
+  Gpt_noweight->SetMarkerColor(kRed);
+	// TH1D * JPsiPt_noweight = new TH1D("JPsiPt_nw","Before reweighting",100,0,25);
+  // JPsiPt->Copy(*JPsiPt_noweight);
+	TH1D * JPsiPt_noweight = (TH1D*) JPsiPt->Clone("JPsiPt_nw");
+  JPsiPt_noweight->SetTitle("Before reweighting");
+  JPsiPt_noweight->SetLineColor(kRed);
+  JPsiPt_noweight->SetMarkerColor(kRed);
+	// TH1D * pthat_noweight = new TH1D("pthat_nw","Before reweighting",100,0,100);
+  // pthat->Copy(*pthat_noweight);
+	TH1D * pthat_noweight = (TH1D*) pthat->Clone("pthat_nw");
+  pthat_noweight->SetTitle("Before reweighting");
+  pthat_noweight->SetLineColor(kRed);
+  pthat_noweight->SetMarkerColor(kRed);
 
 	TCut Weight = "weight"; 
 	TCut GenCut;
@@ -106,26 +124,52 @@ void PlotGen(int Opt){
 	if(Opt == 0) JPsiGenCut = "(TMath::Abs(Gy)<2.4 && TMath::Abs(GpdgId)==443)";
 	if(Opt == 1) JPsiGenCut = "(TMath::Abs(Gy)<2.4 && TMath::Abs(GpdgId)==443)";
 
+  // sanity check
 
-	ntGen->Project("Gpt","Gpt",TCut(Weight) * TCut(GenCut));
-	ntGen->Project("JPsiPt","Gpt",TCut(Weight) * TCut(JPsiGenCut));
-	ntGen->Project("pthat","pthat",TCut(Weight));
+	TH1D * weight = new TH1D("hweight","weight",40,0.8,1.2);
+  ntGen->Draw("weight >> hweight", "weight < 1.4 && weight > 0.6");
+  c->SaveAs("weight.png");
+  return;
+
+  // re-weighted
+	// ntGen->Project("Gpt","Gpt",TCut(Weight) * TCut(GenCut));
+	// ntGen->Project("JPsiPt","Gpt",TCut(Weight) * TCut(JPsiGenCut));
+	// ntGen->Project("pthat","pthat",TCut(Weight));
+  ntGen->Draw("pthat >> pthat", Weight);
+  // unweighted
+	// ntGen->Project("Gpt_nw","Gpt", TCut(GenCut));
+	// ntGen->Project("JPsiPt_nw","Gpt", TCut(JPsiGenCut));
+	// ntGen->Project("pthat_nw","pthat");
+  ntGen->Draw("pthat >> pthat_nw");
 
 	c->SetLogy();
 
 
+	pthat_noweight->Scale(1.0/pthat_noweight->Integral());
+	pthat_noweight->Draw("ep");
+	c->SaveAs(Form("MCPlots/%spthat_bf.png",Part.Data()));	
 	pthat->Scale(1.0/pthat->Integral());
 	pthat->Draw("ep");
+	c->SaveAs(Form("MCPlots/%spthat_af.png",Part.Data()));	
+	// pthat_noweight->Scale(1.0/pthat_noweight->Integral());
+	pthat_noweight->Draw("epsame");
+  c->BuildLegend();
 	c->SaveAs(Form("MCPlots/%spthat.png",Part.Data()));	
 
 
 	Gpt->Scale(1.0/Gpt->Integral());
 	Gpt->Draw("ep");
+	Gpt_noweight->Scale(1.0/Gpt_noweight->Integral());
+	Gpt_noweight->Draw("epsame");
+  c->BuildLegend();
 	c->SaveAs(Form("MCPlots/%sGpt.png",Part.Data()));	
 
 
 	JPsiPt->Scale(1.0/JPsiPt->Integral());
 	JPsiPt->Draw("ep");
+	JPsiPt_noweight->Scale(1.0/JPsiPt_noweight->Integral());
+	JPsiPt_noweight->Draw("epsame");
+  c->BuildLegend();
 	c->SaveAs(Form("MCPlots/%sJPsiPt.png",Part.Data()));	
 	
 

@@ -31,8 +31,8 @@ void PVZMC(int Opt){
 	if(Opt == 0){
 			
 		 OutfileName = "BPPVZMCData.png";
-		 DataInfile = "/data/szhaozho/2017ppSamples/UnSkimmed/BPData.root";
-		 MCInfile = "/data/szhaozho/2017ppSamples/UnSkimmed/OfficialMC/BPMC.root";
+		 DataInfile =  "../../Unskimmed/BPData.root";
+		 MCInfile =  "../../Unskimmed/NewOfficialMC/BPMC.root";
 		 TTreeName = "Bfinder/ntKp";
 
 	}
@@ -41,8 +41,8 @@ void PVZMC(int Opt){
 	if(Opt == 1){
 
 		 OutfileName = "BsPVZMCData.png";
-		 DataInfile = "/data/szhaozho/2017ppSamples/UnSkimmed/BsData.root";
-		 MCInfile = "/data/szhaozho/2017ppSamples/UnSkimmed/OfficialMC/BsMC.root";
+		 DataInfile =  "../../Unskimmed/BsData.root";
+		 MCInfile =  "../../Unskimmed/NewOfficialMC/BsMC.root";
 		 TTreeName = "Bfinder/ntphi";
 
 	}
@@ -69,7 +69,7 @@ void PVZMC(int Opt){
 
 	TH1D * DataPVzHis = new TH1D("DataPVzHis","",300,-30,30);
 
-	ntKp->Project("DataPVzHis","PVz","HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1");
+	ntKp->Project("DataPVzHis","PVz","pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1");
 
 	DataPVzHis->GetXaxis()->SetTitle("PV_{z} (cm)");
 	DataPVzHis->GetYaxis()->SetTitle("Number of Events");
@@ -122,7 +122,7 @@ void PVZMC(int Opt){
 
 	TH1D * MCPVzHis = new TH1D("MCPVzHis","",300,-30,30);
 
-	ntKpMC->Project("MCPVzHis","PVz","HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1");
+	ntKpMC->Project("MCPVzHis","PVz","pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1");
 	
 	MCPVzHis->GetXaxis()->SetTitle("PV_{z} (cm)");
 	MCPVzHis->GetYaxis()->SetTitle("Number of Events");
@@ -162,7 +162,7 @@ void PVZMC(int Opt){
 	TString FinalFunc =  Form("(%f * TMath::Exp(-(PVz-%f)*(PVz-%f)/(2 * %f * %f)))/(%f * TMath::Exp(-(PVz-%f)*(PVz-%f)/(2 * %f * %f)))",p0,p1,p1,p2,p2,p3,p4,p4,p5,p5);
 
 	TH1D * MCPVzHisWerighted = new TH1D("MCPVzHisWerighted","",300,-30,30);
-	ntKpMC->Project("MCPVzHisWerighted","PVz",Form("(HBHENoiseFilterResult == 1 && pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1)*(%s)",FinalFunc.Data()));
+	ntKpMC->Project("MCPVzHisWerighted","PVz",Form("(pPAprimaryVertexFilter == 1 && pBeamScrapingFilter == 1)*(%s)",FinalFunc.Data()));
 
 	MCPVzHisWerighted->GetXaxis()->SetTitle("PV_{z} (cm)");
 	MCPVzHisWerighted->GetYaxis()->SetTitle("Number of Events");
@@ -188,8 +188,7 @@ void PVZMC(int Opt){
 	
 	c->SaveAs(OutfileName.Data());
 	
-
-
+  std::cout << FinalFunc << "\n";
 
 
 }
