@@ -1,13 +1,16 @@
 #include "TCut.h"
+#include "../../parameter.h"
 //donst int nBins=2;
 //double ptBins[nBins+1] = {7,15,50};
 //const int nBins=1;
 //double ptBins[nBins+1]={3,100};
 
 
+//const int nBins=7;
+//double ptBins[nBins+1] = {3,5,7,10,15,20,50,100};
+
 const int nBins=7;
 double ptBins[nBins+1] = {5,7,10,15,20,30,50,60};
-
 
 /* const int nBins = 3; */
 /* double ptBins[nBins+1] = {0,0.5,1.0,2.0}; */
@@ -74,8 +77,10 @@ double hiBins_full[nBins_full+1] = {0,90.*2};
 //const int nBins_bp = 4;
 //double ptBins_bp[nBins_bp+1] = {7,10,15,20,50};
 
-const int nBins_bp = 7;
-double ptBins_bp[nBins_bp+1] = {5,7,10,15,20,30,50,60};
+/* const int nBins_bp = 6; */
+/* double ptBins_bp[nBins_bp+1] = {5,7,10,15,20,50,60}; */
+const int nBins_bp = ptbinsvec.size() - 1;
+const double* ptBins_bp = ptbinsvec.data();
 
 
 //const int nBins_bp = 12;

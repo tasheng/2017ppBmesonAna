@@ -2,3 +2,18 @@
 *.png
 *.jpg
 *.pdf
+*.eps
+# and tables too
+*.tex
+*.aux
+# and *gasp* text files
+*.txt
+
+# Log files
+*.log
+*.out
+
+# ACLiC files
+*_C.d
+*_C.so
+*ACLiC*

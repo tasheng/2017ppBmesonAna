@@ -39,7 +39,9 @@ void CalEffSystBs(){
 
 	TString FileName;
 
-	FileName = "../SkimmedSamples/BsData.root";
+	// FileName = "../SkimmedSamples/BsData.root";
+	// FileName = "../CutSkim/BsData_trkpt5.root";
+	FileName = "../CutSkim/BsData.root";
 	TFile * fin = new TFile(FileName.Data());
 	fin->cd();
 
@@ -357,7 +359,7 @@ void CalEffSystBs(){
 	double tnpabssystup;
 	double tnpabssystdown;
 
-	TFile * finSyst2D = new TFile("../BP/EffAna/NewEff2DMaps/BPSyst2D.root");
+	TFile * finSyst2D = new TFile("../Bs/EffAna/NewEff2DMaps/BsSyst2D.root");
 	
 
 
@@ -477,7 +479,7 @@ void CalEffSystBs(){
 	TH1D * Eff2DHis = new TH1D("Eff2DHis","",NBins,ptBins);
 
 	Eff2DHis->GetXaxis()->SetTitle("p_{T} (GeV/c)");
-	Eff2DHis->GetYaxis()->SetTitle("<1/alpha #times #epsilon>");
+	Eff2DHis->GetYaxis()->SetTitle("<1/#alpha #times #epsilon>");
 	Eff2DHis->GetXaxis()->CenterTitle();	
 	Eff2DHis->GetYaxis()->CenterTitle();
 	Eff2DHis->GetXaxis()->SetTitleOffset(1.2);	
@@ -534,7 +536,7 @@ void CalEffSystBs(){
 		Eff2DTnPUpSystHis->SetBinError(i+1, NewEffErr[i]);
 
 		Eff2DTnPDownSystHis->SetBinContent(i+1, EffTnPDown[i]);		
-		Eff2DTnPDownSystHis->SetBinError(i+1, EffTnPUp[i]);
+		Eff2DTnPDownSystHis->SetBinError(i+1, NewEffErr[i]);
 		
 
 		Eff2DBDTHis->SetBinContent(i+1, EffBDT[i]);		

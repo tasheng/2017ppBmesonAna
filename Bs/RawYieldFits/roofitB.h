@@ -27,7 +27,8 @@
 #include "RooMCStudy.h"
 #include <RooMinuit.h>
 
-
+// draw legend and suppress parameters
+const bool drawLegend = false;
 using namespace RooFit;
 using namespace std;
 
@@ -148,12 +149,13 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	if((variation=="signal"&& (pdf=="3gauss" || pdf=="fixed" || pdf=="scal" || pdf=="merr" || pdf == "perr" || pdf=="scal+" || pdf=="scal-"))||(variation==""&& pdf=="")||variation=="background") modelMC = new RooAddPdf(Form("modelMC%d_%s",_count, pdf.Data()),"",RooArgList(*sigMC),RooArgList(nsigMC));
 	//RooAddPdf* modelMC = new RooAddPdf(Form("modelMC%d",_count),"",RooArgList(bkgMC,sigMC),RooArgList(nbkgMC,nsigMC));
 
+	mass->setRange("signal",init_mean-SignalWidth, init_mean+SignalWidth);
 	std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
 	std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
 	std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
 
 	scale->setConstant();
-	RooFitResult* fitResultMC = modelMC->fitTo(*dsMC,Save());
+	RooFitResult* fitResultMC = modelMC->fitTo(*dsMC,Save(), Range("signal"));
 	scale->setConstant(false);
 	
 	
@@ -323,9 +325,9 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 
 	   if(variation=="signal" && pdf=="1gauss") model = new RooAddPdf(Form("model%d",_count),"",RooArgList(sig1,bkg),RooArgList(nsig,nbkg));
 	   if(npfit != "1" && variation=="signal" && pdf=="1gauss") model = new RooAddPdf(Form("model%d",_count),"",RooArgList(bkg,sig1,peakbg),RooArgList(nbkg,nsig,npeakbg));
+  */
 	   if((variation=="signal"&& (pdf=="3gauss"|| pdf=="fixed" || pdf=="scal" || pdf=="merr" || pdf == "perr" || pdf=="scal+" || pdf=="scal-"))||(variation==""&&pdf=="")) model = new RooAddPdf(Form("model%d",_count),"",RooArgList(*sig, bkg),RooArgList(nsig, nbkg));
 	   if(npfit!= "1" && ((variation=="signal"&&(pdf=="3gauss"|| pdf=="fixed" || pdf=="scal" || pdf=="merr" || pdf == "perr" || pdf=="scal+" || pdf=="scal-"))||(variation==""&&pdf==""))) model = new RooAddPdf(Form("model%d",_count),"",RooArgList(*sig, bkg, peakbg),RooArgList(nsig, nbkg, npeakbg));
-	   */
 
 	//	mean.setConstant();
 	sigma1.setConstant();
@@ -381,6 +383,8 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	//cout << "-----------------------------------------------------------------------" << endl;
 
 	cout << "Begin FitTo AAAAAA" << endl;
+  cout << "variation:" << variation << "pdf:" << pdf << "\n";
+
 
 	RooFitResult* fitResult = model->fitTo(*ds,Save(), Minos(),  RooFit::PrintLevel(0) , Extended(kTRUE));
 	//RooFitResult* fitResult = model->fitTo(*ds,Save(), Minos() , Extended(kTRUE),Range(5.34,5.40));
@@ -499,9 +503,11 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	if(tree=="ntKp")frame->SetMaximum(nsig.getVal()*0.9);
 	//	frame->SetMaximum((h->GetBinContent(h->GetMaximumBin())+h->GetBinError(h->GetMaximumBin()))*1.8);
 
-	//model->paramOn(frame,Layout(0.65, x_2, y_1-0.06), Format("NEU",AutoPrecision(3)));
+  if (drawLegend) {
 		model->paramOn(frame,Layout(1, 1, 1), Format("NEU",AutoPrecision(3)));
-	//uncomment the second and comment the first paramON when we want a nice legend to appear
+  } else {
+    model->paramOn(frame,Layout(0.65, x_2, y_1-0.06), Format("NEU",AutoPrecision(3)));
+  }
 
 
 	frame->getAttText()->SetTextSize(0.00);
@@ -710,7 +716,9 @@ else if (ptmin == 20) { (frame->GetYaxis())->SetRangeUser(0,330);}
 	//leg->AddEntry(frame->findObject(Form("bkg%d",_count)),"Combinatorial","l");
 	leg->AddEntry(frame->findObject(Form("bkg%d",_count)),"Background","l");
 	if(npfit != "1") leg->AddEntry(frame->findObject(Form("peakbg%d",_count)),"B #rightarrow J/#psi X","f");
-	leg->Draw();
+  if (drawLegend) {
+    leg->Draw();
+  }
 
 	
 	TLatex* texcms = new TLatex(0.21,0.88,"CMS");

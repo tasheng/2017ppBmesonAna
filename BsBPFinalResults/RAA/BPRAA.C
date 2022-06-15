@@ -1,4 +1,5 @@
 #include "TROOT.h"
+#include "TStyle.h"
 #include "TH1.h"
 #include "TTree.h"
 #include "TH2.h"
@@ -11,6 +12,7 @@
 #include "TVector3.h"
 #include "TRandom.h"
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 
 #include "TCanvas.h"
@@ -24,6 +26,7 @@
 #include "TLegend.h"
 #include "TLegendEntry.h"
 #include "TMath.h"
+#include "TLine.h"
 //#include "tnp_weight_lowptPbPb.h"
 
 
@@ -55,7 +58,7 @@ void BPRAA(){
 
 
 	TFile * FileBP = new TFile(InfileBP.Data());
-	TH1D * BPCross = (TH1D *) FileBP->Get("CorrDiffHisBin");
+	TH1D * BPCross = (TH1D *) FileBP->Get("hPtSigma");
 	BPCross->SetMarkerStyle(20);
 	BPCross->SetMarkerSize(1);
 	BPCross->SetMarkerColor(1);
@@ -74,8 +77,8 @@ void BPRAA(){
 	float BPXSecPPYErrDown[NBins];
 
 
-	float BPXSecPPYErrUpPercent[NBins];
-	float BPXSecPPYErrDownPercent[NBins];
+	float BPXSecPPYErrUpRatio[NBins];
+	float BPXSecPPYErrDownRatio[NBins];
 
 
 	for(int i = 0; i < NBins; i++){
@@ -83,11 +86,10 @@ void BPRAA(){
 		BPXsecPPY[i] = BPCross->GetBinContent(i+1);
 		BPXSecPPYErrUp[i] = BPCross->GetBinError(i+1);
 		BPXSecPPYErrDown[i] = BPCross->GetBinError(i+1);
-		BPXSecPPYErrUpPercent[i] = BPXSecPPYErrUp[i]/BPXsecPPY[i];
-		BPXSecPPYErrDownPercent[i] = BPXSecPPYErrDown[i]/BPXsecPPY[i];
+		BPXSecPPYErrUpRatio[i] = BPXSecPPYErrUp[i]/BPXsecPPY[i];
+		BPXSecPPYErrDownRatio[i] = BPXSecPPYErrDown[i]/BPXsecPPY[i];
 		
 	}
-
 
 
 	float BPXSecPPXErrUp[NBins] = {1,1.5,2.5,2.5,5,10,5};
@@ -102,8 +104,8 @@ void BPRAA(){
 	float BPXSecPbPbXErrUp[NBins] = {1,1.27,2.6,2.8,5,10,5};
 	float BPXSecPbPbXErrDown[NBins] = {1,1.23,2.4,2.2,5,10,5};
 
-	float BPXSecPbPbYErrUpPercent[NBins] = {0.278198,0.159,0.041,0.0654,0.0690334,0.104543,0.24575};
-	float BPXSecPbPbYErrDownPercent[NBins] = {0.278198,0.145,0.0795,0.065,0.0690334,0.104543,0.24575};
+	float BPXSecPbPbYErrUpRatio[NBins] = {0.278198,0.159,0.041,0.0654,0.0690334,0.104543,0.24575};
+	float BPXSecPbPbYErrDownRatio[NBins] = {0.278198,0.145,0.0795,0.065,0.0690334,0.104543,0.24575};
 
 
 	float BPXSecPbPbYErrUp[NBins];
@@ -111,50 +113,60 @@ void BPRAA(){
 
 	for(int i = 0; i < NBins; i++){
 
-		BPXSecPbPbYErrUp[i] = BPXSecPbPbYErrUpPercent[i] * BPXsecPbPbY[i];
-		BPXSecPbPbYErrDown[i] = BPXSecPbPbYErrDownPercent[i] * BPXsecPbPbY[i];
+		BPXSecPbPbYErrUp[i] = BPXSecPbPbYErrUpRatio[i] * BPXsecPbPbY[i];
+		BPXSecPbPbYErrDown[i] = BPXSecPbPbYErrDownRatio[i] * BPXsecPbPbY[i];
 
 	}
 
 
 
 	//Syst//
+  TString errorFile = "../../2DMapSyst/OutFiles/BPError2D.root";
+  TFile fError(errorFile);
 
+	TH1D * TnPSyst = (TH1D *) fError.Get("TnPSyst");
+	TH1D * BptSyst = (TH1D *) fError.Get("BptSyst");
+	TH1D * BDTSyst = (TH1D *) fError.Get("BDTSyst");
+
+  TString pdfErrorFile = "../../bp_pdf.root";
+  TFile fPdfError(pdfErrorFile);
+  TGraph* pdfSyst = (TGraph *) fPdfError.Get("bp_error");
 
 
 	float BPXSecPPYSystUp[NBins];
 	float BPXSecPPYSystDown[NBins];
 
+  // percent error
+	float BPTrackingSyst[NBins] = {5};
+	float BPMCDataSyst[NBins];
+	float BPPDFSyst[NBins];
+	float BPPtShapeSyst[NBins];
+	float BPTnPSystDown[NBins];
+	float BPTnPSystUp[NBins];
 
+  // Get systematics from input files
+  for (auto ibin = 0; ibin < NBins; ++ibin) {
+    BPMCDataSyst[ibin] = BDTSyst->GetBinContent(ibin + 1);
+    BPPtShapeSyst[ibin] = BptSyst->GetBinContent(ibin + 1);
+    BPTnPSystDown[ibin] = TnPSyst->GetBinContent(ibin + 1);
+    // TnP systematics are symmetric in the binned pT case
+    BPTnPSystUp[ibin] = BPTnPSystDown[ibin];
+    BPPDFSyst[ibin] = pdfSyst->GetY()[ibin];
+  }
 
-	float BPTrackingSyst[NBins] = {0.05,0.05,0.05,0.05,0.05,0.05,0.05};
-
-	float BPMDDataSyst[NBins] = {0.208,0.00947,0.00458,0.0181,0.0490,0.0459,0.0123};
-	float BPPDFSyst[NBins] = {0.0212,0.0122,0.0091,0.0411,0.0120,0.0150,0.0089};
-	float BPPtShapeSyst[NBins] = {0.0096,0.00814,0.000408,0.000617,0.000833,0.00138,0.000640};
-
-	float BPTnPSystDown[NBins] = {0.00454,0.00476,0.00382,0.00354,0.00429,0.00581,0.00613};
-	float BPTnPSystUp[NBins] = {0.00454,0.00476,0.00382,0.00354,0.00429,0.00581,0.00613};
-
-	float BPTotalSystDown[NBins];
-	float BPTotalSystUp[NBins];
+  // RMS of all the errors
+	float BPTotalSystDownRatio[NBins];
+	float BPTotalSystUpRatio[NBins];
 
 	for(int i = 0; i < NBins; i++){
-
-		
-	//	BPTotalSystDown[i] = TMath::Sqrt(BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystDown[i] * BPTnPSystDown[i]);
-	//	BPTotalSystUp[i] = TMath::Sqrt(BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystUp[i] * BPTnPSystUp[i]);
-		BPTotalSystDown[i] = TMath::Sqrt(BPTrackingSyst[i] * BPTrackingSyst[i] + BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystDown[i] * BPTnPSystDown[i]);
-		BPTotalSystUp[i] = TMath::Sqrt(BPTrackingSyst[i] * BPTrackingSyst[i] + BPMDDataSyst[i] * BPMDDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystUp[i] * BPTnPSystUp[i]);
-
-
-
+		BPTotalSystDownRatio[i] = TMath::Sqrt(BPTrackingSyst[i] * BPTrackingSyst[i] + BPMCDataSyst[i] * BPMCDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystDown[i] * BPTnPSystDown[i]) / 100;
+		BPTotalSystUpRatio[i] = BPTotalSystDownRatio[i];
 	}
-	
+
 	for(int i = 0; i < NBins; i++){
 
-		BPXSecPPYSystUp[i] = BPXsecPPY[i] * ( BPTotalSystUp[i]);
-		BPXSecPPYSystDown[i] = BPXsecPPY[i] * (BPTotalSystDown[i] );
+		BPXSecPPYSystUp[i] = BPXsecPPY[i] * ( BPTotalSystUpRatio[i]);
+		BPXSecPPYSystDown[i] = BPXsecPPY[i] * (BPTotalSystDownRatio[i] );
 		//cout << "i = " << i << "     BPXSecPPYSystDown[i] = " << BPXSecPPYSystDown[i] << "  BPXSecPPYErrDown[i] =  " << BPXSecPPYErrDown[i] << endl;
 		
 	}
@@ -162,8 +174,8 @@ void BPRAA(){
 
 	//PbPb
 
-	float BPXSecPbPbYSystUpPercent[NBins] = {0.3577,0.1404,0.1714,0.0775,0.0858,0.0715,0.1253};
-	float BPXSecPbPbYSystDownPercent[NBins] = {0.3210,0.1359,0.1705,0.0761,0.0843,0.0699,0.1220};
+	float BPXSecPbPbYSystUpRatio[NBins] = {0.3577,0.1404,0.1714,0.0775,0.0858,0.0715,0.1253};
+	float BPXSecPbPbYSystDownRatio[NBins] = {0.3210,0.1359,0.1705,0.0761,0.0843,0.0699,0.1220};
 
 
 	float BPXSecPbPbYSystUp[NBins];
@@ -172,8 +184,8 @@ void BPRAA(){
 
 	for(int i = 0; i < NBins; i++){
 
-		BPXSecPbPbYSystDown[i] = (BPXSecPbPbYSystDownPercent[i]) * BPXsecPbPbY[i];
-		BPXSecPbPbYSystUp[i] = (BPXSecPbPbYSystUpPercent[i]) * BPXsecPbPbY[i];
+		BPXSecPbPbYSystDown[i] = (BPXSecPbPbYSystDownRatio[i]) * BPXsecPbPbY[i];
+		BPXSecPbPbYSystUp[i] = (BPXSecPbPbYSystUpRatio[i]) * BPXsecPbPbY[i];
 
 	}
 
@@ -224,8 +236,8 @@ void BPRAA(){
 
 
 
-	BPPbPbCrossGraph->Draw("epsame");	
 	BPPPCrossGraph->Draw("epsame");	
+	BPPbPbCrossGraph->Draw("epsame");	
 
 	BPPPCrossGraphSyst->Draw("5same");	
 	BPPbPbCrossGraphSyst->Draw("5same");	
@@ -268,7 +280,8 @@ void BPRAA(){
 
 	
 
-	TString InfileBP2 = "../Comparisons/NoFiducial/FinalFiles/BPPPCorrYieldPT.root";
+	// TString InfileBP2 = "../Comparisons/NoFiducial/FinalFiles/BPPPCorrYieldPT.root";
+	TString InfileBP2 = "../../../braa_nofid/BP/EffAna/FinalFiles/BPPPCorrYieldPT.root";
 
 
 	TFile * FileBP2 = new TFile(InfileBP2.Data());
@@ -285,8 +298,8 @@ void BPRAA(){
 	float BPXsecPPY2[NBins];
 
 
-	float BPXSecPPYErrUpPercent2[NBins];
-	float BPXSecPPYErrDownPercent2[NBins];
+	float BPXSecPPYErrUpRatio2[NBins];
+	float BPXSecPPYErrDownRatio2[NBins];
 	float BPXSecPPYErrUp2[NBins];
 	float BPXSecPPYErrDown2[NBins];
 
@@ -295,8 +308,8 @@ void BPRAA(){
 		BPXsecPPY2[i] = BPCross2->GetBinContent(i+1);
 		BPXSecPPYErrUp2[i] = BPCross2->GetBinError(i+1);
 		BPXSecPPYErrDown2[i] = BPCross2->GetBinError(i+1);
-		BPXSecPPYErrUpPercent2[i] = BPXSecPPYErrUp2[i]/BPXsecPPY2[i];
-		BPXSecPPYErrDownPercent2[i] = BPXSecPPYErrDown2[i]/BPXsecPPY2[i];
+		BPXSecPPYErrUpRatio2[i] = BPXSecPPYErrUp2[i]/BPXsecPPY2[i];
+		BPXSecPPYErrDownRatio2[i] = BPXSecPPYErrDown2[i]/BPXsecPPY2[i];
 		
 	}
 
@@ -340,7 +353,7 @@ void BPRAA(){
 
 
 
-	TH2D * HisEmptyRAA = new TH2D("HisEmpty","",100,5,60,100,0,1.3);
+	TH2D * HisEmptyRAA = new TH2D("HisEmptyRAA","",100,5,60,100,0,1.3);
 	HisEmptyRAA->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
 	HisEmptyRAA->GetYaxis()->SetTitle("RAA = #frac{1}{TAA} #frac{dN_{PbPb}/dp_{T}}{d #sigma_{pp}/d p_{T}}");
 	HisEmptyRAA->GetXaxis()->CenterTitle();
@@ -366,11 +379,15 @@ void BPRAA(){
 
 	float BPRAAYSystUp[NBins] ;
 	float BPRAAYSystDown[NBins];
+	float BPRAAYSystUpRatio[NBins] ;
+	float BPRAAYSystDownRatio[NBins];
 
 
 
 	float BPRAAYErrUp[NBins];
 	float BPRAAYErrDown[NBins];
+	float BPRAAYErrUpRatio[NBins];
+	float BPRAAYErrDownRatio[NBins];
 
 
 	//2015 Data Sets
@@ -399,16 +416,25 @@ void BPRAA(){
 		BPRAAY[i] = BPXsecPbPbY[i] / BPXsecPPY[i];
 
 
-		BPRAAYErrUp[i] = BPRAAY[i] * TMath::Sqrt(BPXSecPbPbYErrUpPercent[i] * BPXSecPbPbYErrUpPercent[i] + BPXSecPPYErrUpPercent[i] * BPXSecPPYErrUpPercent[i]);
-		BPRAAYErrDown[i] = BPRAAY[i] * TMath::Sqrt(BPXSecPbPbYErrDownPercent[i] * BPXSecPbPbYErrDownPercent[i] + BPXSecPPYErrDownPercent[i] * BPXSecPPYErrDownPercent[i]);
+		BPRAAYErrUp[i] = BPRAAY[i] * TMath::Sqrt(BPXSecPbPbYErrUpRatio[i] * BPXSecPbPbYErrUpRatio[i] + BPXSecPPYErrUpRatio[i] * BPXSecPPYErrUpRatio[i]);
+		BPRAAYErrDown[i] = BPRAAY[i] * TMath::Sqrt(BPXSecPbPbYErrDownRatio[i] * BPXSecPbPbYErrDownRatio[i] + BPXSecPPYErrDownRatio[i] * BPXSecPPYErrDownRatio[i]);
 		
 
-		BPRAAYSystDown[i] = BPRAAY[i] * TMath::Sqrt(BPXSecPbPbYSystDownPercent[i] * BPXSecPbPbYSystDownPercent[i] + BPTotalSystDown[i] * BPTotalSystDown[i]);
-		BPRAAYSystUp[i] = BPRAAY[i] * TMath::Sqrt(BPXSecPbPbYSystUpPercent[i] * BPXSecPbPbYSystUpPercent[i] + BPTotalSystUp[i] * BPTotalSystUp[i]);
+		BPRAAYSystDown[i] = BPRAAY[i] * TMath::Sqrt(BPXSecPbPbYSystDownRatio[i] * BPXSecPbPbYSystDownRatio[i] + BPTotalSystDownRatio[i] * BPTotalSystDownRatio[i]);
+		BPRAAYSystUp[i] = BPRAAY[i] * TMath::Sqrt(BPXSecPbPbYSystUpRatio[i] * BPXSecPbPbYSystUpRatio[i] + BPTotalSystUpRatio[i] * BPTotalSystUpRatio[i]);
 
-		cout << "i = " << i <<  "    BPRAAY[i] = " << BPRAAY[i] << "   BPRAAYErrUp[i]  = "  << BPRAAYErrUp[i]/BPRAAY[i]   << "  BPRAAYErrDown[i] =   " << BPRAAYErrDown[i]/BPRAAY[i]  <<   "   BPRAAYSystUp[i]  = "  << BPRAAYSystUp[i]/BPRAAY[i]   << "  BPRAAYSystDown[i] =   " << BPRAAYSystDown[i]/BPRAAY[i]  << endl;
+    BPRAAYErrUpRatio[i] = BPRAAYErrUp[i]/BPRAAY[i];
+    BPRAAYErrDownRatio[i] = BPRAAYErrDown[i]/BPRAAY[i];
+    BPRAAYSystUpRatio[i] = BPRAAYSystUp[i]/BPRAAY[i];
+    BPRAAYSystDownRatio[i] = BPRAAYSystDown[i]/BPRAAY[i];
 
-			
+		cout << "i = " << i <<  "    BPRAAY[i] = " << BPRAAY[i] <<
+      "   BPRAAYErrUpRatio[i]  = "  <<  BPRAAYErrUpRatio[i] <<
+      "  BPRAAYErrDownRatio[i] =   " <<  BPRAAYErrDownRatio[i] <<
+      "   BPRAAYSystUpRatio[i]  = "  << BPRAAYSystUpRatio[i]   <<
+      "  BPRAAYSystDownRatio[i] =   " << BPRAAYSystDownRatio[i]  << endl;
+
+
 	}
 
 
@@ -502,10 +528,33 @@ void BPRAA(){
 
 	fout->Close();
 
+  std::vector<float> globUncert(NBins, 0.035);
+  // summary of errors (in ratio, not percent)
+  std::vector<int> ptbins = {5, 7, 10, 15, 20, 30, 50, 60};
+  std::vector<float> abscissae = {6.0, 8.75, 12.5, 17.5, 25, 40, 55};
 
-
-
-
-
-
+  string outFile = "../../MakeFinalPlots/NominalPlots/RAA/dataSource/RAA_pt_Bp_New.txt";
+  ofstream out;
+  out.open(outFile);
+  unsigned columnWidth = 14;
+  out << std::left << std::setw(columnWidth) <<
+    "ptmin" << std::setw(columnWidth) << "ptmax" << std::setw(columnWidth) <<
+    "central val" << std::setw(columnWidth) <<
+    "statUp" << std::setw(columnWidth) << "statDown" << std::setw(columnWidth) <<
+    "systUp" << std::setw(columnWidth) << "systDown" << std::setw(columnWidth) <<
+    "glbUp" << std::setw(columnWidth) << "glbDown" << std::setw(columnWidth) <<
+    "abscissae" << endl;
+  for (auto i = 0; i < NBins; ++i ) {
+    out << std::setw(columnWidth) <<
+      ptbins[i] << std::setw(columnWidth) << ptbins[i + 1] << std::setw(columnWidth) <<
+      setprecision(3) << BPRAAY[i] << std::setw(columnWidth) <<
+      setprecision(2) << std::defaultfloat <<
+      BPRAAYErrUpRatio[i] << std::setw(columnWidth) <<
+      BPRAAYErrDownRatio[i] << std::setw(columnWidth) <<
+      BPRAAYSystUpRatio[i] << std::setw(columnWidth) <<
+      BPRAAYSystDownRatio[i] << std::setw(columnWidth) <<
+      globUncert[i] << std::setw(columnWidth) <<
+      globUncert[i] << std::setw(columnWidth) << abscissae[i] << "\n";
+  }
+  out.close();
 }

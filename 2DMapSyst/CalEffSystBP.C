@@ -38,7 +38,9 @@ void CalEffSystBP(){
 
 	TString FileName;
 
-	FileName = "../SkimmedSamples/BPData.root";
+	// FileName = "../SkimmedSamples/BPData.root";
+	// FileName = "../CutSkim/BPData_trkpt5.root";
+	FileName = "../CutSkim/BPData.root";
 	TFile * fin = new TFile(FileName.Data());
 	fin->cd();
 
@@ -464,7 +466,8 @@ void CalEffSystBP(){
 			for(int k = 0; k < NBins; k++){
 
 				//	if((BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08  && ((BptNew[j] > 7 && BptNew[j] < 10 && ByNew[j] > 1.5 )||(BptNew[j] > 10)) && (Bmu1Type > -0.1 && Bmu2Type > -0.1)))
-				if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08 &&  TMath::Abs(ByNew[j]) < 2.4  && ((BptNew[j] > 5 && BptNew[j] < 10 && abs(ByNew[j]) > 1.5 )||(BptNew[j] > 10)))
+				// if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08 &&  TMath::Abs(ByNew[j]) < 2.4  && ((BptNew[j] > 5 && BptNew[j] < 10 && abs(ByNew[j]) > 1.5 )||(BptNew[j] > 10)))
+				if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08 &&  TMath::Abs(ByNew[j]) < 2.4  && ((BptNew[j] > 5 && BptNew[j] < 10 && abs(ByNew[j]) > 1.5)||(BptNew[j] > 10)))
 				{
 
 
@@ -583,7 +586,7 @@ void CalEffSystBP(){
 	TH1D * Eff2DHis = new TH1D("Eff2DHis","",NBins,ptBins);
 
 	Eff2DHis->GetXaxis()->SetTitle("p_{T} (GeV/c)");
-	Eff2DHis->GetYaxis()->SetTitle("<1/alpha #times #epsilon>");
+	Eff2DHis->GetYaxis()->SetTitle("<1/#alpha #times #epsilon>");
 	Eff2DHis->GetXaxis()->CenterTitle();	
 	Eff2DHis->GetYaxis()->CenterTitle();
 	Eff2DHis->GetXaxis()->SetTitleOffset(1.2);	
@@ -640,7 +643,7 @@ void CalEffSystBP(){
 		Eff2DTnPUpSystHis->SetBinError(i+1, NewEffErr[i]);
 
 		Eff2DTnPDownSystHis->SetBinContent(i+1, EffTnPDown[i]);		
-		Eff2DTnPDownSystHis->SetBinError(i+1, EffTnPUp[i]);
+		Eff2DTnPDownSystHis->SetBinError(i+1, NewEffErr[i]);
 		
 
 		Eff2DBDTHis->SetBinContent(i+1, EffBDT[i]);		

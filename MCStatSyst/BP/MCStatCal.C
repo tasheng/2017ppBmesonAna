@@ -12,6 +12,7 @@
 #include "TRandom.h"
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 //#include "tnp_weight_lowptPbPb.h"
 
 
@@ -25,6 +26,7 @@ using std::endl;
 void MCStatCal(){
 
 	const int NFiles = 10000;
+	// const int NFiles = 1000;
 	const int NBins = 7;
 	//const int NBins = 6;
 
@@ -36,10 +38,18 @@ void MCStatCal(){
 	//	gStyle->SetOptTitle(0);
 	gStyle->SetOptStat(0);
 
+	TString nomFileName = "../../2DMapSyst/OutFiles/BPSyst2D.root";
+  TFile fnom(nomFileName);
+  TH1D* eff2d = (TH1D*) fnom.Get("Eff2DHis");
+  for (auto i = 0; i < NBins; ++i ) {
+    cout << eff2d->GetBinContent(i + 1) << "\n";
+  }
 
-	TString FileName;
+  TString FileName;
 
-	FileName = "../../SkimmedSamples/BPData.root";
+	// FileName = "../../SkimmedSamples/BPData.root";
+	// FileName = "../../CutSkim/BPData_trkpt5.root";
+	FileName = "../../CutSkim/BPData.root";
 	TFile * fin = new TFile(FileName.Data());
 	fin->cd();
 
@@ -199,9 +209,8 @@ void MCStatCal(){
 	if(NBins == 7){
 
 
-		//		ptbinsvec.push_back(3);
 		ptbinsvec.push_back(5);
-		ptbinsvec.push_back(7);		
+		ptbinsvec.push_back(7);
 		ptbinsvec.push_back(10);
 		ptbinsvec.push_back(15);
 		ptbinsvec.push_back(20);
@@ -214,74 +223,75 @@ void MCStatCal(){
 
 
 		minvec.push_back(45);
-		minvec.push_back(22);
+		minvec.push_back(21.5);
 		minvec.push_back(11.3);
-		minvec.push_back(5);
+		minvec.push_back(5.4);
 		minvec.push_back(3.5);
-		minvec.push_back(2);
+		minvec.push_back(2.5);
 		minvec.push_back(1.5);
 
 
-		minaccvec.push_back(4);
+		minaccvec.push_back(8.4);
+		minaccvec.push_back(4.6);
 		minaccvec.push_back(3.5);
-		minaccvec.push_back(2.1);
-		minaccvec.push_back(1.57);
-		minaccvec.push_back(1.57);
-		minaccvec.push_back(1.57);
-		minaccvec.push_back(1.57);
+		minaccvec.push_back(2.2);
+		minaccvec.push_back(1.6);
+		minaccvec.push_back(1);
+		minaccvec.push_back(0.8);
+
+		maxaccvec.push_back(9.4);
+		maxaccvec.push_back(5.4);
+		maxaccvec.push_back(4);
+		maxaccvec.push_back(2.6);
+		maxaccvec.push_back(2);
+		maxaccvec.push_back(2);
+		maxaccvec.push_back(1.8);
+
+		minselvec.push_back(1);
+		minselvec.push_back(1);
+		minselvec.push_back(1);
+		minselvec.push_back(1.2);
+		minselvec.push_back(1.2);
+		minselvec.push_back(1.2);
+		minselvec.push_back(1.2);
+
+		maxselvec.push_back(9);
+		maxselvec.push_back(7);
+		maxselvec.push_back(5);
+		maxselvec.push_back(4);
+		maxselvec.push_back(4);
+		maxselvec.push_back(4);
+		maxselvec.push_back(4);
 
 
-		minselvec.push_back(30);
-		minselvec.push_back(10);
-		minselvec.push_back(5);
-		minselvec.push_back(0);
-		minselvec.push_back(0);
-		minselvec.push_back(0);
-		minselvec.push_back(80);
 
 
-
-
-		maxvec.push_back(60);
-		maxvec.push_back(26);
-		maxvec.push_back(13.5);
-		maxvec.push_back(8);
+		maxvec.push_back(53);
+		maxvec.push_back(23.5);
+		maxvec.push_back(12);
+		maxvec.push_back(5.9);
+		maxvec.push_back(4.1);
+		maxvec.push_back(4);
 		maxvec.push_back(5.5);
-		maxvec.push_back(5);
-		maxvec.push_back(8);
-
-
-		maxaccvec.push_back(20);
-		maxaccvec.push_back(20);
-		maxaccvec.push_back(20);
-		maxaccvec.push_back(20);
-		maxaccvec.push_back(20);
-		maxaccvec.push_back(20);
-		maxaccvec.push_back(20);
-
-
-		maxselvec.push_back(10);
-		maxselvec.push_back(10);
-		maxselvec.push_back(10);
-		maxselvec.push_back(10);
-		maxselvec.push_back(10);
-		maxselvec.push_back(10);
-		maxselvec.push_back(10);
 
 
 
 
 
 
-		meanvec.push_back(53.538932);
-		meanvec.push_back(23.943692);
-		meanvec.push_back(12.038493);
-		meanvec.push_back(5.7727937);
-		meanvec.push_back(3.7848080);
-		meanvec.push_back(3.0837052);
-		meanvec.push_back(2.9782204);
 
 
+
+    for (auto i = 0; i < NBins; ++i) {
+      meanvec.push_back(eff2d->GetBinContent(i + 1));
+    }
+		// meanvec.push_back(48.3);
+		// meanvec.push_back(22.4);
+		// meanvec.push_back(11.62);
+		// meanvec.push_back(5.6727937);
+		// meanvec.push_back(3.7848080);
+		// meanvec.push_back(3.0837052);
+		// meanvec.push_back(3.5);
 
 	}
 
@@ -392,7 +402,7 @@ void MCStatCal(){
 
 	for(int i = 0; i < NBins; i++){
 
-		EffInvDistribution[i] = new TH1D("EffInvDistribution","",200,Min[i],Max[i]);
+		EffInvDistribution[i] = new TH1D(Form("EffInvDistribution%d", i),"",200,Min[i],Max[i]);
 		EffInvDistribution[i]->GetXaxis()->SetTitle("<1/(acc x eff)>");
 		EffInvDistribution[i]->GetYaxis()->SetTitle("Counts");
 		EffInvDistribution[i]->SetTitle(Form("MC Smeared Distribution for %.0f < Bpt < %.0f",ptBins[i],ptBins[i+1]));
@@ -402,7 +412,7 @@ void MCStatCal(){
 		EffInvDistribution[i]->GetYaxis()->SetTitleOffset(1.4);
 
 
-		SelInvDistribution[i] = new TH1D("SelInvDistribution","",200,MinSel[i],MaxSel[i]);
+		SelInvDistribution[i] = new TH1D(Form("SelInvDistribution%d", i),"",200,MinSel[i],MaxSel[i]);
 		SelInvDistribution[i]->GetXaxis()->SetTitle("<1/(eff)>");
 		SelInvDistribution[i]->GetYaxis()->SetTitle("Counts");
 		SelInvDistribution[i]->SetTitle(Form("MC Smeared Distribution for %.0f < Bpt < %.0f",ptBins[i],ptBins[i+1]));
@@ -413,7 +423,7 @@ void MCStatCal(){
 
 
 
-		AccInvDistribution[i] = new TH1D("AccInvDistribution","",200,MinAcc[i],MaxAcc[i]);
+		AccInvDistribution[i] = new TH1D(Form("AccInvDistribution%d", i),"",200,MinAcc[i],MaxAcc[i]);
 		AccInvDistribution[i]->GetXaxis()->SetTitle("<1/(acc)>");
 		AccInvDistribution[i]->GetYaxis()->SetTitle("Counts");
 		AccInvDistribution[i]->SetTitle(Form("MC Smeared Distribution for %.0f < Bpt < %.0f",ptBins[i],ptBins[i+1]));
@@ -435,7 +445,8 @@ void MCStatCal(){
 
 
 
-	for(int q = 0; q < NFiles; q++){
+	// for(int q = 0; q < NFiles; q++){
+	for(int q = 0; q < 1; q++){
 
 		if(q%1 == 0)	cout << "Now Working On File " << q << endl;
 
@@ -446,9 +457,13 @@ void MCStatCal(){
 
 		finEff->cd();
 
-		TH2D * invEff2D = (TH2D *) finEff->Get(Form("EffBptByInvTrial%d",q));
-		TH2D * invSel2D = (TH2D *) finEff->Get(Form("SelBptByInvTrial%d",q));
-		TH2D * invAcc2D = (TH2D *) finEff->Get(Form("AccBptByInvTrial%d",q));
+		TFile* finNom = new TFile("../../BP/EffAna/NewEff2DMaps/EffFineBDT.root");
+		// TH2D * invEff2D = (TH2D *) finEff->Get(Form("EffBptByInvTrial%d",q));
+		// TH2D * invSel2D = (TH2D *) finEff->Get(Form("SelBptByInvTrial%d",q));
+		// TH2D * invAcc2D = (TH2D *) finEff->Get(Form("AccBptByInvTrial%d",q));
+		TH2D * invEff2D = (TH2D *) finNom->Get("invEff2D");
+		TH2D * invSel2D = (TH2D *) finNom->Get("invEffonly2D");
+		TH2D * invAcc2D = (TH2D *) finNom->Get("invAcc2D");
 
 
 		int XBin;
@@ -469,7 +484,7 @@ void MCStatCal(){
 
 				for(int k = 0; k < NBins; k++){
 
-					if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08 &&  TMath::Abs(ByNew[j]) < 2.4  && ((BptNew[j] > 5 && BptNew[j] < 10 && abs(ByNew[j]) > 1.5 )||(BptNew[j] > 10)))
+					if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08 &&  TMath::Abs(ByNew[j]) < 2.4  && ((BptNew[j] > 5 && BptNew[j] < 10 && abs(ByNew[j]) > 0 )||(BptNew[j] > 10)))
 					{
 
 
@@ -501,6 +516,14 @@ void MCStatCal(){
 		}
 
 
+    unsigned columnWidth = 14;
+    std::cout << std::left << 
+      std::setw(columnWidth) << "bin" <<
+      std::setw(columnWidth) << "acc" <<
+      std::setw(columnWidth) << "sel" <<
+      std::setw(columnWidth) << "Eff" <<
+      std::setw(columnWidth) << "eff error" << "\n";
+
 		for(int k = 0; k < NBins; k++){
 
 			NewSel[k] = SumCountsSel[k]/Counts[k];
@@ -508,6 +531,15 @@ void MCStatCal(){
 			NewEff[k] = SumCounts[k]/Counts[k];
 	
 			//cout << "SumCounts[k] = " << SumCounts[k] << "    Counts[k]" << Counts[k]  << "   NewEff[k] = " << NewEff[k] << endl;
+      std::cout.precision(3);
+
+      std::cout << std::left <<
+        std::setw(columnWidth) << k <<
+        std::setw(columnWidth) << 1 / NewAcc[k] <<
+        std::setw(columnWidth) << 1 / NewSel[k] <<
+        std::setw(columnWidth) << 1 / NewEff[k] << "\n";
+        // std::setw(columnWidth) << 1 / NewAcc[k] * 1 / NewSel[k] << "\n";
+
 
 			EffInvDistribution[k]->Fill(NewEff[k]);
 			SelInvDistribution[k]->Fill(NewSel[k]);			
@@ -524,6 +556,7 @@ void MCStatCal(){
 
 		}
 
+    return;
 		finEff->Close();
 	
 
@@ -560,8 +593,16 @@ void MCStatCal(){
 	MCSystStatHis->SetMarkerStyle(20);
 	MCSystStatHis->SetLineColor(1);
 
+  for (int i = 0; i < NBins; i++) {
+    // print all eff and error
+    cout << "bin:" << i
+         << ", eff: " << 1 / EffInvDistribution[i]->GetMean()
+         << ", acc: " << 1 / AccInvDistribution[i]->GetMean()
+         << ", sel: " << 1 / SelInvDistribution[i]->GetMean() << "\n";
+  }
 
-	for(int i = 0; i < NBins; i++){
+  for(int i = 0; i < NBins; i++){
+
 
 		EffInvDistribution[i]->SetMinimum(0);
 		EffInvDistribution[i]->Draw();
@@ -619,7 +660,7 @@ void MCStatCal(){
 		texChi[i]->SetTextColor(1);
 
 		texChi[i]->Draw("SAME");
-		c->SaveAs(Form("Plots/Acc/MCStatAcc_%d.png",i));
+		c->SaveAs(Form("Plots/Sel/MCStatSel_%d.png",i));
 
 		RMS = SelInvDistribution[i]->GetRMS();
 		MeanValue = SelInvDistribution[i]->GetMean();
@@ -646,7 +687,7 @@ void MCStatCal(){
 		texChi[i]->SetTextColor(1);
 
 		texChi[i]->Draw("SAME");
-		c->SaveAs(Form("Plots/Sel/MCStatSel_%d.png",i));
+		c->SaveAs(Form("Plots/Acc/MCStatAcc_%d.png",i));
 	
 	
 		RMS = AccInvDistribution[i]->GetRMS();
@@ -659,5 +700,13 @@ void MCStatCal(){
 	}
 
 
+  // save output
+  TFile fout("mcstat.root", "recreate");
+  for (auto i = 0; i < NBins; ++i) {
+    EffInvDistribution[i]->Write();
+		AccInvDistribution[i]->Write();
+    SelInvDistribution[i]->Write();
+  }
+  fout.Close();
 
 }

@@ -28,6 +28,8 @@
 #include "RooMCStudy.h"
 #include <RooMinuit.h>
 
+// draw legend and suppress parameters
+const bool drawLegend = false;
 using namespace RooFit;
 using namespace std;
 
@@ -145,11 +147,16 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
   if((variation=="signal"&& (pdf=="3gauss" || pdf=="fixed" || pdf=="scal" || pdf=="merr" || pdf == "perr" || pdf=="scal+" || pdf=="scal-"))||(variation==""&& pdf=="")||variation=="background") modelMC = new RooAddPdf(Form("modelMC%d_%s",_count, pdf.Data()),"",RooArgList(*sigMC),RooArgList(nsigMC));
 	//RooAddPdf* modelMC = new RooAddPdf(Form("modelMC%d",_count),"",RooArgList(bkgMC,sigMC),RooArgList(nbkgMC,nsigMC));
 
+  double width = 0.08;
+  double BmassH = BP_MASS + width;
+  double BmassL = BP_MASS - width;
+  mass->setRange("signal",BmassL,BmassH);
+
   std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
   std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
   std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
   scale->setConstant();
-	RooFitResult* fitResultMC = modelMC->fitTo(*dsMC,Save()); 
+	RooFitResult* fitResultMC = modelMC->fitTo(*dsMC,Save(), Range("signal"));
   scale->setConstant(false);
   std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
   std::cout<<"sumEntries: "<<dsMC->sumEntries()<<std::endl;
@@ -464,8 +471,11 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 
 
 
-	//model->paramOn(frame,Layout(0.65, x_2, y_1-0.05), Format("NEU",AutoPrecision(3)));
-	model->paramOn(frame,Layout(1, 1, 1), Format("NEU",AutoPrecision(3)));  //easy way to make the params desapear
+  if (drawLegend) {
+   model->paramOn(frame,Layout(1, 1, 1), Format("NEU",AutoPrecision(3)));
+  } else {
+    model->paramOn(frame,Layout(0.65, x_2, y_1-0.05), Format("NEU",AutoPrecision(3)));
+  }
 					//model->paramOn(frame,Layout(x_2+0.5, x_2+0.5, y_1+0.16), Format("NEU",AutoPrecision(3)));
 
   frame->getAttText()->SetTextSize(0.00);
@@ -650,7 +660,9 @@ else if (ptmin == 50) { (frame->GetYaxis())->SetRangeUser(0,55);}
 	//leg->AddEntry(frame->findObject(Form("bkg%d",_count)),"Combinatorial","l");
   leg->AddEntry(frame->findObject(Form("bkg%d",_count)),"Background","l");
   if(npfit != "1") leg->AddEntry(frame->findObject(Form("peakbg%d",_count)),"B #rightarrow J/#psi X","f");
-  leg->Draw();
+  if (drawLegend) {
+    leg->Draw();
+  }
 
 
   TLatex* texcms = new TLatex(0.21,0.88,"CMS");
@@ -775,10 +787,6 @@ else if (ptmin == 50) { (frame->GetYaxis())->SetRangeUser(0,55);}
   sigma2_new.setConstant();
   sig1frac_new.setConstant();*/
 
-  double width = 0.08;
-  double BmassH = BP_MASS + width;
-  double BmassL = BP_MASS - width;
-  mass->setRange("signal",BmassL,BmassH);
   RooAbsReal *bkgIntegral = bkg.createIntegral(*mass,NormSet(*mass),Range("signal"));
 // bkgIntegralErr = bkgIntegral->getPropagatedError(*fitResult);	
   cout<<"bkg integral: "<<bkgIntegral->getVal()<<endl;

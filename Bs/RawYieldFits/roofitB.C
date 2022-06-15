@@ -228,6 +228,9 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 
 	}
 
+  std::cout << nBins_check << "\n";
+  std::cout << ptBins_check[0] << ", " << ptBins_check[1] << "\n";
+
 
 	TH1D* hPt = new TH1D("hPt","",nBins_check,ptBins_check);
 
@@ -307,8 +310,7 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 	std::vector<std::vector<double>> background_syst;
 	// std::vector<std::string> signal = {"3gauss", "fixed", "scal", "perr", "merr", "scal+", "scal-"};
 	//std::vector<std::string> signal = {"3gauss", "fixed","scal+", "scal-"};
-	//	 std::vector<std::string> signal = {"3gauss"};
-	std::vector<std::string> signal = {"3gauss", "fixed", "scal+", "scal-"};
+	std::vector<std::string> signal = {"3gauss", "fixed"};
 	//std::vector<std::string> signal = {"3gauss", "1gauss","fixed", "scal", "perr", "merr"};
 	// std::vector<std::string> signal = {"3gauss", "1gauss", "fixed_mean", "scaling", "-_error", "+_error"};
 	std::vector<std::vector<double>> signal_syst;
@@ -483,20 +485,21 @@ cout << "TESTE 123__"<< i<< "  " << ptBins_check[i] << endl;
 		//tex = new TLatex(0.55,0.85,Form("%.0f < p_{T} < %.0f GeV/c",_ptBins[i],_ptBins[i+1]));
 		//if(varExp=="abs(By)") tex = new TLatex(0.55,0.85,Form("%.1f < y < %.1f",_ptBins[i],_ptBins[i+1]));
 		if(varExp=="Bpt"){
-					//fr the AN run these
-			//tex_pt = new TLatex(0.55,0.8,Form("%d < p_{T} < %d GeV/c",(int)ptBins_check[i],(int)ptBins_check[i+1]));
-			//tex_y = new TLatex(0.55,0.74,"p_{T} > 10 GeV/c : |y| < 2.4"); 
-			//tex_y2 = new TLatex(0.55,0.68,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4"); 
-			//tex_y1 = new TLatex(0.55,0.74,"1.5 < |y| < 2.4"); 
-			//tex_y11 =new TLatex(0.55,0.74,"|y| < 2.4"); 
-			
-			
-					//for the paper run these			
-			tex_pt = new TLatex(0.55,0.4,Form("%d < p_{T} < %d GeV/c",(int)ptBins_check[i],(int)ptBins_check[i+1]));
-			tex_y = new TLatex(0.55,0.34,"p_{T} > 10 GeV/c : |y| < 2.4"); 
-			tex_y2 = new TLatex(0.55,0.28,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4"); 
-			tex_y1 = new TLatex(0.55,0.34,"1.5 < |y| < 2.4"); 
-			tex_y11 =new TLatex(0.55,0.34,"|y| < 2.4"); 
+      //for the paper run these
+      if (drawLegend) {
+        tex_pt = new TLatex(0.55,0.4,Form("%d < p_{T} < %d GeV/c",(int)ptBins_check[i],(int)ptBins_check[i+1]));
+        tex_y = new TLatex(0.55,0.34,"p_{T} > 10 GeV/c : |y| < 2.4");
+        tex_y2 = new TLatex(0.55,0.28,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4");
+        tex_y1 = new TLatex(0.55,0.34,"1.5 < |y| < 2.4");
+        tex_y11 =new TLatex(0.55,0.34,"|y| < 2.4");
+      } else {
+        //fr the AN run these
+        tex_pt = new TLatex(0.55,0.8,Form("%d < p_{T} < %d GeV/c",(int)ptBins_check[i],(int)ptBins_check[i+1]));
+        tex_y = new TLatex(0.55,0.74,"p_{T} > 10 GeV/c : |y| < 2.4");
+        tex_y2 = new TLatex(0.55,0.68,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4");
+        tex_y1 = new TLatex(0.55,0.74,"1.5 < |y| < 2.4");
+        tex_y11 =new TLatex(0.55,0.74,"|y| < 2.4");
+      }
 		}
 
 		std::cout<<"CHEGUEI AQUI"<<std::endl;
@@ -575,8 +578,8 @@ cout << "TESTE 123__"<< i<< "  " << ptBins_check[i] << endl;
 		lat->DrawLatex(0.64,0.70,Form("Significance: %.1f", real_significance));
 */
 		std::cout<<"Canvas Updated"<<std::endl;
-	//	c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_doubly%d_%.0f_%0.f",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".pdf");
 		c->Update();
+		c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_doubly%d_%.0f_%0.f",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".pdf");
 		c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_doubly%d_%.0f_%0.f",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".png");
 		//c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_doubly%d_%.0f_%0.f",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".C");
 		// c->SaveAs(Form("%s%s/%s_%s_%d%s_%d%d.png",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(), (int)ptBins_check[i],(int)ptBins_check[i+1]));
@@ -649,8 +652,8 @@ cout << "TESTE 123__"<< i<< "  " << ptBins_check[i] << endl;
 			//	tex_hibin->Draw();
 				tex_y->Draw();
 
-				c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1],background[j].c_str(), doubly)+tree+".pdf");
-				c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1],background[j].c_str(), doubly)+tree+".png");
+				c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1],background[j].c_str(), doubly)+tree+".pdf");
+				c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1],background[j].c_str(), doubly)+tree+".png");
 
 				modelcurve_back = frame->getCurve(Form("model%d",_count));
 				RooRealVar* fitYield_back = static_cast<RooRealVar*>(f_back->floatParsFinal().at(f_back->floatParsFinal().index(Form("nsig%d",_count))));
@@ -668,10 +671,10 @@ cout << "TESTE 123__"<< i<< "  " << ptBins_check[i] << endl;
 			//	tex_hibin->Draw();
 				tex_y->Draw();
 
-				c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1],signal[j].c_str(), doubly)+tree+".pdf");
-				cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(), (int)ptBins_check[i], (int)ptBins_check[i+1],signal[j].c_str(), doubly)+tree+".pdf");
-				c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1],signal[j].c_str(), doubly)+tree+".png");
-				cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(), (int)ptBins_check[i], (int)ptBins_check[i+1],signal[j].c_str(), doubly)+tree+".png");
+				c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1],signal[j].c_str(), doubly)+tree+".pdf");
+				cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(), (int)ptBins_check[i], (int)ptBins_check[i+1],signal[j].c_str(), doubly)+tree+".pdf");
+				c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1],signal[j].c_str(), doubly)+tree+".png");
+				cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(), (int)ptBins_check[i], (int)ptBins_check[i+1],signal[j].c_str(), doubly)+tree+".png");
 
 				modelcurve_signal = frame->getCurve(Form("model%d",_count));
 				RooRealVar* fitYield_signal = static_cast<RooRealVar*>(f_signal->floatParsFinal().at(f_signal->floatParsFinal().index(Form("nsig%d",_count))));
