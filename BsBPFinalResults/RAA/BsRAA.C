@@ -145,7 +145,7 @@ void BsRAA(){
   TGraph* pdfSyst = (TGraph *) fPdfError.Get("bs_error");
 
   // percent error
-	float BsTrackingSyst[NBins] = {10};
+	float BsTrackingSyst[NBins] = {[0 ... NBins - 1] = 10};
 	float BsMCDataSyst[NBins];
 	float BsPtShapeSyst[NBins];
 	float BsPDFSyst[NBins];
