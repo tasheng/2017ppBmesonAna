@@ -17,6 +17,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <map>
 #include "../../parameter.h"
 
 
@@ -25,6 +26,7 @@ using namespace std;
 using std::cout;
 using std::endl;
 
+bool reweightPtOnY = true;
 
 
 void  MCEff(int DoTnP, int Rescale){
@@ -196,7 +198,8 @@ void  MCEff(int DoTnP, int Rescale){
 
 
 	Float_t Bgen[NCand];
-
+	Float_t Bgenpt[NCand];
+	Float_t Bgeny[NCand];
 
 
 	//	Float_t pthatweight;
@@ -325,6 +328,8 @@ void  MCEff(int DoTnP, int Rescale){
 	ntKp->SetBranchAddress("Btrk2Chi2ndf",Btrk2Chi2ndf);
 
 	ntKp->SetBranchAddress("Bgen",Bgen);
+	ntKp->SetBranchAddress("Bgenpt",Bgenpt);
+	ntKp->SetBranchAddress("Bgeny",Bgeny);
 
 
 	ntKp->SetBranchAddress("Btrk1nStripLayer",Btrk1nStripLayer);	
@@ -551,7 +556,8 @@ void  MCEff(int DoTnP, int Rescale){
 	int NEvents = ntKp->GetEntries();
 
 	const int yBinN = 5;
-	double yBinning[yBinN+1] = {0.0,0.5, 1.0, 1.5,2.0, 2.4};
+  std::vector<double> yBins ({0.0, 0.5, 1.0, 1.5, 2.0, 2.4});
+	double yBinning[yBinN+1] = {0.0, 0.5, 1.0, 1.5, 2.0, 2.4};
 
   // create a vector of pT binning with specified regional widths
   auto createBins = [] (std::vector<double> edges,
@@ -793,6 +799,14 @@ void  MCEff(int DoTnP, int Rescale){
 	// TF1 * BptWFunc = new TF1("BptWFunc","1.000000/(x*x) +0.435893*TMath::Log(x) - 0.116910",0,100);
 	// TF1 * BptWFunc = new TF1("BptWFunc","1.070585/x**(8.245110) + 0.833796 + 0.016723 * x",0,100);
 	TF1 * BptWFunc = new TF1("BptWFunc","10.577117/x**(1.906323) + 0.654119 + 0.012688 * x",0,100);
+
+  TFile fBptWeight("../../NewBptStudies/ResultFile/BptWeight_BP.root");
+  std::map<int, TF1*> BptWtF;
+  if (reweightPtOnY) {
+    for (auto iy = 0; iy < yBinN; ++iy) {
+      BptWtF[iy] = (TF1*) fBptWeight.Get(TString::Format("BptWeight_y%d", iy));
+    }
+  }
 
 	int BDTWeightBin;
 	float BDTWeight;
@@ -1306,7 +1320,9 @@ void  MCEff(int DoTnP, int Rescale){
 				BDTWeightHisSyst->Fill(Bpt[j],abs(By[j]),TotalWeight * BDTWeight);
 
 			
-				BptWeight = BptWFunc->Eval(Bpt[j]);
+        auto iY = std::upper_bound(yBins.begin(), yBins.end(), abs(Bgeny[j]))
+          - yBins.begin() - 1;
+				BptWeight = BptWtF[iY]->Eval(Bgenpt[j]);
 
 				Eff1DRECOHisBpt->Fill(Bpt[j],TotalWeight * BptWeight);
 				BptWeightHisSyst->Fill(Bpt[j],abs(By[j]),TotalWeight * BptWeight);
@@ -1366,7 +1382,6 @@ void  MCEff(int DoTnP, int Rescale){
 			for(int j = 0; j < Gsize; j++){
 
 		
-				BptWeight = BptWFunc->Eval(Gpt[j]);
 			//	EventWeight = PVzWeight * BptWeight * weight;
 				
 
@@ -1376,6 +1391,9 @@ void  MCEff(int DoTnP, int Rescale){
 	//			if((TMath::Abs(Gy[j])<2.4 && TMath::Abs(GpdgId[j])==521 && GisSignal[j]==1 && GcollisionId[j]==0 ) ){
 				if( (TMath::Abs(Gy[j])<2.4 && TMath::Abs(GpdgId[j])==521 && GisSignal[j]==1 && GcollisionId[j]==0 )  && ((Gpt[j]>5 && Gpt[j]<10 && TMath::Abs(Gy[j])>1.5) || (Gpt[j]>10))  ){
 
+          auto iY = std::upper_bound(yBins.begin(), yBins.end(), abs(Gy[j]))
+            - yBins.begin() - 1;
+          BptWeight = BptWtF[iY]->Eval(Gpt[j]);
 
 					NoWeightGenHis->Fill(Gpt[j],abs(Gy[j]),1);
 					EvtWeightGenHis->Fill(Gpt[j],abs(Gy[j]),EventWeight);
