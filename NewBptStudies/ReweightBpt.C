@@ -1,4 +1,12 @@
 #include "TROOT.h"
+#include <TCanvas.h>
+#include <TCut.h>
+#include <TGraphAsymmErrors.h>
+#include <TLatex.h>
+#include <TLine.h>
+#include <TStyle.h>
+#include <TString.h>
+// #include <TPadPainter.h>
 #include "TH1.h"
 #include "TTree.h"
 #include "TH2.h"
@@ -12,6 +20,8 @@
 #include "TRandom.h"
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <vector>
 //#include "uti.h"
 //#include "parameters.h"
 
@@ -21,75 +31,75 @@ using namespace std;
 using std::cout;
 using std::endl;
 
+void reweightInY(TH1D* GptMC, TGraphAsymmErrors* gaeBplusReference, TCut weightpthat, TCut GenCut);
+
+constexpr float BptMin = 5;
+constexpr float BptMax = 60;
+constexpr int nBinsReweight = 220;
+const std::vector<double> yBins = {0, 0.5, 1, 1.5, 2, 2.4};
+float ptBinsReweight[nBinsReweight + 1] = {0};
+TString ParName;
+TF1 *f1 = 0;
+
+TString inputFONLL = "FONLLFine/FONLL_rapidity.root";
 
 void ReweightBpt(int Opt){
 
 
 	TString inputMC;
-	TString inputFONLL;
-	TString MethodLabel = "FONLL";
 	TCut GenCut;
-
-	TString ParName;
-
-
 	if(Opt == 0){
-
 		ParName = "BP";
 		inputMC =  "../Unskimmed/NewOfficialMC/BPMC.root";
-		inputFONLL = "FONLLFine/BPFONLLFine.root";
-		// inputFONLL = "FONLLFine/fonllOutput_pp_Bplus_5p03TeV_yFid.root";
+		// inputFONLL = "FONLLFine/BPFONLLFine.root";
 		GenCut = "TMath::Abs(Gy)<2.4 && TMath::Abs(GpdgId)==521 && GisSignal==1 && GcollisionId==0";
-
-	}
-
-	if(Opt == 1){
-
+	} else if(Opt == 1){
 		ParName = "Bs";
 		inputMC =  "../Unskimmed/NewOfficialMC/BsMC.root";
-		inputFONLL = "FONLLFine/BPFONLLFine.root";
-		// inputFONLL = "FONLLFine/fonllOutput_pp_Bplus_5p03TeV_yFid.root";
+		// inputFONLL = "FONLLFine/BPFONLLFine.root";
 		GenCut = "(TMath::Abs(Gy)<2.4&&TMath::Abs(GpdgId)==531&&GisSignal>0)";
-
 	}
-
-
-
-	gStyle->SetOptStat(0); 
-	TCanvas * c = new TCanvas("c","c",1800,600);
-	c->Divide(3,1);
-	TCut weighpthat = "(weight)";
-	
-
+	TCut weightpthat = "(weight)";
 	TFile *finMC = new TFile(inputMC.Data());
 	TFile *finFONLL = new TFile(inputFONLL.Data());
-
 	TTree * tMC = (TTree*) finMC->Get("Bfinder/ntGen");
 	tMC->AddFriend("hltanalysis/HltTree");
-	tMC->AddFriend("hiEvtAnalyzer/HiTree");  
+	tMC->AddFriend("hiEvtAnalyzer/HiTree");
 	tMC->AddFriend("skimanalysis/HltTree");
 
-	// const int nBinsReweight = 180;
-	const int nBinsReweight = 220;
-	float ptBinsReweight[nBinsReweight + 1];
-	float BptMin = 5.0;
-
 	for(int i = 0; i < nBinsReweight + 1; i++){
-
 		ptBinsReweight[i] = BptMin + 0.25 * i;
-
 	}
 
 
-	
-
 	TH1D * GptMC = new TH1D("GptMC","GptMC",nBinsReweight,ptBinsReweight);
-		
-
-
 	GptMC->GetYaxis()->SetTitleOffset(1.1);
 
-	tMC->Project("GptMC","Gpt",TCut(weighpthat)*TCut(GenCut));
+  std::vector<TF1> fits;
+  // fit pt distribution in every y bin
+  for (unsigned iY = 0; iY < yBins.size() - 1; ++iY) {
+    tMC->Project("GptMC","Gpt",TCut(weightpthat) * TCut(GenCut) *
+                 TCut(TString::Format("abs(Gy) > %f && abs(Gy) < %f", yBins[iY], yBins[iY + 1])));
+    TGraphAsymmErrors* gaeBplusReference =
+      (TGraphAsymmErrors*)finFONLL->Get(TString::Format("gaeSigmaBplus%d", iY));
+    reweightInY(GptMC, gaeBplusReference, weightpthat, GenCut);
+    TF1* fFit = (TF1*) f1->Clone();
+    fits.push_back(*fFit);
+  }
+  for (auto f : fits) {
+    TString BptReweightFunc = Form("%f/x**(%f) + %f + %f * x",
+                                   f.GetParameter(0), f.GetParameter(1),
+                                   f.GetParameter(2), f.GetParameter(3));
+    cout << BptReweightFunc << "\n";
+  }
+}
+
+void reweightInY(TH1D* GptMC, TGraphAsymmErrors* gaeBplusReference, TCut weightpthat, TCut GenCut) {
+	TString MethodLabel = "FONLL";
+	gStyle->SetOptStat(0);
+	TCanvas * c = new TCanvas("c","c",1800,600);
+	c->Divide(3,1);
+
 	GptMC->Sumw2();
 
 	GptMC->GetXaxis()->SetTitle("Gen p_{T} (GeV)");
@@ -104,8 +114,14 @@ void ReweightBpt(int Opt){
 	gPad->SetLogy();
 	GptMC->Draw("ep");
 
+  // Get the y index
+  TString name = gaeBplusReference->GetName();
+  TString iY = TString(name(name.Length() - 1, 1));
+  unsigned iy = std::stoi(iY.Data());
+  TLatex latex;
+  latex.SetTextSize(0.05);
+  latex.DrawLatexNDC(0.5, 0.7, TString::Format("%.1f < |y| < %.1f",yBins[iy], yBins[iy + 1]));
 
-	TGraphAsymmErrors* gaeBplusReference = (TGraphAsymmErrors*)finFONLL->Get("gaeSigmaBplus");
 
 	TH1D * GptFONLL = new TH1D("GptFONLL","",nBinsReweight,ptBinsReweight);
 
@@ -115,12 +131,10 @@ void ReweightBpt(int Opt){
 	for(int i=0;i<nBinsReweight;i++){
 
 		gaeBplusReference->GetPoint(i,x,y);
-
-		cout << "i = " << i << "  x = " << x << "  y = "  << y << endl;
-
-		
+		// cout << "i = " << i << "  x = " << x << "  y = "  << y << endl;
 		yErr = gaeBplusReference->GetErrorY(i);
 		GptFONLL->SetBinContent(i+1,y);
+    // we only use the errors from the MC
 		//GptFONLL->SetBinError(i+1,yReweightBptErr);
 	}
 
@@ -131,6 +145,7 @@ void ReweightBpt(int Opt){
 	GptFONLL->GetXaxis()->SetTitle(Form("%s p_{T} (GeV)",MethodLabel.Data()));
 	GptFONLL->GetYaxis()->SetTitle(Form("%s_pp, #entries ",MethodLabel.Data()));
 	GptFONLL->Sumw2();
+  // normalize the FONLL distribution
 	GptFONLL->Scale(1.0/GptFONLL->Integral());
 	GptFONLL->SetMarkerStyle(20);
 	GptFONLL->SetMarkerColor(kBlack);
@@ -141,39 +156,47 @@ void ReweightBpt(int Opt){
 
 
 	TH1D * BptRatio = (TH1D *) GptFONLL->Clone("BptRatio");
-	BptRatio->GetYaxis()->SetTitleOffset(1.3); 
+	BptRatio->GetYaxis()->SetTitleOffset(1.3);
 	BptRatio->Divide(GptMC);
 	c->cd(3);
 
 
 
-	TF1 *f1;
 
 	//if(MethodLabel == "FONLL") f1 = new TF1("f1","[0]/(x*x*x)-[1]/(x*x) + [2]",5,120);
 
 	//if(MethodLabel == "NLO") f1 = new TF1("f1","[0]/(x*x*x)+ [1] * x + [2]",5,120);
 
 
-	if(MethodLabel =="FONLL") f1 =  new TF1("f1"," [0]/x**[1] + [2] + [3] * x",5,100);
-	
+	// if(MethodLabel =="FONLL") f1 =  new TF1("f1"," [0]/x**[1] + [2] + [3] * x",
+	if(MethodLabel =="FONLL") f1 =  new TF1("f1"," [0]/x**[1] + [2] + [3] * TMath::Log(x)",
+                                          BptMin, BptMax);
+
 	if(MethodLabel =="NLO") f1 =  new TF1("f1"," ([0]-[1]*x)*TMath::Exp(-[2]*x) + [3] + [4] *x ",5,300);
-	
+
 	if(MethodLabel == "DATAEXP") f1 =  new TF1("f1"," ([0]-[1]*x)*TMath::Exp(-[2]*x) + [3] + [4] *x ",5,300);
 
 
 	f1->SetParLimits(0,0,10000);
 	f1->SetParLimits(1,0,4);
-	f1->SetParLimits(2,0,2);
-	f1->SetParLimits(3,-1,1.0);
+	f1->SetParLimits(2,-2,2);
+	// f1->SetParLimits(3,-1,1.0);
+	f1->SetParLimits(3,0,1);
+
+  // std::vector<double> iniPars = {200, 3, 0.75, 0.015};
+  std::vector<double> iniPars = {100, 3, 0, 0.3};
+  f1->SetParameters(iniPars.data());
+
+
 	if(MethodLabel =="NLO") 	f1->SetParLimits(4,0,0.1);
 
 	//TF1 * f1 = new TF1("f1","([0]-[1]*x)*TMath::Exp(-[2]*x)+[3]",5,105);
 
-	f1->SetParLimits(2,0,10);
-	f1->SetParLimits(1,0,100);
+	// f1->SetParLimits(2,0,10);
+	// f1->SetParLimits(1,0,100);
 
 
-	BptRatio->Fit(f1,"R");
+	BptRatio->Fit(f1,"L");
 	//BptRatio->Fit(f1,"L q m","",5,105);
 
 	BptRatio->GetXaxis()->SetTitle("B_{s}^{0} p_{T}");
@@ -234,11 +257,14 @@ void ReweightBpt(int Opt){
 	Unity->SetLineColor(kBlue + 2);
 	Unity->Draw();
 
-	c->SaveAs(Form("plotReweight/%sBptReweigt%s.png",ParName.Data(),MethodLabel.Data()));
-	c->SaveAs(Form("plotReweight/%sBptReweigt%s.pdf",ParName.Data(),MethodLabel.Data()));
+	c->SaveAs(Form("plotReweight/%sBptReweigt%s%s.png",
+                 ParName.Data(),MethodLabel.Data(), iY.Data()));
+	c->SaveAs(Form("plotReweight/%sBptReweigt%s%s.pdf",
+                 ParName.Data(),MethodLabel.Data(), iY.Data()));
 
 
-	ofstream foutResults(Form("ResultFile/ReweightBpt_%s.txt", ParName.Data()));
+	ofstream foutResults(Form("ResultFile/ReweightBpt_%s_y%s.txt",
+                            ParName.Data(), iY.Data()));
 	foutResults	<< "([0]-x)*TMath::Exp(-[1]*x)+[2]" << endl;
 	foutResults	<< "Fitting Results: " << BptReweightFunc.Data() << endl;
 	foutResults << "Paramater 0 = " << f1->GetParameter(0) << endl;
@@ -256,4 +282,3 @@ void ReweightBpt(int Opt){
 */
 
 }
-
