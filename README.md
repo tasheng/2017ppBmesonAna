@@ -889,7 +889,7 @@ To produce the pp cross section of Bs and B+ as a function of pT in the same plo
 
 cd CrossSection/
 
-root -b -l -q plotPt'(1,1,0,1,1)'
+root -b -l -q plotPt.C'(1,1,0,1,1)'
 
 The cross section plot files will be saved at figs/pdf/xsec_vsPt.pdf as pdf format and figs/png/xsec_vsPt.png as png
 
