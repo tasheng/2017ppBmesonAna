@@ -126,6 +126,7 @@ void BsRAA(){
 
 
 
+
 	//Syst//
 
 
@@ -185,6 +186,9 @@ void BsRAA(){
 		BsXSecPPYSystDown[i] = BsXsecPPY[i] * BsTotalSystDownRatio[i];
     std::cout << "i = " << i << "     BsXSecPPYSyst[i] = " <<
       BsTotalSystUpRatio[i] << "%\n";
+    std::cout << "components " << BsTrackingSyst[i] << ", " << BsMCDataSyst[i]
+              << ", " << BsPDFSyst[i] << ", " << BsTrackSelSyst[i] << ", " <<
+      BsPtShapeSyst[i] << ", " << BsTnPSystDown[i] << "\n";
 	}
 
 
@@ -606,8 +610,8 @@ void BsRAA(){
 
 	fout->Close();
 
-
-  std::vector<float> globUncert(NBins, 0.077);
+  double lumiUncertainty = TMath::Sqrt(TMath::Power(0.019, 2) + TMath::Power(0.015, 2));
+  std::vector<float> globUncert(NBins, lumiUncertainty);
   // summary of errors (in ratio, not percent)
   std::vector<int> ptbins = {7, 10, 15, 20, 50};
   std::vector<float> abscissae = {8.5, 12.5, 17.5, 35.0};
