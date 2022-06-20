@@ -56,7 +56,7 @@ void BsRAA(){
 
 	TFile * FileBs = new TFile(InfileBs.Data());
 
-	TH1D * BsCross = (TH1D *) FileBs->Get("CorrDiffHisBin");
+	TH1D * BsCross = (TH1D *) FileBs->Get("hPtSigma");
 	BsCross->SetMarkerStyle(20);
 	BsCross->SetMarkerSize(1);
 	BsCross->SetMarkerColor(1);
