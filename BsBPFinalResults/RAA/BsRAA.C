@@ -1,4 +1,5 @@
 #include "TROOT.h"
+#include "TStyle.h"
 #include "TH1.h"
 #include "TTree.h"
 #include "TH2.h"
@@ -11,6 +12,7 @@
 #include "TVector3.h"
 #include "TRandom.h"
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 
 #include "TCanvas.h"
@@ -24,6 +26,7 @@
 #include "TLegend.h"
 #include "TLegendEntry.h"
 #include "TMath.h"
+#include "TLine.h"
 //#include "tnp_weight_lowptPbPb.h"
 
 
@@ -123,7 +126,6 @@ void BsRAA(){
 
 
 
-
 	//Syst//
 
 
@@ -144,12 +146,16 @@ void BsRAA(){
   TFile fPdfError(pdfErrorFile);
   TGraph* pdfSyst = (TGraph *) fPdfError.Get("bs_error");
 
+  TString trackSelErrorFile = "../../syst_track_sel.root";
+  TFile fTrackSelError(trackSelErrorFile);
+  TGraph* trackSelSyst = (TGraph *) fTrackSelError.Get("bs_track_sel_error");
+
   // percent error
 	float BsTrackingSyst[NBins] = {[0 ... NBins - 1] = 10};
 	float BsMCDataSyst[NBins];
 	float BsPtShapeSyst[NBins];
 	float BsPDFSyst[NBins];
-
+	float BsTrackSelSyst[NBins];
 	float BsTnPSystDown[NBins];
 	float BsTnPSystUp[NBins];
 
@@ -160,6 +166,7 @@ void BsRAA(){
     // TnP systematics are symmetric in the binned pT case
     BsTnPSystUp[ibin] = BsTnPSystDown[ibin];
     BsPDFSyst[ibin] = pdfSyst->GetY()[ibin];
+    BsTrackSelSyst[ibin] = trackSelSyst->GetY()[ibin];
   }
 
   // RMS of all the errors
@@ -167,8 +174,9 @@ void BsRAA(){
 	float BsTotalSystUpRatio[NBins];
 
 	for(int i = 0; i < NBins; i++){
-		BsTotalSystDownRatio[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] + BsMCDataSyst[i] * BsMCDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystDown[i] * BsTnPSystDown[i]) / 100;
-		BsTotalSystUpRatio[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] +BsMCDataSyst[i] * BsMCDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystUp[i] * BsTnPSystUp[i]) / 100;
+		BsTotalSystDownRatio[i] = TMath::Sqrt(TMath::Power(BsTrackingSyst[i], 2) + TMath::Power(BsMCDataSyst[i], 2) +
+                                          TMath::Power(BsPDFSyst[i], 2) + TMath::Power(BsTrackSelSyst[i], 2) +
+                                          TMath::Power(BsPtShapeSyst[i], 2) + TMath::Power(BsTnPSystDown[i], 2)) / 100;
 	}
 
 
@@ -610,7 +618,7 @@ void BsRAA(){
   unsigned columnWidth = 14;
   out << std::left << std::setw(columnWidth) <<
     "ptmin" << std::setw(columnWidth) << "ptmax" << std::setw(columnWidth) <<
-    "central val" << std::setw(columnWidth) <<
+    "central_val" << std::setw(columnWidth) <<
     "statUp" << std::setw(columnWidth) << "statDown" << std::setw(columnWidth) <<
     "systUp" << std::setw(columnWidth) << "systDown" << std::setw(columnWidth) <<
     "glbUp" << std::setw(columnWidth) << "glbDown" << std::setw(columnWidth) <<

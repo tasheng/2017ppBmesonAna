@@ -1,5 +1,6 @@
 #include "TROOT.h"
 #include "TH1.h"
+#include <TH1D.h>
 #include "TTree.h"
 #include "TH2.h"
 #include "TF1.h"
@@ -10,8 +11,11 @@
 #include "TLorentzVector.h"
 #include "TVector3.h"
 #include "TRandom.h"
+#include <TCanvas.h>
+#include <TStyle.h>
 #include <iostream>
 #include <fstream>
+#include "../../parameter.h"
 //#include "tnp_weight_lowptPbPb.h"
 
 
@@ -85,6 +89,8 @@ void CrossSectionAna(int DoTnP){
 	EffInfoTree->SetBranchAddress("By",ByNew);
 	EffInfoTree->SetBranchAddress("Bpt",BptNew);
 	
+	Int_t trackSelection;
+	EffInfoTree->SetBranchAddress("track", &trackSelection);
 
 /*
 	EffInfoTree->SetBranchAddress("BEffInv",BEffInv);
@@ -144,10 +150,16 @@ void CrossSectionAna(int DoTnP){
 	double ptBins[NBins + 1];
 
 	int Counts[NBins];
+	int CountsTight[NBins];
+	int CountsLoose[NBins];
 	double SumCounts[NBins];
 	double SumCountsErr[NBins];
+	double SumCountsTight[NBins];
+	double SumCountsLoose[NBins];
 	double NewEff[NBins];
 	double NewEffErr[NBins];
+	double NewEffTight[NBins];
+	double NewEffLoose[NBins];
 
 	double NewEffReal[NBins];
 	double NewEffRealErr[NBins];
@@ -304,6 +316,8 @@ void CrossSectionAna(int DoTnP){
 
 	for(int i = 0; i < NBins; i++){
 		Counts[i] = 0;
+		CountsTight[i] = 0;
+		CountsLoose[i] = 0;
 		SumCounts[i] = 0;
 		SumCountsErr[i] = 0;
 		SumCountsEff[i] = 0;
@@ -315,32 +329,13 @@ void CrossSectionAna(int DoTnP){
 		SumCountsErrUp[i] = 0;
 		SumCountsDown[i] = 0;
 		SumCountsErrDown[i] = 0;
+		SumCountsTight[i] = 0;
+		SumCountsLoose[i] = 0;
 
 
 
 
 	}
-
-
-
-	/*
-	   const int NBins = 3;
-	   double ptBins[NBins + 1] ={5,15,20,50};
-
-	   int Counts[NBins]={0,0,0};
-	   double SumCounts[NBins]={0,0,0};
-	   double SumCountsErr[NBins]={0,0,0};
-	   */
-
-
-	/*
-	   const int NBins = 4;
-	   double ptBins[NBins + 1] ={5,10,15,20,50};
-
-	   int Counts[NBins]={0,0,0,0};
-	   double SumCounts[NBins]={0,0,0,0};
-	   double SumCountsErr[NBins]={0,0,0,0};
-	   */
 
 
 
@@ -415,9 +410,6 @@ void CrossSectionAna(int DoTnP){
 
 
 
-
-
-
 	double tnpabssystup;
 	double tnpabssystdown;
 
@@ -429,6 +421,11 @@ void CrossSectionAna(int DoTnP){
 	fin1DEff->cd();
 
 	TH2D * invAcc2D = (TH2D *) fin1DEff->Get("invEff2D");
+	TH2D * invEffTrkTight = (TH2D *) fin1DEff->Get("invEffTrkTight");
+	TH2D * invEffTrkLoose = (TH2D *) fin1DEff->Get("invEffTrkLoose");
+
+  Float_t EffInvTrkTight;
+  Float_t EffInvTrkLoose;
 
 	int XBin;
 	int YBin;
@@ -439,7 +436,9 @@ void CrossSectionAna(int DoTnP){
 		//MuonInfoTree->GetEntry(i);
 
 
-		for(int j = 0; j < BsizeNew; j++){
+    // We expect a flat tree, no array
+		// for(int j = 0; j < BsizeNew; j++){
+    int j = 0;
 
 
 			for(int k = 0; k < NBins; k++){
@@ -453,12 +452,20 @@ void CrossSectionAna(int DoTnP){
 					XBin = invAcc2D->GetXaxis()->FindBin( BptNew[j]);
 					YBin = invAcc2D->GetYaxis()->FindBin( TMath::Abs(ByNew[j]));
 					BEffInv[j] = invAcc2D->GetBinContent(XBin,YBin);
+          EffInvTrkTight = invEffTrkTight->GetBinContent(XBin,YBin);
+          EffInvTrkLoose = invEffTrkLoose->GetBinContent(XBin,YBin);
+
 					BEffInvErr[j] = invAcc2D->GetBinError(XBin,YBin);
 					BEff[j] = 1.0/invAcc2D->GetBinContent(XBin,YBin);
 
-
 					BEffErr[j] = BEffInvErr[j]/(BEffInv[j] * BEffInv[j]);
-					if(BEffInv[j] > 0){
+	
+          if (EffInvTrkLoose > 0) {
+            SumCountsLoose[k] += EffInvTrkLoose;
+            CountsLoose[k]++;
+          }
+
+					if(trackSelection > 0 && BEffInv[j] > 0) {
 						SumCounts[k] = SumCounts[k] + BEffInv[j];
 						SumCountsErr[k] = SumCountsErr[k] + BEffInvErr[j] * BEffInvErr[j];
 						SumCountsEff[k] = SumCountsEff[k] + BEff[j];
@@ -478,13 +485,26 @@ void CrossSectionAna(int DoTnP){
 
 						//cout << "SumCountsUp = " << SumCountsUp[k] << endl;
 						//cout << "Candidate: " << "   Bpt = " << BptNew[j] << "   Efficiency =  " << BEffInv[j] << "   Efficiency Error  = " << BEffInvErr[j] << endl;
-					}
-				}
 
-			}
+          }
+					if(trackSelection > 0 && BEffInv[j] <= 0) {
+            cout << "[Warning] 0 inverse efficiency for pT "
+                 << BptNew[j] << ", y " << ByNew[j] << "\n";
 
+          }
+          // tight track selection
+          if (trackSelection > 1 && EffInvTrkTight > 0) {
+            SumCountsTight[k] += EffInvTrkTight;
+            CountsTight[k]++;
+          }
+					if(trackSelection > 1 && EffInvTrkTight <= 0) {
+            cout << "[Warning] 0 inverse efficiency for pT "
+                 << BptNew[j] << ", y " << ByNew[j] << "\n";
+          }
+        }
+      }
 
-		}
+		// }
 
 	}
 
@@ -561,12 +581,19 @@ void CrossSectionAna(int DoTnP){
 	hInvEffDown->SetMinimum(0);
 
 
+  TH1D *hInvEffTight = (TH1D*) hInvEff->Clone("hInvEffTight");
+	hInvEffTight->GetYaxis()->SetTitle("<1/(Eff * Acc)> - Tight track selection");
+
+  TH1D *hInvEffLoose = (TH1D*) hInvEff->Clone("hInvEffLoose");
+	hInvEffLoose->GetYaxis()->SetTitle("<1/(Eff * Acc)> - Loose track selection");
 
 	for(int i = 0; i < NBins; i++){
 
 
 		NewEff[i] = SumCounts[i]/Counts[i];
 		NewEffErr[i] = TMath::Sqrt(SumCountsErr[i])/Counts[i];
+		NewEffTight[i] = SumCountsTight[i]/CountsTight[i];
+		NewEffLoose[i] = SumCountsLoose[i]/CountsLoose[i];
 
 
 		NewEffUp[i] = SumCountsUp[i]/Counts[i];
@@ -584,6 +611,12 @@ void CrossSectionAna(int DoTnP){
 
 		hInvEff->SetBinContent(i+1,NewEff[i]);
 		hInvEff->SetBinError(i+1,NewEffErr[i]);
+
+		hInvEffTight->SetBinContent(i+1, NewEffTight[i]);
+		hInvEffTight->SetBinError(i+1, epsilon);
+    // TODO: currently loose is the same as nominal
+		hInvEffLoose->SetBinContent(i+1, NewEff[i]);
+		hInvEffLoose->SetBinError(i+1, epsilon);
 
 		hEff->SetBinContent(i+1,1/NewEff[i]);
 		hEff->SetBinError(i+1,NewEffErr[i]/(NewEff[i] * NewEff[i]));
@@ -620,6 +653,8 @@ void CrossSectionAna(int DoTnP){
 
 
 		//NewEffErr[i] = 0; //Remove Error on Efficiency Correction//
+		cout << "CountTight =  " <<  CountsTight[i] << "   NewEffTight = " << NewEffTight[i] << "\n";
+		cout << "-----------------------------------------------------------------------------------------------" << endl;
 	}
 
 
@@ -641,10 +676,20 @@ void CrossSectionAna(int DoTnP){
 
 	c->cd();
 
+	hInvEffTight->SetMarkerColor(kRed);
+	hInvEffLoose->SetMarkerColor(kBlue);
+  hInvEff->SetTitle("Nominal");
+  hInvEffTight->SetTitle("Tight track sel.");
+  hInvEffLoose->SetTitle("Loose track sel.");
 	hInvEff->Draw("ep");
+	hInvEffLoose->Draw("EP same");
+	hInvEffTight->Draw("EP same");
+  c->BuildLegend(0.6, 0.6, 0.9, 0.8);
 
+  hInvEff->SetTitle("");
 	cout << "OK" << endl;
 
+  gSystem->MakeDirectory("EffFinal/pdf/");
 	c->SaveAs(Form("EffFinal/ReAnaEff_%dBins.png",NBins));
 	c->SaveAs(Form("EffFinal/pdf/ReAnaEff_%dBins.pdf",NBins));
 
@@ -805,10 +850,13 @@ CorrDiffHisBin
 	TFile * RawYield = new TFile("../RawYieldFits/ROOTfiles/yields_Bs_binned_pt.root");
 	RawYield->cd();
 	TH1D * hPt = (TH1D *) RawYield->Get("hPt");
+	TFile * RawYieldTight = new TFile("../RawYieldFits/ROOTfiles/yields_Bs_binned_pt_trk.root");
+	TH1D * hPtTight = (TH1D *) RawYieldTight->Get("hPt");
 
 
 	double RawCount;
 	double RawCountErr;
+	double RawCountTight;
 
 	double CorrYield= 0;
 	double CorrYieldErr= 0;
@@ -847,6 +895,7 @@ CorrDiffHisBin
 	CorrDiffHis->GetYaxis()->CenterTitle();
 
 
+	TH1D * CorrDiffHisTight = (TH1D*) CorrDiffHis->Clone("hPtSigma_tight");
 
 	for(int i = 0; i < NBins;i++){
 		RawCount = hPt->GetBinContent(i+1);
@@ -856,6 +905,10 @@ CorrDiffHisBin
 		CorrDiffHis->SetBinContent(i+1,CorrYieldDiff[i]);
 		CorrDiffHis->SetBinError(i+1,CorrYieldDiffErr[i]);
 
+		RawCountTight = hPtTight->GetBinContent(i+1);
+		CorrDiffHisTight->
+      SetBinContent(i+1, (RawCountTight *  NewEffTight[i]) / (BRchain*2* lumi) );
+		CorrDiffHisTight->SetBinError(i+1, epsilon);
 	}
 
 
@@ -965,11 +1018,13 @@ CorrDiffHisBin
 	foutCorr->cd();
 	CorrDiffHis->Write();
 	CorrDiffHisBin->Write();
+	CorrDiffHisTight->Write();
+  hInvEff->Write();
+  hInvEffTight->Write();
+  hInvEffLoose->Write();
+  hPt->Write();
+  hPtTight->SetName("hPtTight");
+  hPtTight->Write();
 	foutCorr->Close();
-
-	
-
-
-
 
 }

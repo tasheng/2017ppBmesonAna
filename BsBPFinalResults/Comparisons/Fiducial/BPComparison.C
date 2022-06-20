@@ -1,4 +1,5 @@
 #include "TROOT.h"
+#include "TStyle.h"
 #include "TH1.h"
 #include "TTree.h"
 #include "TH2.h"
@@ -11,6 +12,7 @@
 #include "TVector3.h"
 #include "TRandom.h"
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 
 #include "TCanvas.h"
@@ -47,11 +49,12 @@ void BPComparison(){
 	TString InfileBP = "../../../BP/EffAna/FinalFiles/BPPPCorrYieldPT.root";
 
 	TFile * FileBP = new TFile(InfileBP.Data());
-	TH1D * BPCross = (TH1D *) FileBP->Get("CorrDiffHisBin");
-	BPCross->SetMarkerStyle(20);
-	BPCross->SetMarkerSize(1);
-	BPCross->SetMarkerColor(1);
-	BPCross->SetLineColor(1);
+
+	// TH1D * BPCross = (TH1D *) FileBP->Get("CorrDiffHisBin");
+	// BPCross->SetMarkerStyle(20);
+	// BPCross->SetMarkerSize(1);
+	// BPCross->SetMarkerColor(1);
+	// BPCross->SetLineColor(1);
 
 
 
@@ -63,8 +66,11 @@ void BPComparison(){
 	
 	const int NBins = 7;
 
-	// float BPXsecPPY[NBins];
-	float BPXsecPPX[NBins] = {6,8.5,12.5,17.5,25,40,55};
+	float BPXsecPPY[NBins];
+	float BPXsecPPX[NBins] = {6,7.5,12.5,17.5,25,40,55};
+
+	float BPXSecPPYErrUp[NBins];
+	float BPXSecPPYErrDown[NBins];
 
 	// float BPXSecPPYErrUp[NBins];
 	// float BPXSecPPYErrDown[NBins];
@@ -159,6 +165,10 @@ void BPComparison(){
   TFile fPdfError(pdfErrorFile);
   TGraph* pdfSyst = (TGraph *) fPdfError.Get("bp_error");
 
+  TString trackSelErrorFile = "../../../syst_track_sel.root";
+  TFile fTrackSelError(trackSelErrorFile);
+  TGraph* trackSelSyst = (TGraph *) fTrackSelError.Get("bp_track_sel_error");
+
 	float BPXSecPPYSystUp[NBins];
 	float BPXSecPPYSystDown[NBins];
 
@@ -170,6 +180,7 @@ void BPComparison(){
 	float BPTrackingSyst[NBins] = {[0 ... NBins - 1] = 5};
 	float BPMCDataSyst[NBins];
 	float BPPDFSyst[NBins];
+	float BPTrackSelSyst[NBins];
 	float BPPtShapeSyst[NBins];
 	float BPTnPSystDown[NBins];
 	float BPTnPSystUp[NBins];
@@ -182,34 +193,40 @@ void BPComparison(){
     // TnP systematics are symmetric in the binned pT case
     BPTnPSystUp[ibin] = BPTnPSystDown[ibin];
     BPPDFSyst[ibin] = pdfSyst->GetY()[ibin];
+    BPTrackSelSyst[ibin] = trackSelSyst->GetY()[ibin];
     cout << "i:" << ibin <<
       ", MC/data:" << BPMCDataSyst[ibin] <<
       ", pt shape:" << BPPtShapeSyst[ibin] <<
-      ", tnp:" << BPTnPSystDown[ibin]
-         << "\n";
-
+      ", tnp:" << BPTnPSystDown[ibin] <<
+      ", PDF:" << BPPDFSyst[ibin] <<
+      ", track sel:" << BPTrackSelSyst[ibin] <<
+      "\n";
   }
 
   // RMS of all the errors
 	float BPTotalSystDownRatio[NBins];
-	float BPTotalSystUp[NBins];
+	float BPTotalSystUpRatio[NBins];
 
 	for(int i = 0; i < NBins; i++){
-		BPTotalSystDownRatio[i] = TMath::Sqrt(BPTrackingSyst[i] * BPTrackingSyst[i] + BPMCDataSyst[i] * BPMCDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystDown[i] * BPTnPSystDown[i]) / 100;
-		BPTotalSystUp[i] = TMath::Sqrt(BPTrackingSyst[i] * BPTrackingSyst[i] + BPMCDataSyst[i] * BPMCDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystUp[i] * BPTnPSystUp[i]) / 100;
+		BPTotalSystDownRatio[i] = TMath::Sqrt(TMath::Power(BPTrackingSyst[i], 2) + TMath::Power(BPMCDataSyst[i], 2) +
+                                          TMath::Power(BPPDFSyst[i], 2) + TMath::Power(BPTrackSelSyst[i], 2) +
+                                          TMath::Power(BPPtShapeSyst[i], 2) + TMath::Power(BPTnPSystDown[i], 2)) / 100;
+    BPTotalSystUpRatio[i] = TMath::Sqrt(TMath::Power(BPTrackingSyst[i], 2) + TMath::Power(BPMCDataSyst[i], 2) +
+                                        TMath::Power(BPPDFSyst[i], 2) + TMath::Power(BPTrackSelSyst[i], 2) +
+                                        TMath::Power(BPPtShapeSyst[i], 2) + TMath::Power(BPTnPSystUp[i], 2)) / 100;
 	}
   // global uncertainty from branching ratio and luminosity
   // Fixed, copied from the paper draft
   std::vector<float> globUncert(NBins, 0.035);
 
 	for(int i = 0; i < NBins; i++){
-		BPXSecPPYSystUp[i] = BPXsecPPY2D[i] * BPTotalSystUp[i];
+		BPXSecPPYSystUp[i] = BPXsecPPY2D[i] * BPTotalSystUpRatio[i];
 		BPXSecPPYSystDown[i] = BPXsecPPY2D[i] * BPTotalSystDownRatio[i];
 		cout << "i = " << i << "     BP syst[i] = " << BPTotalSystDownRatio[i] <<
 		";    glob: " << globUncert[i] << "\n";
 
     BPXSecPPYSystDownScaled[i] = BPXsecPPY2DScaled[i] * BPTotalSystDownRatio[i];
-    BPXSecPPYSystUpScaled[i] = BPXsecPPY2DScaled[i] * BPTotalSystUp[i];
+    BPXSecPPYSystUpScaled[i] = BPXsecPPY2DScaled[i] * BPTotalSystUpRatio[i];
 	}
 
 	//PbPb

@@ -4,7 +4,8 @@
 
 
 DOANALYSISPbPb_ROOFIT_FULL_BP=0
-DOANALYSISPbPb_ROOFIT_BINNED_PT_BP=1
+DOANALYSISPbPb_ROOFIT_BINNED_PT_BP=0
+DOANALYSISPbPb_ROOFIT_BINNED_PT_BP_TRK=1
 DOANALYSISPbPb_ROOFIT_BINNED_Y_BP=0
 DOANALYSISPbPb_ROOFIT_BINNED_MULTI_BP=0
 
@@ -65,6 +66,7 @@ echo "TRGPbPb="$TRGPbPb
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_FULL="ROOTfiles/yields_Bp_full.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_Y="ROOTfiles/yields_Bp_binned_y.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT="ROOTfiles/yields_Bp_binned_pt.root"
+OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT_trk="ROOTfiles/yields_Bp_binned_pt_trk.root"
 
 NPROOFIT_PbPb="1"
 # NPROOFIT_PbPb_BP="701.019629*TMath::Erf((Bmass-5.140349)/-0.035471)+701.019629+16.946432*TMath::Gaus(Bmass,5.343914,0.040000)/(sqrt(2*3.14159)*0.040000)"
@@ -83,6 +85,20 @@ if [ $DOANALYSISPbPb_ROOFIT_BINNED_PT_BP  -eq 1  ]; then
 root -b  -q 'roofitB.C+('0','\"ntKp\"','0','1','0','\"$INPUTDATAPbPbCANDWISE_BP\"','\"$INPUTMCPbPbCANDWISE_BP\"','\"Bpt\"','\"$TRGPbPb\"','\"$CUTPbPb\"','\"$SELGENPbPb\"','$ISMCPbPb','1','$ISDOWEIGHTPbPb','\"$LABELPbPb\"','\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT\"','\"plotFits/final_roofit\"','\"$NPROOFIT_PbPb_BP\"','0','$CENTPbPbMIN','$CENTPbPbMAX')' |& tee binned_pt.log
 
 rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
+fi
+
+if [ $DOANALYSISPbPb_ROOFIT_BINNED_PT_BP_TRK -eq 1  ]; then
+    cut_trk_tight="(track>1)"
+    root -b  -q 'roofitB.C('0','\"ntKp\"','0','1','0', \
+'\"$INPUTDATAPbPbCANDWISE_BP\"', \
+'\"$INPUTMCPbPbCANDWISE_BP\"','\"Bpt\"', \
+'\"$TRGPbPb\"','\"$cut_trk_tight\"','\"$SELGENPbPb\"', \
+'$ISMCPbPb','1','$ISDOWEIGHTPbPb','\"$LABELPbPb\"', \
+'\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT_trk\"', \
+'\"plotFits/trk_tight_roofit\"','\"$NPROOFIT_PbPb_BP\"', \
+'0','$CENTPbPbMIN','$CENTPbPbMAX')' |& tee binned_pt_trk.log
+
+    rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
 fi
 
 

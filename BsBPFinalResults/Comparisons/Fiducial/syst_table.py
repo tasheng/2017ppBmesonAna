@@ -1,6 +1,7 @@
 import ROOT as r
 import numpy as np
 
+trkErrorFile = "../../../syst_track_sel.root"
 
 BPerrorFile = "../../../2DMapSyst/OutFiles/BPError2D.root";
 BPpdfErrorFile = "../../../bp_pdf.root";
@@ -23,6 +24,7 @@ def get_line(name, array):
 def make_table(meson, errf, pdff, tracking_error, outFile):
     fError = r.TFile(errf);
     fPdfError = r.TFile(pdff);
+    fTrkError = r.TFile(trkErrorFile);
 
     TnPSyst = fError.Get("TnPSyst");
     BptSyst = fError.Get("BptSyst");
@@ -30,17 +32,20 @@ def make_table(meson, errf, pdff, tracking_error, outFile):
     nBins = TnPSyst.GetNbinsX()
 
     pdfSyst = fPdfError.Get(meson + "_error");
+    trkSyst = fTrkError.Get(meson + "_track_sel_error");
 
     tnp = np.array([TnPSyst.GetBinContent(i) for i in range(1, nBins + 1)])
     bpt = np.array([BptSyst.GetBinContent(i) for i in range(1, nBins + 1)])
     bdt = np.array([BDTSyst.GetBinContent(i) for i in range(1, nBins + 1)])
     tracking = np.full(nBins, tracking_error)
     pdf = np.array(pdfSyst.GetY())
+    trk_sel = np.array(trkSyst.GetY())
 
-    total = np.sqrt(np.sum([e**2 for e in [bpt, tnp, bdt, tracking, pdf]], axis=0))
+    total = np.sqrt(np.sum([e**2 for e in [bpt, tnp, bdt, tracking, trk_sel, pdf]], axis=0))
 
     with open(outFile, "w") as f:
         f.write(get_line("Hadron tracking efficiency", tracking))
+        f.write(get_line("Track selection", trk_sel))
         f.write(get_line("Data-MC discrepancy", bdt))
         f.write(get_line(r"\pt shape", bpt))
         f.write(get_line("PDF variation", pdf))

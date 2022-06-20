@@ -25,10 +25,8 @@
 #include "TLegend.h"
 #include "TLegendEntry.h"
 #include "TMath.h"
+#include "TStyle.h"
 #include "scale.h"
-//#include "tnp_weight_lowptPBsb.h"
-
-
 
 //#include "his.h"
 using namespace std;
@@ -188,6 +186,10 @@ void BsComparison(){
   TFile fPdfError(pdfErrorFile);
   TGraph* pdfSyst = (TGraph *) fPdfError.Get("bs_error");
 
+  TString trackSelErrorFile = "../../../syst_track_sel.root";
+  TFile fTrackSelError(trackSelErrorFile);
+  TGraph* trackSelSyst = (TGraph *) fTrackSelError.Get("bs_track_sel_error");
+
 	float BsXSecPPYSystUp[NBins];
 	float BsXSecPPYSystDown[NBins];
 
@@ -200,6 +202,7 @@ void BsComparison(){
 	float BsMCDataSyst[NBins];
 	float BsPtShapeSyst[NBins];
 	float BsPDFSyst[NBins];
+	float BsTrackSelSyst[NBins];
 
 	float BsTnPSystDown[NBins];
 	float BsTnPSystUp[NBins];
@@ -211,6 +214,7 @@ void BsComparison(){
     // TnP systematics are symmetric in the binned pT case
     BsTnPSystUp[ibin] = BsTnPSystDown[ibin];
     BsPDFSyst[ibin] = pdfSyst->GetY()[ibin];
+    BsTrackSelSyst[ibin] = trackSelSyst->GetY()[ibin];
   }
 
   // RMS of all the errors
@@ -218,12 +222,12 @@ void BsComparison(){
 	float BsTotalSystUpRatio[NBins];
 
 	for(int i = 0; i < NBins; i++){
-
-
-		BsTotalSystDownRatio[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] + BsMCDataSyst[i] * BsMCDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystDown[i] * BsTnPSystDown[i]) / 100;
-		BsTotalSystUpRatio[i] = TMath::Sqrt(BsTrackingSyst[i] * BsTrackingSyst[i] +BsMCDataSyst[i] * BsMCDataSyst[i] + BsPDFSyst[i] * BsPDFSyst[i] + BsPtShapeSyst[i] * BsPtShapeSyst[i] + BsTnPSystUp[i] * BsTnPSystUp[i]) / 100;
-
-
+		BsTotalSystDownRatio[i] = TMath::Sqrt(TMath::Power(BsTrackingSyst[i], 2) + TMath::Power(BsMCDataSyst[i], 2) +
+                                          TMath::Power(BsPDFSyst[i], 2) + TMath::Power(BsTrackSelSyst[i], 2) +
+                                          TMath::Power(BsPtShapeSyst[i], 2) + TMath::Power(BsTnPSystDown[i], 2)) / 100;
+    BsTotalSystUpRatio[i] = TMath::Sqrt(TMath::Power(BsTrackingSyst[i], 2) + TMath::Power(BsMCDataSyst[i], 2) +
+                                        TMath::Power(BsPDFSyst[i], 2) + TMath::Power(BsTrackSelSyst[i], 2) +
+                                        TMath::Power(BsPtShapeSyst[i], 2) + TMath::Power(BsTnPSystUp[i], 2)) / 100;
 	}
 
   std::vector<float> globUncert(NBins, 0.077);

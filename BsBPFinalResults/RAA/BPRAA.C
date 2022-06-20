@@ -51,11 +51,7 @@ void BPRAA(){
 	c->SetLeftMargin(0.16);
 
 
-
-
-//	TString InfileBs = "FinalFiles/BsPPCorrYieldPT.root";
 	TString InfileBP = "../../BP/EffAna/FinalFiles/BPPPCorrYieldPT.root";
-
 
 	TFile * FileBP = new TFile(InfileBP.Data());
 	TH1D * BPCross = (TH1D *) FileBP->Get("hPtSigma");
@@ -132,17 +128,15 @@ void BPRAA(){
   TFile fPdfError(pdfErrorFile);
   TGraph* pdfSyst = (TGraph *) fPdfError.Get("bp_error");
 
+  TString trackSelErrorFile = "../../syst_track_sel.root";
+  TFile fTrackSelError(trackSelErrorFile);
+  TGraph* trackSelSyst = (TGraph *) fTrackSelError.Get("bp_track_sel_error");
 
 	float BPXSecPPYSystUp[NBins];
 	float BPXSecPPYSystDown[NBins];
 
-  // percent error
-	float BPTrackingSyst[NBins] = {5};
-	float BPMCDataSyst[NBins];
-	float BPPDFSyst[NBins];
-	float BPPtShapeSyst[NBins];
-	float BPTnPSystDown[NBins];
-	float BPTnPSystUp[NBins];
+	float BsTnPSystDown[NBins];
+	float BsTnPSystUp[NBins];
 
   // Get systematics from input files
   for (auto ibin = 0; ibin < NBins; ++ibin) {
@@ -152,6 +146,7 @@ void BPRAA(){
     // TnP systematics are symmetric in the binned pT case
     BPTnPSystUp[ibin] = BPTnPSystDown[ibin];
     BPPDFSyst[ibin] = pdfSyst->GetY()[ibin];
+    BPTrackSelSyst[ibin] = trackSelSyst->GetY()[ibin];
   }
 
   // RMS of all the errors
@@ -159,7 +154,10 @@ void BPRAA(){
 	float BPTotalSystUpRatio[NBins];
 
 	for(int i = 0; i < NBins; i++){
-		BPTotalSystDownRatio[i] = TMath::Sqrt(BPTrackingSyst[i] * BPTrackingSyst[i] + BPMCDataSyst[i] * BPMCDataSyst[i] + BPPDFSyst[i] * BPPDFSyst[i] + BPPtShapeSyst[i] * BPPtShapeSyst[i] + BPTnPSystDown[i] * BPTnPSystDown[i]) / 100;
+		BPTotalSystDownRatio[i] =
+      TMath::Sqrt(TMath::Power(BPTrackingSyst[i], 2) + TMath::Power(BPMCDataSyst[i], 2) +
+                  TMath::Power(BPPDFSyst[i], 2) + TMath::Power(BPTrackSelSyst[i], 2) +
+                  TMath::Power(BPPtShapeSyst[i], 2) + TMath::Power(BPTnPSystDown[i], 2)) / 100;
 		BPTotalSystUpRatio[i] = BPTotalSystDownRatio[i];
 	}
 
@@ -539,7 +537,7 @@ void BPRAA(){
   unsigned columnWidth = 14;
   out << std::left << std::setw(columnWidth) <<
     "ptmin" << std::setw(columnWidth) << "ptmax" << std::setw(columnWidth) <<
-    "central val" << std::setw(columnWidth) <<
+    "central_val" << std::setw(columnWidth) <<
     "statUp" << std::setw(columnWidth) << "statDown" << std::setw(columnWidth) <<
     "systUp" << std::setw(columnWidth) << "systDown" << std::setw(columnWidth) <<
     "glbUp" << std::setw(columnWidth) << "glbDown" << std::setw(columnWidth) <<

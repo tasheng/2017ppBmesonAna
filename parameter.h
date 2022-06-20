@@ -1,5 +1,6 @@
 #include <vector>
 #include <array>
+#include <map>
 
 // PbPb published binning
 /* const std::vector<double> ptbinsvec = { */
@@ -16,6 +17,26 @@ const std::array<double, nptBins + 1> ptbinsvec = {
   5, 7, 10, 15, 20, 30, 50, 60
 };
 
+
+enum Tracking{
+  loose = 0,
+  standard = 1,
+  tight = 2,
+};
+
+std::map<Tracking, double> ptErr{
+  {Tracking::standard, 0.1},
+  {Tracking::tight, 0.05},
+  {Tracking::loose, 0.15}
+};
+
+std::map<Tracking, double> chi2Nlayer{
+  {Tracking::standard, 0.18},
+  {Tracking::tight, 0.15},
+  {Tracking::loose, 0.18}
+};
+
+const double epsilon = 1e-7;
 
 // 7 bins
 /* float BPXsecPbPbY[NBins] = {4.82132e+06/11.1,311668,270167,64384.4,208537/11.1,28700.6/11.1,7000.73/11.1}; */

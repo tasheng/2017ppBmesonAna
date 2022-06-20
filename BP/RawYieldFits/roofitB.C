@@ -1,5 +1,7 @@
 #include "CMS_lumi.C"
 #include "roofitB.h"
+#include <RooGlobalFunc.h>
+#include <TSystem.h>
 #include <iostream>
 
 int _nBins = nBins;
@@ -244,6 +246,7 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 	RooRealVar* pt = new RooRealVar("Bpt","Bpt",0,200);
 	RooRealVar* y = new RooRealVar("By","By",-2.4, 2.4);
 	RooRealVar* nMult = new RooRealVar("nMult","nMult",0,200);
+	RooRealVar* trackSelection = new RooRealVar("track", "track", 0, 5);
 //	RooRealVar* w = new RooRealVar("Pthatweight","Pthatweight",0.,12.) ;
 	RooDataSet* ds = new RooDataSet();
 	RooDataSet* dsMC = new RooDataSet();   
@@ -289,11 +292,13 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 
 	std::cout<<"varExp= "<<_varExp<<std::endl;
 
-	ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new, RooArgSet(*mass, *pt, *y, *nMult));
+	ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new,
+                      RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
 	
 	cout << "ds Pass = " << endl;
 
-	dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,RooArgSet(*mass, *pt, *y, *nMult));
+	dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,
+                        RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
 	//    TString ptbinning;
 
 	
@@ -343,7 +348,12 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 		std::cout<<_varExp<<" bin = "<<ptBins_check[i]<<" "<<ptBins_check[i+1]<<std::endl;
 	//      return;
 		RooDataSet* ds_cut;
-		if(doubly==0)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y), Form("(Bpt>%f && Bpt < %f)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))",ptBins_check[i] , ptBins_check[i+1])); 
+		if(doubly==0) {
+      ds_cut =
+        new RooDataSet(Form("ds_cut%d",_count),"",ds,
+                       RooArgSet(*mass, *pt, *y, *trackSelection),
+                       Form("(Bpt>%f && Bpt < %f)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))",ptBins_check[i] , ptBins_check[i+1]));
+    }
 		if(doubly==1)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y, *nMult), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto)); 
 		if(doubly==2)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto)); 
 
@@ -355,8 +365,12 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 //		if(doubly==0) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1"); 
 //		if(doubly==1) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1"); 
 	
-		if(doubly==0) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y), Form("(%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1"); 
+		if(doubly==0) {
+      dsMC_cut =
+        new RooDataSet(Form("dsMC_cut%d",_count), "", dsMC,
+                       RooArgSet(*mass, *pt, *y, *trackSelection), Form("(%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1");
 
+    }
 
 
 		if(doubly==1) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y, *nMult), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1"); 
@@ -375,8 +389,14 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 
 */
 
+    // Apply track selection cut
+    std::cout << "data entries: " << ds_cut->sumEntries() << "\n";
+    std::cout << "MC entries: " << dsMC_cut->sumEntries() << "\n";
+    ds_cut = (RooDataSet*) ds_cut->reduce(seldata);
+    dsMC_cut = (RooDataSet*) dsMC_cut->reduce(selmc);
+    std::cout << "data entries: " << ds_cut->sumEntries() << "\n";
+    std::cout << "MC entries: " << dsMC_cut->sumEntries() << "\n";
 
-		// return;
 		std::cout<<"Really created datasets"<<std::endl;
 				// create RooDataHist
 		if(ptBins_check[i+1]<1.5) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y), Form("Bmass>%f&&Bmass<%f",minhisto, maxhisto), "1"); 
@@ -397,6 +417,7 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 		dhMC = new RooDataHist(Form("dhMC%d",_count),"",*mass,Import(*hMC));
 		std::cout<<"RooDataHist "<<std::endl;
 		h->SetAxisRange(0,h->GetMaximum()*1.4,"Y");
+
 		outputw->import(*ds);
 		outputw->import(*dsMC);
 		outputw->import(*dh);
@@ -605,6 +626,7 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb =
 		lat->DrawLatex(0.64,0.70,Form("Significance: %.1f", real_significance));
 */
 
+    gSystem->MakeDirectory(outplotf + _prefix);
 		c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_doubly%d_%.0f_%0.f_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".pdf");
 		c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_doubly%d_%.0f_%0.f_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly,centmin,centmax)+tree+".png");		
 	       // c->SaveAs(Form("%s%s/%s_%s_%d%s_%d%d.png",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(), (int)ptBins_check[i],(int)ptBins_check[i+1]));
