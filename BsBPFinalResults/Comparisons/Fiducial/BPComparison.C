@@ -29,6 +29,8 @@
 #include "TStyle.h"
 #include "scale.h"
 
+#include "../../../parameter.h"
+
 //#include "tnp_weight_lowptPbPb.h"
 // #include "auxiliaryPt.h"
 //#include "his.h"
@@ -64,7 +66,7 @@ void BPComparison(){
 
 	//B+ PbPb//
 	
-	const int NBins = 7;
+	const int NBins = ptbinsvec.size() - 1;
 
 	float BPXsecPPY[NBins];
 	float BPXsecPPX[NBins] = {6,8.5,12.5,17.5,25,40,55};
@@ -118,7 +120,7 @@ void BPComparison(){
 		BPXSecPPY2DErrDownScaled[i] = BPCross2D->GetBinError(i+1);
 	}
 
-  std::vector<double> scaledPt = {5, 7, 10};
+  std::vector<double> scaledPt = {7, 10};
   std::vector<double> factor = scaleFactor("../../../CutSkim/BPMC.root", "ntKp", scaledPt);
   for (auto i = 0; i < factor.size(); ++i) {
     cout << "applying scaling factor: " << factor[i] << "\n";
@@ -129,19 +131,15 @@ void BPComparison(){
 
 
 
-	float BPXSecPPXErrUp[NBins] = {1,1.5,2.5,2.5,5,10,5};
-	float BPXSecPPXErrDown[NBins] = {1,1.5,2.5,2.5,5,10,5};
+	float BPXSecPPXErrUp[NBins];
+	float BPXSecPPXErrDown[NBins];
+  for (auto i = 0; i < NBins; ++i) {
+    BPXsecPPX[i] = (ptbinsvec[i] + ptbinsvec[i + 1]) / 2;
+    BPXSecPPXErrUp[i] = (ptbinsvec[i] - ptbinsvec[i + 1]) / 2;
+    BPXSecPPXErrDown[i] = BPXSecPPXErrUp[i];
+  }
 
 
-	float BPXsecPbPbY[NBins] = {4.82132e+06/11.1,311668,270167,64384.4,208537/11.1,28700.6/11.1,7000.73/11.1};
-	float BPXsecPbPbX[NBins] = {6,8.73,12.4,17.2,25,40,55};
-
-
-	float BPXSecPbPbXErrUp[NBins] = {1,1.27,2.6,2.8,5,10,5};
-	float BPXSecPbPbXErrDown[NBins] = {1,1.23,2.4,2.2,5,10,5};
-
-	float BPXSecPbPbYErrUpRatio[NBins] = {0.278198,0.159,0.041,0.0654,0.0690334,0.104543,0.24575};
-	float BPXSecPbPbYErrDownRatio[NBins] = {0.278198,0.145,0.0795,0.065,0.0690334,0.104543,0.24575};
 
 	float BPXSecPbPbYErrUp[NBins];
 	float BPXSecPbPbYErrDown[NBins];
@@ -231,8 +229,6 @@ void BPComparison(){
 
 	//PbPb
 
-	float BPXSecPbPbYSystUpRatio[NBins] = {0.3577,0.1404,0.1714,0.0775,0.0858,0.0715,0.1253};
-	float BPXSecPbPbYSystDownRatio[NBins] = {0.3210,0.1359,0.1705,0.0761,0.0843,0.0699,0.1220};
 
 
 	float BPXSecPbPbYSystUp[NBins];
@@ -264,8 +260,8 @@ void BPComparison(){
 	HisEmpty->Draw();
 
   // separate plots for different fiducial regions
-  int NBinsLow = 2;
-  int NBinsHigh = 5;
+  int NBinsLow = 1;
+  int NBinsHigh = 3;
   vector<double> BPXsecPPXLow = {BPXsecPPX, BPXsecPPX + NBinsLow};
   vector<double> BPXsecPPXHigh = {BPXsecPPX + NBinsLow, BPXsecPPX + NBins};
   vector<double> BPXsecPPXErrDownLow = {BPXSecPPXErrDown, BPXSecPPXErrDown + NBinsLow};
@@ -788,8 +784,6 @@ void BPComparison(){
 
 
   // summary of errors (in ratio, not percent)
-  std::vector<int> ptbins = {5, 7, 10, 15, 20, 30, 50, 60};
-  std::vector<float> abscissae = {6.0, 8.5, 12.5, 17.5, 25, 40, 55};
 
   string outFile = "../../../MakeFinalPlots/NominalPlots/CrossSection/dataSource/corryield_pt_Bp_New.txt";
   ofstream out;
@@ -806,7 +800,7 @@ void BPComparison(){
     "abscissae" << endl;
   for (auto i = 0; i < NBins; ++i ) {
     out << std::setw(columnWidth) <<
-      ptbins[i] << std::setw(columnWidth) << ptbins[i + 1] << std::setw(columnWidth) <<
+      ptbinsvec[i] << std::setw(columnWidth) << ptbinsvec[i + 1] << std::setw(columnWidth) <<
       setprecision(0) << std::fixed << BPXsecPPY2D[i] << std::setw(columnWidth) <<
       setprecision(2) << std::defaultfloat <<
       BPXSecPPY2DErrUpRatio[i] << std::setw(columnWidth) <<

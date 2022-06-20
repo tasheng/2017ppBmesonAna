@@ -179,11 +179,7 @@ void MCStatCal(){
 
 	if(NBins == 4){
 
-		ptbinsvec.push_back(5);
-		ptbinsvec.push_back(10);
-		ptbinsvec.push_back(15);
-		ptbinsvec.push_back(20);
-		ptbinsvec.push_back(50);
+		ptbinsvec = {7, 10, 15, 20, 50};
 
 
 

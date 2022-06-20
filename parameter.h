@@ -8,15 +8,20 @@
 /* 	7, 10, 15, 20, 50 */
 /* }; */
 
-// const unsigned nptBins = 4;
-// const std::array<double, nptBins + 1> ptbinsvec = {
-// 	7, 10, 15, 20, 50
-// };
-const unsigned nptBins = 7;
+const unsigned nptBins = 4;
 const std::array<double, nptBins + 1> ptbinsvec = {
-  5, 7, 10, 15, 20, 30, 50, 60
+	7, 10, 15, 20, 50
 };
 
+// // const unsigned nptBins = 1;
+// const unsigned nptBins = 2;
+// const std::array<double, nptBins + 1> ptbinsvec = {
+// 	5, 7, 10
+// 	// 7, 10
+// };
+const std::vector<float> abscissae = {
+8.5, 12.5, 17.5, 35
+};
 
 enum Tracking{
   loose = 0,

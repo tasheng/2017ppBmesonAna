@@ -68,7 +68,7 @@ void plotPt(bool bSavePlots       = 1,
 
 		Int_t endMes = nMes;
 
-    std::vector<int> nlines = {4, 7};
+    std::vector<int> nlines = {4, 4};
 		for (Int_t ib=0; ib<endMes; ib++){
 			ifstream in;
 			string inputFileName = Form("%s/%s_%s_New.txt",inputDir,inputFileType[whichPlot],mesonName[ib]);
@@ -88,7 +88,7 @@ void plotPt(bool bSavePlots       = 1,
 			getline(in,tmpstrg);//ignore first line/ the header
 
       cout << "start reading" << endl;
-			int nEntry=0;
+			unsigned nEntry=0;
 			// while(in >> x[0] >> x[1] >> x[2] >> x[3] >> x[4] >> x[5] >> x[6] >> x[7] >> x[8] >> x[9])
 			// {
 			for (auto iline = 0; iline < nlines[ib]; ++iline)
@@ -127,7 +127,7 @@ void plotPt(bool bSavePlots       = 1,
 					}
 					else{//bp
 						//central value	
-						if(nEntry<2){
+						if(nEntry < nBinsLowNew){
 						binLowNew[nEntry]    = x[9];	
 						glbSystUpBp = x[8]*100;
 						glbSystDownBp   = x[7]*100;
@@ -168,28 +168,29 @@ void plotPt(bool bSavePlots       = 1,
 						bs_high_ySystH[nEntry-1] = x[5]*x[2];
 						//	cout << "Bs Bro: " << " bs_high_ySystL = " << bs_high_ySystL[nEntry-1] << "  bs_high_ySystH = " << bs_high_ySystH[nEntry-1] << endl;
 
-						if(bDoDebug){
-							if(nEntry==1) cout << "Central  \t statUncertL  \t systUncertL "<< endl;
-							cout<< bs_high[nEntry-2] << "\t" << bs_high_yStatL[nEntry-2] << "\t" << bs_high_ySystL[nEntry-2] << endl;
-						}
+						// if(bDoDebug){
+						// 	if(nEntry==1) cout << "Central  \t statUncertL  \t systUncertL "<< endl;
+						// 	cout<< bs_high[nEntry-2] << "\t" << bs_high_yStatL[nEntry-2] << "\t" << bs_high_ySystL[nEntry-2] << endl;
+						// }
 						}
 					}else{//bp
-						if(nEntry>1){
+						if(nEntry >= nBinsLowNew){
+              auto iEntryHigh = nEntry - nBinsLowNew;
 						//central value
-						binHighNew[nEntry-2] = x[9];				
-						bpl_high[nEntry-2] = x[2];
+						binHighNew[iEntryHigh] = x[9];				
+						bpl_high[iEntryHigh] = x[2];
 						//stat uncert
-						bpl_high_yStatL[nEntry-2] = x[4]*x[2];
-						bpl_high_yStatH[nEntry-2] = x[3]*x[2];
+						bpl_high_yStatL[iEntryHigh] = x[4]*x[2];
+						bpl_high_yStatH[iEntryHigh] = x[3]*x[2];
 						//bin width
-						bpl_high_xErrL[nEntry-2] = x[9]-x[0];
-						bpl_high_xErrH[nEntry-2] = x[1]-x[9];
+						bpl_high_xErrL[iEntryHigh] = x[9]-x[0];
+						bpl_high_xErrH[iEntryHigh] = x[1]-x[9];
 						//systm. uncert
-						bpl_high_ySystL[nEntry-2] = x[6]*x[2];
-						bpl_high_ySystH[nEntry-2] = x[5]*x[2];
+						bpl_high_ySystL[iEntryHigh] = x[6]*x[2];
+						bpl_high_ySystH[iEntryHigh] = x[5]*x[2];
 
-            cout << "ysyst:" << bpl_high_ySystL[nEntry-2] << ", ratio: " <<
-              bpl_high_ySystL[nEntry-2] / bpl_high[nEntry-2] << "\n";
+            cout << "ysyst:" << bpl_high_ySystL[iEntryHigh] << ", ratio: " <<
+              bpl_high_ySystL[iEntryHigh] / bpl_high[iEntryHigh] << "\n";
 
 
 						}
@@ -504,7 +505,7 @@ void plotPt(bool bSavePlots       = 1,
 		if(whichPlot==1) f4->GetYaxis()->SetRangeUser(0.0,4.0);
 		if(whichPlot==0) f4->GetYaxis()->SetRangeUser(100.0,2000000); //1.8 -> 0.9
 		
-		f4->GetYaxis()->SetRangeUser(0.0,4.5); 
+		f4->GetYaxis()->SetRangeUser(0.0, 3.0); 
 		f4->SetLineColor(0);
 		//f4->GetXaxis()->SetNdivisions(-6);
 

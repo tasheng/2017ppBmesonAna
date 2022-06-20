@@ -80,7 +80,7 @@ double hiBins_full[nBins_full+1] = {0,90.*2};
 /* const int nBins_bp = 6; */
 /* double ptBins_bp[nBins_bp+1] = {5,7,10,15,20,50,60}; */
 const int nBins_bp = ptbinsvec.size() - 1;
-const double* ptBins_bp = ptbinsvec.data();
+/* const double* ptBins_bp = ptbinsvec.data(); */
 
 
 //const int nBins_bp = 12;

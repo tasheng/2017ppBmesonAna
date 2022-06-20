@@ -5,10 +5,10 @@
 
 //binning
 const unsigned int nBinsLow   = 1;
-const unsigned int nBinsLowNew   = 2;
+const unsigned int nBinsLowNew   = 1;
 
 const unsigned int nBinsHigh  = 3;
-const unsigned int nBinsHighNew  = 5;
+const unsigned int nBinsHighNew  = 3;
 
 double boxWidth = 2.;
 

@@ -28,6 +28,7 @@
 #include "TMath.h"
 #include "TLine.h"
 //#include "tnp_weight_lowptPbPb.h"
+#include "../../parameter.h"
 
 
 
@@ -64,10 +65,10 @@ void BPRAA(){
 
 	//B+ PbPb//
 	
-	const int NBins = 7;
+	const int NBins = ptbinsvec.size() - 1;
 
 	float BPXsecPPY[NBins];
-	float BPXsecPPX[NBins] = {6,8.5,12.5,17.5,25,40,55};
+	float BPXsecPPX[NBins];
 
 	float BPXSecPPYErrUp[NBins];
 	float BPXSecPPYErrDown[NBins];
@@ -88,20 +89,10 @@ void BPRAA(){
 	}
 
 
-	float BPXSecPPXErrUp[NBins] = {1,1.5,2.5,2.5,5,10,5};
-	float BPXSecPPXErrDown[NBins] = {1,1.5,2.5,2.5,5,10,5};
-	
+	float BPXSecPPXErrUp[NBins];
+	float BPXSecPPXErrDown[NBins];
 
 
-	float BPXsecPbPbY[NBins] = {4.82132e+06/11.1,311668,270167,64384.4,208537/11.1,28700.6/11.1,7000.73/11.1};
-	float BPXsecPbPbX[NBins] = {6,8.73,12.4,17.2,25,40,55};
-
-
-	float BPXSecPbPbXErrUp[NBins] = {1,1.27,2.6,2.8,5,10,5};
-	float BPXSecPbPbXErrDown[NBins] = {1,1.23,2.4,2.2,5,10,5};
-
-	float BPXSecPbPbYErrUpRatio[NBins] = {0.278198,0.159,0.041,0.0654,0.0690334,0.104543,0.24575};
-	float BPXSecPbPbYErrDownRatio[NBins] = {0.278198,0.145,0.0795,0.065,0.0690334,0.104543,0.24575};
 
 
 	float BPXSecPbPbYErrUp[NBins];
@@ -113,6 +104,11 @@ void BPRAA(){
 		BPXSecPbPbYErrDown[i] = BPXSecPbPbYErrDownRatio[i] * BPXsecPbPbY[i];
 
 	}
+  for (auto i = 0; i < NBins; ++i) {
+    BPXsecPPX[i] = (ptbinsvec[i] + ptbinsvec[i + 1]) / 2;
+    BPXSecPPXErrUp[i] = (ptbinsvec[i] - ptbinsvec[i + 1]) / 2;
+    BPXSecPPXErrDown[i] = BPXSecPPXErrUp[i];
+  }
 
 
 
@@ -177,9 +173,6 @@ void BPRAA(){
 
 
 	//PbPb
-
-	float BPXSecPbPbYSystUpRatio[NBins] = {0.3577,0.1404,0.1714,0.0775,0.0858,0.0715,0.1253};
-	float BPXSecPbPbYSystDownRatio[NBins] = {0.3210,0.1359,0.1705,0.0761,0.0843,0.0699,0.1220};
 
 
 	float BPXSecPbPbYSystUp[NBins];
@@ -370,15 +363,15 @@ void BPRAA(){
 
 
 	float BPRAAY[NBins];
-//	float BPRAAX[NBins] = {8.73,12.4,17.2,27.3};
-	float BPRAAX[NBins] = {6,8.73,12.4,17.2,25,40,55};
+	float BPRAAX[NBins] = {8.73,12.4,17.2,27.3};
+	// float BPRAAX[NBins] = {6,8.73,12.4,17.2,25,40,55};
 
 
-//	float BPRAAXErrUp[NBins] = {1.27,2.6,2.8,22.7};
-//	float BPRAAXErrDown[NBins] = {1.73,2.4,2.2,7.3};
+	float BPRAAXErrUp[NBins] = {1.27,2.6,2.8,22.7};
+	float BPRAAXErrDown[NBins] = {1.73,2.4,2.2,7.3};
 
-	float BPRAAXErrUp[NBins] = {1,1.27,2.6,2.8,5,10,5};
-	float BPRAAXErrDown[NBins] = {1,1.23,2.4,2.2,5,10,5};
+	// float BPRAAXErrUp[NBins] = {1,1.27,2.6,2.8,5,10,5};
+	// float BPRAAXErrDown[NBins] = {1,1.23,2.4,2.2,5,10,5};
 
 
 	float BPRAAYSystUp[NBins] ;
@@ -532,7 +525,8 @@ void BPRAA(){
 
 	fout->Close();
 
-  std::vector<float> globUncert(NBins, 0.035);
+  double lumiUncertainty = TMath::Sqrt(TMath::Power(0.019, 2) + TMath::Power(0.015, 2));
+  std::vector<float> globUncert(NBins, lumiUncertainty);
   // summary of errors (in ratio, not percent)
   std::vector<int> ptbins = {5, 7, 10, 15, 20, 30, 50, 60};
   std::vector<float> abscissae = {6.0, 8.5, 12.5, 17.5, 25, 40, 55};
@@ -550,7 +544,8 @@ void BPRAA(){
     "abscissae" << endl;
   for (auto i = 0; i < NBins; ++i ) {
     out << std::setw(columnWidth) <<
-      ptbins[i] << std::setw(columnWidth) << ptbins[i + 1] << std::setw(columnWidth) <<
+      ptbinsvec[i] << std::setw(columnWidth) <<
+      ptbinsvec[i + 1] << std::setw(columnWidth) <<
       setprecision(3) << BPRAAY[i] << std::setw(columnWidth) <<
       setprecision(2) << std::defaultfloat <<
       BPRAAYErrUpRatio[i] << std::setw(columnWidth) <<

@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 //#include "tnp_weight_lowptPbPb.h"
+#include "../parameter.h"
 
 
 
@@ -24,8 +25,7 @@ using std::endl;
 
 void CalEffSystBP(){
 
-	const int NBins = 7;
-	//const int NBins = 6;
+	const int NBins = ptbinsvec.size() - 1;
 
 	int TnP = 1;
 
@@ -198,117 +198,7 @@ void CalEffSystBP(){
 
 
 	double lumi = 302.3;
-	std::vector<double> ptbinsvec;
 	std::vector<double> corrfactvec;
-
-
-	if(NBins == 1){
-
-
-		ptbinsvec.push_back(10.0);
-		ptbinsvec.push_back(50);
-	}
-
-
-	if(NBins == 3){
-
-		ptbinsvec.push_back(5);
-		ptbinsvec.push_back(15);
-		ptbinsvec.push_back(20);
-		ptbinsvec.push_back(50);
-
-	}
-
-
-	if(NBins == 4){
-
-		ptbinsvec.push_back(5);
-		ptbinsvec.push_back(10);
-		ptbinsvec.push_back(15);
-		ptbinsvec.push_back(20);
-		ptbinsvec.push_back(50);
-
-		/*
-		   corrfactvec.push_back(1.24759);
-		   corrfactvec.push_back(1.05256);
-		   corrfactvec.push_back(1.02614);
-		   corrfactvec.push_back(1.01174);
-		   */
-
-
-	}
-
-	if(NBins == 6){
-
-
-		ptbinsvec.push_back(5);
-		ptbinsvec.push_back(7);		
-		ptbinsvec.push_back(10);
-		ptbinsvec.push_back(15);
-		ptbinsvec.push_back(20);
-		ptbinsvec.push_back(50);
-		ptbinsvec.push_back(100);
-
-
-
-	}
-
-
-
-	if(NBins == 7){
-
-
-//		ptbinsvec.push_back(3);
-		ptbinsvec.push_back(5);
-		ptbinsvec.push_back(7);		
-		ptbinsvec.push_back(10);
-		ptbinsvec.push_back(15);
-		ptbinsvec.push_back(20);
-		ptbinsvec.push_back(30);
-		
-		ptbinsvec.push_back(50);
-		ptbinsvec.push_back(60);
-
-
-
-	}
-
-
-
-	if(NBins == 9){
-
-		ptbinsvec.push_back(2);
-		ptbinsvec.push_back(3);
-		ptbinsvec.push_back(5);
-		ptbinsvec.push_back(7);		
-		ptbinsvec.push_back(10);
-		ptbinsvec.push_back(15);
-		ptbinsvec.push_back(20);
-		ptbinsvec.push_back(30);
-		ptbinsvec.push_back(50);
-		ptbinsvec.push_back(100);
-
-
-
-	}
-	if(NBins == 10){
-
-		ptbinsvec.push_back(1);
-		ptbinsvec.push_back(2);
-		ptbinsvec.push_back(3);
-		ptbinsvec.push_back(5);
-		ptbinsvec.push_back(7);		
-		ptbinsvec.push_back(10);
-		ptbinsvec.push_back(15);
-		ptbinsvec.push_back(20);
-		ptbinsvec.push_back(30);
-		ptbinsvec.push_back(50);
-		ptbinsvec.push_back(100);
-
-
-
-	}
-
 
 
 	for(int i = 0; i < NBins + 1; i++){
