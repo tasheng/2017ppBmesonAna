@@ -13,8 +13,10 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TRandom.h"
+#include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include "../../parameter.h"
 
 
@@ -551,31 +553,21 @@ void  MCEff(int DoTnP, int Rescale){
 	const int yBinN = 5;
 	double yBinning[yBinN+1] = {0.0,0.5, 1.0, 1.5,2.0, 2.4};
 
-	double LowBinWidth = 0.5/Factor;
-	int NLowBin = 10/LowBinWidth;
-	//	int NLowBin = 5;
+  // create a vector of pT binning with specified regional widths
+  auto createBins = [] (std::vector<double> edges,
+                        std::vector<double> binWidth) {
+    std::vector<double> bins = {edges[0]};
+    while (bins.back() < edges.back()) {
+      auto iRegion = std::upper_bound(edges.begin(), edges.end(), bins.back())
+        - edges.begin() - 1;
+      bins.push_back(bins.back() + binWidth.at(iRegion));
+    }
+    return bins;
+  };
 
-	double MidBinWidth = 1/Factor;
-	int NMidBin = 10/MidBinWidth;
-	double HighBinWidth = 1/Factor;
-	int NHighBin = 40/HighBinWidth;
-	const int BptBin = NHighBin + NMidBin + NLowBin;
-	double BptBinning[BptBin + 1];
-
-
-
-
-	for(int i = 0; i < NLowBin; i++){
-		BptBinning[i] = 0 + i * LowBinWidth;
-	}
-	for(int i = 0; i < NMidBin; i++){
-		BptBinning[i+NLowBin] = 10 + i * MidBinWidth;
-	}
-	for(int i = 0; i <  NHighBin+1; i++){
-		BptBinning[i+NLowBin+NMidBin] = 20 + i * HighBinWidth;
-	}
-
-
+  auto bptBinVec = createBins({0, 10, 40, 50, 60}, {1/8., 1/4., 1/2., 1});
+  auto BptBinning = bptBinVec.data();
+  const int BptBin = bptBinVec.size() - 1;
 
 	double PVzWeight;
 
@@ -1304,6 +1296,7 @@ void  MCEff(int DoTnP, int Rescale){
 				if(Bpt[j] < 50 && Bpt[j] > 20){
 					BDTWeightBin = weights_BDT_pt_20_50->GetXaxis()->FindBin(BDT_pt_20_50[j]);
 					BDTWeight = weights_BDT_pt_20_50->GetBinContent(BDTWeightBin);
+
 				}
 
 				if(Bpt[j] < 60 && Bpt[j] > 50) BDTWeight = 1;
@@ -1924,6 +1917,9 @@ void  MCEff(int DoTnP, int Rescale){
 		invEffTrkTight->Write();
 		invEffTrkLoose->Write();
 
+    // debugging purpose
+    BDTWeightHisSyst->Write();
+    BptWeightHisSyst->Write();
 
 		invEff2DTnPSystUp->Write();
 		invEff2DTnPSystDown->Write();
