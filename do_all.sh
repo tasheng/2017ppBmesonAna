@@ -49,6 +49,7 @@ bsEff () {
     # about 1hr
     echo "Takes Bsw.root as input"
     # root -b -l -q MCEff.C'(1,0)' > eff.log
+    ls -l BDTWeights/Bsw.root
     root -b -l -q CrossSectionAna.C'(1)'
     # root -b -l -q CrossSectionAnaMult.C'(1)'
     # >> Bs/EffAna/FinalFiles/BsPPCorrYieldPT.root
@@ -109,6 +110,7 @@ comp () {
     # << BP/EffAna/FinalFiles/BPPPCorrYieldPT.root
     root -b -l -q BPComparison.C
     root -b -l -q BsComparison.C
+    python syst_table.py
     cd ../../RAA/
     root -b -l -q BPRAA.C
     root -b -l -q BsRAA.C
