@@ -674,7 +674,7 @@ void  MCEff(int DoTnP, int Rescale){
 	// double  PtBin1D[NPtBins1D + 1] = {5,7,10,15,20,50,60};
 
 	const int NPtBins1D = ptbinsvec.size() - 1;
-	double* PtBin1D = ptbinsvec.data();
+	double* PtBin1D = (double*) ptbinsvec.data();
 
 	const int NMultiBin = 10;
 	double  MultiBin1D[NMultiBin + 1] = {0,15,25,30,35,40,50,65,80,100,130};
