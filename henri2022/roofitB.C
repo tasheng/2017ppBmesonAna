@@ -1,10 +1,10 @@
 #include "roofitB.h"
 #include "CMS_lumi.C"
+#include "parameter.h"
 #include "parametersNew.h"
 
 
-int syst=0;
-int bp_bs = 0u;
+int syst=1;
 
 TTree* makeTTree(TTree* intree, TString treeTitle) 
 {
@@ -26,33 +26,73 @@ TTree* makeTTree(TTree* intree, TString treeTitle)
 	return outtree ;
 }
 
-//void roofitB(int usePbPb = 0, int fitOnSaved = 0, TString inputmc = "", TString _varExp = "", TString trgselection = "",  TString cut = "", TString cutmcgen = "", int isMC = 0, Double_t luminosity = 1., int doweight = 1, TString collsyst = "", TString outputfile = "", TString outplotf = "", TString npfit = "", int doDataCor = 0, Float_t centmin = 0., Float_t centmax = 100.)
+//void roofitB(int usePbPb = 0, int fitOnSaved = 0, TString inputmc = "", TString varExp = "", TString trgselection = "",  TString cut = "", TString cutmcgen = "", int isMC = 0, Double_t luminosity = 1., int doweight = 1, TString collsyst = "", TString outputfile = "", TString outplotf = "", TString npfit = "", int doDataCor = 0, Float_t centmin = 0., Float_t centmax = 100.)
 
-void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb = 0, int fitOnSaved = 0, TString inputdata = "", TString inputmc = "", TString _varExp = "", TString trgselection = "",  TString cut = "", TString cutmcgen = "", int isMC = 0, Double_t luminosity = 1., int doweight = 1, TString collsyst="" ,TString outputfile = "", TString outplotf = "", TString npfit = "", int doDataCor = 0){ 
+void roofitB(int doubly = 0, TString tree = "ntphi", int full = 1, int usePbPb = 0, int fitOnSaved = 0, TString inputdata = "", TString inputmc = "", TString varExp = "", TString trgselection = "",  TString cut = "", TString cutmcgen = "", int isMC = 0, Double_t luminosity = 1., int doweight = 1, TString outputfile = "", TString outplotf = "", TString npfit = "", int doDataCor = 0){ 
 
 	double MyBackground;
 	double	yieldRec;
-
-	TString varExp = _varExp;
-
-int _nBins;
-
-if(tree=="ntphi"){ _nBins=nBins;}
-else if(tree=="ntKPi"){ _nBins=nBinsBP;}
-
-double _ptBins[_nBins] ;
-
-if(tree=="ntphi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBins[c];}}
-else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
+	int _nBins;
+	
+	if(varExp == "Bpt"){ 
+	if(full == 1){ _nBins = 1 ;}
+	else if(full == 0) {
+		if(tree=="ntphi"){ _nBins = nptBins;}
+		else if(tree=="ntKp"){ _nBins = nptBinsBP;}}
+	} else if(varExp == "nMult"){;}
 
 
-	/*	if(_varExp == "abs(By)"){
+	cout << "number of bins" << _nBins << endl;	
+	double _ptBins[_nBins+1];
+
+	if(varExp == "Bpt"){ 
+	if(full == 1){
+                if(tree=="ntphi"){for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBins_full[c];}}
+		else if(tree=="ntKp"){for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBins_fullBP[c];}}
+	} else if(full == 0) {
+		if(tree=="ntphi"){for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptbinsvec[c];}}
+		else if(tree=="ntKp"){for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptbinsvecBP[c];}}
+	                     }
+	} else if(varExp == "nMult"){;}
+
+
+cout << endl << endl;
+std::cout<<"Variable "<<varExp<<std::endl;
+cout << tree << " BINS: ";
+for(int t; t< sizeof(_ptBins)/sizeof(_ptBins[0]);t++){cout <<"__"<<  _ptBins[t]<<"__";}
+cout << endl << endl;
+
+/*	if(varExp=="nMult"){
+		if(full==0) {
+			nBins_check = nBins_Mult;
+			ptBins_check = MultBins;
+			_nBins = nBins_Mult;
+			_ptBins = MultBins;
+		}
+		else if(full==1){
+			nBins_check = nBins_full;
+			ptBins_check = nMults_full;
+		}
+	}
+	else if(varExp=="abs(By)"){
+		if(full==0) {
+			nBins_check = nBinsY;
+			ptBins_check = ptBinsY;
+		}
+		else if(full==1){
+			nBins_check = nBins_full;
+			ptBins_check = hiBins_full;
+		}
+
+	}*/
+
+	/*	if(varExp == "abs(By)"){
 		_nBins = nBinsY;
 		_ptBins = ptBinsY;
 		}*/
+	
 
-
-	if (!(usePbPb==1||usePbPb==0)) std::cout<<"ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!, you are using a non valid isPbPb option"<<std::endl;
+	if (!(usePbPb==1||usePbPb==0)) std::cout<<"ERROR!!, you are using a non valid isPbPb option"<<std::endl;
 	bool isPbPb=(bool)(usePbPb);
 
 	std::cout<<"DEBUG 3"<<std::endl;
@@ -170,55 +210,14 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 	//		ntMC->AddFriend("BDT");
 	//	ntMC->AddFriend("Bfinder/ntGen");	
 	//}
-	std::cout<<"cd'ed"<<std::endl;
-	int nBins_check = 0;
-	double *ptBins_check;
-
-	if(_varExp=="Bpt"){
-		if(full==0) {
-			nBins_check = _nBins;
-			ptBins_check = _ptBins;
-			if(tree=="ntKp" && bp_bs==0){
-				nBins_check = nBins_bp;
-				ptBins_check = ptBins_bp;}
-			   }
-
-		else if(full==1){
-			nBins_check = nBins_full;
-			ptBins_check = ptBins_full;}
-			   }
-
-/*	if(_varExp=="nMult"){
-		if(full==0) {
-			nBins_check = nBins_Mult;
-			ptBins_check = MultBins;
-			_nBins = nBins_Mult;
-			_ptBins = MultBins;
-		}
-		else if(full==1){
-			nBins_check = nBins_full;
-			ptBins_check = nMults_full;
-		}
-	}
-	else if(_varExp=="abs(By)"){
-		if(full==0) {
-			nBins_check = nBinsY;
-			ptBins_check = ptBinsY;
-		}
-		else if(full==1){
-			nBins_check = nBins_full;
-			ptBins_check = hiBins_full;
-		}
-
-	}*/
 
 
-	TH1D* hPt = new TH1D("hPt","",nBins_check,ptBins_check);
 
+	TH1D* hPt = new TH1D("hPt","",_nBins,_ptBins);
 
 	TH1D* hPtMC = new TH1D("hPtMC","",_nBins,_ptBins);
 	//TH1D* hPtGen = new TH1D("hPtGen","",_nBins,_ptBins);
-	TH1D* hMean = new TH1D("hMean","",nBins_check,ptBins_check);                       
+	TH1D* hMean = new TH1D("hMean","",_nBins,_ptBins);                       
 	TH1D* hSigmaGaus1 = new TH1D("hSigmaGaus1","",_nBins,_ptBins); 
 	TH1D* hSigmaGaus2 = new TH1D("hSigmaGaus2","",_nBins,_ptBins); 
 	std::cout<<"Histograms"<<std::endl;
@@ -270,19 +269,17 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 	TFile* outf = new TFile(outputf.Data(),"recreate");
 	outf->cd();
 
-	std::cout<<"varExp= "<<_varExp<<std::endl;
-
 	ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new, RooArgSet(*mass, *pt, *y, *nMult));
 	dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,RooArgSet(*mass, *pt, *y, *nMult));
 	//    TString ptbinning;
 
-	// std::vector<std::string> background = {"1st", "2nd", "3rd"};
-	std::vector<std::string> background = {"1st", "2nd"};
+	// std::vector<std::string> background = {"1st", "2nd2", "3rd"};
+	std::vector<std::string> background = {"1st", "2nd","mass_range"};
 	std::vector<std::vector<double>> background_syst;
 	// std::vector<std::string> signal = {"3gauss", "fixed", "scal", "perr", "merr", "scal+", "scal-"};
 	//std::vector<std::string> signal = {"3gauss", "fixed","scal+", "scal-"};
 	//	 std::vector<std::string> signal = {"3gauss"};
-	std::vector<std::string> signal = {"3gauss", "fixed", "scal+", "scal-"};
+	std::vector<std::string> signal = {"3gauss", "fixed", "gauss_cb"};
 	//std::vector<std::string> signal = {"3gauss", "1gauss","fixed", "scal", "perr", "merr"};
 	// std::vector<std::string> signal = {"3gauss", "1gauss", "fixed_mean", "scaling", "-_error", "+_error"};
 	std::vector<std::vector<double>> signal_syst;
@@ -293,7 +290,7 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 
 
 
-	for(int i=0;i<nBins_check;i++)
+	for(int i=0;i<_nBins;i++)
 	{
 		_count++;
 		std::cout<<"I'm in the for"<<std::endl;
@@ -314,20 +311,20 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 		//fout->Close();
 		//      skimtreeMC = (TTree*)ntMC->CopyTree(Form("%s*(%s&&%s>%f&&%s<%f)",weightmc.Data(),Form("%s&&BgenNew==23333",selmc.Data()),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1]), "skimtreeMC");
 		//			ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new, RooArgSet(*mass, *pt));
-		std::cout<<_varExp<<" bin = "<<ptBins_check[i]<<" "<<ptBins_check[i+1]<<std::endl;
+		std::cout<<varExp<<" bin = "<<_ptBins[i]<<" "<<_ptBins[i+1]<<std::endl;
 		//      return;
 		RooDataSet* ds_cut;
 		std::cout<< "Pass 1" << std::endl;
-		//if(doubly==0) ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y, *BDT_pt_5_10, *BDT_pt_10_15, *BDT_pt_15_20,*BDT_pt_20_50), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f&&(Bpt > 5 &&  Bpt < 10 && BDT_pt_5_10_New > 0.10)&&(Bpt > 10 &&  Bpt < 15 && BDT_pt_10_15_New > 0.10)&&(Bpt > 15 &&  Bpt < 20 && BDT_pt_15_20_New > 0.10)&&(Bpt > 20 &&  Bpt < 50 && BDT_pt_20_50_New > 0.10)",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto));
+		//if(doubly==0) ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y, *BDT_pt_5_10, *BDT_pt_10_15, *BDT_pt_15_20,*BDT_pt_20_50), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f&&(Bpt > 5 &&  Bpt < 10 && BDT_pt_5_10_New > 0.10)&&(Bpt > 10 &&  Bpt < 15 && BDT_pt_10_15_New > 0.10)&&(Bpt > 15 &&  Bpt < 20 && BDT_pt_15_20_New > 0.10)&&(Bpt > 20 &&  Bpt < 50 && BDT_pt_20_50_New > 0.10)",varExp.Data(),_ptBins[i],varExp.Data(),_ptBinsk[i+1],minhisto, maxhisto));
 
 
 
 		std::cout<< "THIS HERE NOW doubly:       "<<doubly << std::endl;
 
 
-		if(doubly==0) ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y),Form("(Bpt>%f && Bpt < %f)&&((Bpt < 10 && abs(By) >1.5) || (Bpt>10))",ptBins_check[i], ptBins_check[i+1])); 
-		if(doubly==1)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y, *nMult), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto)); 
-		if(doubly==2)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto)); 
+		if(doubly==0) ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y),Form("(Bpt>%f && Bpt < %f)&&((Bpt < 10 && abs(By) >1.5) || (Bpt>10))",_ptBins[i], _ptBins[i+1])); 
+		if(doubly==1)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y, *nMult), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto)); 
+		if(doubly==2)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto)); 
 
 		std::cout<< "Pass 2" << std::endl;
 		//  RooRealVar* w = (RooRealVar*) data->addColumn(wFunc) ;
@@ -336,16 +333,13 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 
 
 		RooDataSet* dsMC_cut;
-		if(doubly==0) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt,  *y), Form("(%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1"); 
-//		if(doubly==1) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1"); 
+		if(doubly==0) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt,  *y), Form("(%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto), "1"); 
+//		if(doubly==1) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto), "1"); 
 
-		if(doubly==1) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y, *nMult), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1"); 
+		if(doubly==1) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y, *nMult), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto), "1"); 
+		if(doubly==2) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt,  *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto), "1"); 
 
-		if(doubly==2) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt,  *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),ptBins_check[i],varExp.Data(),ptBins_check[i+1],minhisto, maxhisto), "1"); 
 
-
-		// return;
-		std::cout<<"Really created datasets"<<std::endl;
 		// create RooDataHist
 		h = new TH1D(Form("h%d",_count),"",nbinsmasshisto,minhisto,maxhisto);
 		hMC = new TH1D(Form("hMC%d",_count),"",nbinsmasshisto,minhisto,maxhisto);
@@ -379,22 +373,19 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 
 
 		
-		RooFitResult* f = fit("", "", tree, c, cMC, ds_cut, dsMC_cut, dh, dhMC, mass, frame, ptBins_check[i], ptBins_check[i+1], isMC, npfit);
-		//RooFitResult* f = fit("sigonly", "", tree, c, cMC, ds_cut, dsMC_cut, dh, dhMC, mass, frame, ptBins_check[i], ptBins_check[i+1], isMC, npfit);
+		RooFitResult* f = fit("", "", tree, c, cMC, ds_cut, dsMC_cut, dh, dhMC, mass, frame, _ptBins[i], _ptBins[i+1], isMC, npfit);
 
 
-		std::cout << "Now Finall We Validate Our Fits" << std::endl;
-	//	validate_fit(w_val, tree, _varExp, full,centmin, centmax, ptBins_check[i], ptBins_check[i+1]);
+	//	std::cout << "Now Finall We Validate Our Fits" << std::endl;
+	//	validate_fit(w_val, tree, varExp, full,centmin, centmax, _ptBins[i], _ptBins[i+1]);
 		//std::cout << "Now Finall We Scan Our Significance" << std::endl;
 
-		//scan_significance(w_val, tree, _varExp, full,centmin, centmax, ptBins_check[i], ptBins_check[i+1]);
+		//scan_significance(w_val, tree, varExp, full,centmin, centmax, _ptBins[i], _ptBins[i+1]);
 
 		/*
 		for(int q= 0; q < 100; q++){
-			std::cout << "BRO NOW IS WORKING ON  " << q << std::endl; 
-			validate_fit(w_val, tree, _varExp, full,q);
-		}
-		*/
+			validate_fit(w_val, tree, varExp, full,q);
+		}*/
 	
 	
 		//datahist = frame->getHist("ds");
@@ -419,23 +410,16 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 			//    	skimtree_new->Project(Form("htest%d",_count),"Bmass",Form("%s&&%s&&%s>%f&&%s<%f)*(1/%s)",sideband.Data(),seldata.Data(),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],weightdata.Data()));
 			std::cout<<"yield bkg sideband: "<<htest->GetEntries()<<std::endl;
 		}
-		std::cout<<"pt bin = "<<ptBins_check[i]<<" "<<ptBins_check[i+1]<<std::endl;
-		std::cout<<"count= "<<i<<std::endl;
 
-
-		if(_varExp!="nMult"){
-			hPt->SetBinContent(i+1,yield/(ptBins_check[i+1]-ptBins_check[i]));
-			hPt->SetBinError(i+1,yieldErr/(ptBins_check[i+1]-ptBins_check[i]));
+		if(varExp!="nMult"){
+			hPt->SetBinContent(i+1,yield/(_ptBins[i+1]-_ptBins[i]));
+			hPt->SetBinError(i+1,yieldErr/(_ptBins[i+1]-_ptBins[i]));
 		}
-
 
 		else{
 			hPt->SetBinContent(i+1,yield/(_ptBins[1] - _ptBins[0]));
 			hPt->SetBinError(i+1,yieldErr/(_ptBins[1] - _ptBins[0]));
 		}
-
-
-
 
 		if(f->floatParsFinal().index(Form("nsig%d",_count)) != -1){
 			RooRealVar* fitMean = static_cast<RooRealVar*>(f->floatParsFinal().at(f->floatParsFinal().index(Form("mean%d",_count))));
@@ -456,14 +440,14 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 	if(varExp=="Bpt"){
       //for the paper run these
       if (drawLegend) {
-        tex_pt = new TLatex(0.55,0.4,Form("%d < p_{T} < %d GeV/c",(int)ptBins_check[i],(int)ptBins_check[i+1]));
+        tex_pt = new TLatex(0.55,0.4,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
         tex_y = new TLatex(0.55,0.34,"p_{T} > 10 GeV/c : |y| < 2.4");
         tex_y2 = new TLatex(0.55,0.28,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4");
         tex_y1 = new TLatex(0.55,0.34,"1.5 < |y| < 2.4");
         tex_y11 =new TLatex(0.55,0.34,"|y| < 2.4");
       } else {
         //fr the AN run these
-        tex_pt = new TLatex(0.55,0.8,Form("%d < p_{T} < %d GeV/c",(int)ptBins_check[i],(int)ptBins_check[i+1]));
+        tex_pt = new TLatex(0.55,0.8,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
         tex_y = new TLatex(0.55,0.74,"p_{T} > 10 GeV/c : |y| < 2.4");
         tex_y2 = new TLatex(0.55,0.68,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4");
         tex_y1 = new TLatex(0.55,0.74,"1.5 < |y| < 2.4");
@@ -472,12 +456,12 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 		}
 	if(varExp=="nMult"){
 	tex_pt = new TLatex(0.21,0.75,"0 < p_{T} < 100 GeV/c");
-	tex_nMult = new TLatex(0.21,0.62,Form("%d < nTrks < %d%%",(int)ptBins_check[i],(int)ptBins_check[i+1]));
+	tex_nMult = new TLatex(0.21,0.62,Form("%d < nTrks < %d%%",(int)_ptBins[i],(int)_ptBins[i+1]));
 	tex_y = new TLatex(0.21,0.69,"|y| < 2.4");
 	     		}
 	if(varExp=="abs(By)"){
 	tex_pt = new TLatex(0.21,0.75,"5 < p_{T} < 50 GeV/c");
-	tex_y = new TLatex(0.21,0.69,Form("%.1f < |y| < %.1f",ptBins_check[i],ptBins_check[i+1]));
+	tex_y = new TLatex(0.21,0.69,Form("%.1f < |y| < %.1f",_ptBins[i],_ptBins[i+1]));
 		}
 
 		tex_pt->SetNDC();
@@ -513,18 +497,27 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 		tex_y2->SetLineWidth(2);
 
 
-		if(ptBins_check[i] >= 10){tex_y11->Draw();}
-		else if(ptBins_check[i+1]==50){tex_y->Draw();
+		if(_ptBins[i] >= 10){tex_y11->Draw();}
+		else if(_ptBins[i+1]==50){tex_y->Draw();
 					    tex_y2->Draw();}
 		else{tex_y1->Draw();}
 		CMS_lumi(c,19011,0);
 		c->Update();
 
-	
+	TLatex* texB;
+	if(tree=="ntphi"){ texB = new TLatex(0.21,0.82, "B^{0}_{s}");}
+	if(tree=="ntKp"){ texB = new TLatex(0.21,0.8, "B^{#pm}");}
+	texB->SetNDC();
+	texB->SetTextFont(62);
+	texB->SetTextSize(0.065);
+	texB->SetLineWidth(2);
+	texB->Draw();
+
+/*
 		TLatex *lat = new TLatex();
 		lat->SetNDC();
 		lat->SetTextSize(0.035);
-/*	
+	
 		lat->DrawLatex(0.64,0.85,Form("S = %.1f", yield));
 		lat->DrawLatex(0.64,0.80,Form("S_err = %.1f", yieldErr));		
 		lat->DrawLatex(0.64,0.75,Form("B = %.1f", bkgd));
@@ -532,11 +525,11 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 		lat->DrawLatex(0.64,0.70,Form("Significance: %.1f", real_significance));
 */
 		std::cout<<"Canvas Updated"<<std::endl;
-	//	c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_doubly%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly)+tree+".pdf");
-		c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_cutY%d_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly)+tree+".png");
-		//c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_doubly%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1], doubly)+tree+".C");
-		cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_cutY%d_",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(), (int)ptBins_check[i], (int)ptBins_check[i+1], doubly)+tree+".pdf");
-	//	cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_doubly%d_%.0f_%0.f",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(), (int)ptBins_check[i], (int)ptBins_check[i+1], doubly)+tree+".png");
+	//	c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_cutY%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_postfix.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1], doubly)+tree+".pdf");
+		c->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_cutY%d_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1], doubly)+tree+".png");
+		//c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_cutY%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_postfix.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1], doubly)+tree+".C");
+		cMC->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_cutY%d_",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),varExp.Data(), (int)_ptBins[i], (int)_ptBins[i+1], doubly)+tree+".pdf");
+	//	cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_cutY%d_%.0f_%0.f",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_postfix.Data(),varExp.Data(), (int)_ptBins[i], (int)_ptBins[i+1], doubly)+tree+".png");
 
 
 
@@ -581,54 +574,60 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 		double max_back=0.;
 		double full_err=0;
 	
-		
-
 		if(syst==1){
 
-			for(int j=0; j<background.size(); j++){
-				RooFitResult* f_back = fit("background", background[j], tree, c, cMC, ds_cut, dsMC_cut, dh, dhMC, mass, frame, ptBins_check[i], ptBins_check[i+1], isMC, npfit);
+				for(int j=0; j<background.size(); j++){
+				RooFitResult* f_back = fit("background", background[j], tree, c, cMC, ds_cut, dsMC_cut, dh, dhMC, mass, frame, _ptBins[i], _ptBins[i+1], isMC, npfit);
+				
+				texB->Draw();
 				tex_pt->Draw();
-				tex_y->Draw();
-
-				c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1],background[j].c_str(), doubly)+tree+".pdf");
-				c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1],background[j].c_str(), doubly)+tree+".png");
-
+				if(_ptBins[i] >= 10){tex_y11->Draw();}
+				else if(_ptBins[i+1]==50){
+						tex_y->Draw();
+						tex_y2->Draw();}
+				else{tex_y1->Draw();}
+				CMS_lumi(c,19011,0);
+				c->Update();
+				
+				c->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_", outplotf.Data(), _prefix.Data(), _isMC.Data(), _isPbPb.Data(), varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],background[j].c_str(), doubly)+tree+".png");
+			
 				modelcurve_back = frame->getCurve(Form("model%d",_count));
 				RooRealVar* fitYield_back = static_cast<RooRealVar*>(f_back->floatParsFinal().at(f_back->floatParsFinal().index(Form("nsig%d",_count))));
 				back_variation.push_back(fitYield_back->getVal());
 				back_err.push_back(abs(((yield-fitYield_back->getVal())/yield)*100));
 				if(abs(((yield-fitYield_back->getVal())/yield)*100)>max_back) max_back=abs(((yield-fitYield_back->getVal())/yield)*100);
-
 			}
 
 			general_err.push_back(max_back);
 
 			for(int j=0; j<signal.size(); j++){
-				RooFitResult* f_signal = fit("signal", signal[j], tree, c, cMC, ds_cut, dsMC_cut, dh, dhMC, mass, frame, ptBins_check[i], ptBins_check[i+1], isMC, npfit);
+				RooFitResult* f_signal = fit("signal", signal[j], tree, c, cMC, ds_cut, dsMC_cut, dh, dhMC, mass, frame, _ptBins[i], _ptBins[i+1], isMC, npfit);
+				
+				texB->Draw();
 				tex_pt->Draw();
-				tex_y->Draw();
+				if(_ptBins[i] >= 10){tex_y11->Draw();}
+				else if(_ptBins[i+1]==50){
+						tex_y->Draw();
+						tex_y2->Draw();}
+				else{tex_y1->Draw();}
+				CMS_lumi(c,19011,0);
+				c->Update();
 
-				c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1],signal[j].c_str(), doubly)+tree+".pdf");
-				cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(), (int)ptBins_check[i], (int)ptBins_check[i+1],signal[j].c_str(), doubly)+tree+".pdf");
-				c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(),(int)ptBins_check[i],(int)ptBins_check[i+1],signal[j].c_str(), doubly)+tree+".png");
-				cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_%s_doubly_%d",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_count,_postfix.Data(),_varExp.Data(), (int)ptBins_check[i], (int)ptBins_check[i+1],signal[j].c_str(), doubly)+tree+".png");
-
+				//tex_y->Draw();
+			//	c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_%s_cutY%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");
+				cMC->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),varExp.Data(), (int)_ptBins[i], (int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");
+				c->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".png");
+			//	cMC->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d_%d_%s_cutY%d",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),_count,_postfix.Data(),varExp.Data(), (int)_ptBins[i], (int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".png");
 				modelcurve_signal = frame->getCurve(Form("model%d",_count));
 				RooRealVar* fitYield_signal = static_cast<RooRealVar*>(f_signal->floatParsFinal().at(f_signal->floatParsFinal().index(Form("nsig%d",_count))));
 				signal_variation.push_back(fitYield_signal->getVal());
 				signal_err.push_back(abs(((yield-fitYield_signal->getVal())/yield)*100));
 				if(abs(((yield-fitYield_signal->getVal())/yield)*100)>max_signal) max_signal=abs(((yield-fitYield_signal->getVal())/yield)*100);
-
-
 			}
 
 			general_err.push_back(max_signal);
-
 			full_err=sqrt(max_back*max_back+max_signal*max_signal);
-
 			general_err.push_back(full_err);
-
-
 
 		}
 
@@ -653,13 +652,15 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 	hPt->Write();
 	outf->Close();	
 
+	string Path;
+	if(tree == "ntphi"){ Path = "./filesbs/";}
+	else if (tree == "ntKp"){Path = "./filesbp/";}
 	std::ofstream myfile;
-	myfile.open ("systematics_"+tree+".txt");
-
+	myfile.open (Path + "systematics_"+tree+".txt");
 
 	if(syst==1){ 
-		for(int i=0; i<nBins_check; i++){
-			std::cout<<"pt bin = "<<ptBins_check[i]<<" "<<ptBins_check[i+1]<<std::endl;
+		for(int i=0; i<_nBins; i++){
+			std::cout<<"pt bin = "<<_ptBins[i]<<" "<<_ptBins[i+1]<<std::endl;
 			std::cout<<"nominal yield = "<<nominal_yields[i]<<std::endl;
 			std::cout<<"count= "<<i<<std::endl;
 
@@ -679,10 +680,8 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 
 	}
 
+
 	myfile.close();
-
-
-	std::cout<<"ISTO AQUI CORRE DAFQ"<<std::endl;
 
 	/*if(fitOnSaved == 1){
 	  outf->Close();	
@@ -693,6 +692,8 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 	//	ntGen->Project("hPtGen","Gpt",TCut(weightgen)*(TCut(selmcgen.Data())));
 	//	divideBinWidth(hPtGen);*/
 
+
+
 	TCanvas* cPt =  new TCanvas("cPt","",600,600);
 	cPt->SetLogy();
 	hPt->SetXTitle("B_{s} p_{T} (GeV/c)");
@@ -700,29 +701,29 @@ else if(tree=="ntKPi"){ for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBinsBP[c];}}
 	hPt->Draw();
 
 
-	std::vector<std::string> labels_back = {"Linear", "2nd Poly", "3rd Poly"};
+	std::vector<std::string> labels_back = {"Linear", "2nd Poly", "mass range" };
 	std::vector<std::string> col_name_back;
-	if(tree=="ntphi"&&_varExp=="Bpt") col_name_back= {"Background Model","7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$50"};
-	if(tree=="ntKp" && _varExp=="Bpt") col_name_back= {"Background Model", "7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$50" };
+	if(tree=="ntphi"&&varExp=="Bpt") col_name_back= {"Background Model","7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$50"};
+	if(tree=="ntKp" && varExp=="Bpt") col_name_back= {"Background Model","5$<p_T<$7","7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$30", "30$<p_T<$50","50$<p_T<$60"};
 
-	std::vector<std::string> labels_signal = {"Triple Gaussian", "Fixed Mean", "Increased $\\sigma$ scaling factor", "Decreased $\\sigma$ scaling factor"};
+	std::vector<std::string> labels_signal = {"Triple Gaussian", "Fixed Mean", "CB+Gaussian"};
 	//		std::vector<std::string> labels_signal = {"Triple Gaussian", "Fixed Mean","Double Gaussian + $\\sigma$ scaling factor" , "Increased $\\sigma$ scaling factor", "Decreased $\\sigma$ scaling factor"};
 	std::vector<std::string> col_name_signal;
-	if(tree=="ntphi"&&_varExp=="Bpt") col_name_signal= {"Signal Model","7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$50"};
-	if(tree=="ntKp" && _varExp=="Bpt") col_name_back= {"Signal Model", "7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$50" };
+	if(tree=="ntphi"&&varExp=="Bpt") col_name_signal= {"Signal Model","7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$50"};
+	if(tree=="ntKp" && varExp=="Bpt") col_name_signal= {"Signal Model", "5$<p_T<$7","7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$30", "30$<p_T<$50","50$<p_T<$60"};
 
 
 
 	std::vector<std::string> labels_general = {"Background", "Signal", "Total"};
 	std::vector<std::string> col_name_general;
-	if(tree=="ntphi"&&_varExp=="Bpt") col_name_general= {"Systematic Source","5$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$50"};
-	if(tree=="ntKp" && _varExp=="Bpt") col_name_signal= {"Systematic Source", "5$<p_T<$7", "7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$30", "30$<p_T<$40", "40$<p_T<$50", "50$<p_T<$60" };
+	if(tree=="ntphi"&&varExp=="Bpt") col_name_general= {"Systematic Source","7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$50"};
+	if(tree=="ntKp" && varExp=="Bpt") col_name_general= {"Systematic Source", "5$<p_T<$7", "7$<p_T<$10", "10$<p_T<$15", "15$<p_T<$20", "20$<p_T<$30", "30$<p_T<$50", "50$<p_T<$60" };
 
 
 	if(syst==1 && full==0){
-		latex_table("background_systematics_table_"+std::string (_varExp.Data())+"_"+std::string (tree.Data()), nBins_check+1,  (int)(1+background.size()),  col_name_back,labels_back,back_syst_rel_values, "Background PDF Systematic Errors");
-		latex_table("signal_systematics_table_"+std::string (_varExp.Data())+"_"+std::string (tree.Data()), nBins_check+1, (int)(1+signal.size()),    col_name_signal, labels_signal,sig_syst_rel_values, "Signal PDF Systematic Errors");
-		latex_table("general_systematics_table_"+std::string (_varExp.Data())+"_"+std::string (tree.Data()),   nBins_check+1, 4 , col_name_general, labels_general, general_syst, "Overall PDF Variation Systematic Errors");	
+		latex_table(Path + "background_systematics_table_"+std::string (varExp.Data())+"_"+std::string (tree.Data()), _nBins+1,  (int)(1+background.size()),  col_name_back,labels_back,back_syst_rel_values, "Background PDF Systematic Errors");
+		latex_table(Path + "signal_systematics_table_"+std::string (varExp.Data())+"_"+std::string (tree.Data()), _nBins+1, (int)(1+signal.size()),    col_name_signal, labels_signal,sig_syst_rel_values, "Signal PDF Systematic Errors");
+		latex_table(Path + "general_systematics_table_"+std::string (varExp.Data())+"_"+std::string (tree.Data()),  _nBins+1, 4 , col_name_general, labels_general, general_syst, "Overall PDF Variation Systematic Errors");	
 
 	}
 
