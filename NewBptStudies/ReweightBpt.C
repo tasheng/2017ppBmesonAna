@@ -83,15 +83,20 @@ void ReweightBpt(int Opt){
     TGraphAsymmErrors* gaeBplusReference =
       (TGraphAsymmErrors*)finFONLL->Get(TString::Format("gaeSigmaBplus%d", iY));
     reweightInY(GptMC, gaeBplusReference, weightpthat, GenCut);
-    TF1* fFit = (TF1*) f1->Clone();
+    TF1* fFit = (TF1*) f1->Clone(TString::Format("BptWeight_y%d", iY));
     fits.push_back(*fFit);
   }
+
+  // Save the output
+  TFile fout(Form("ResultFile/BptWeight_%s.root", ParName.Data()), "recreate");
   for (auto f : fits) {
     TString BptReweightFunc = Form("%f/x**(%f) + %f + %f * x",
                                    f.GetParameter(0), f.GetParameter(1),
                                    f.GetParameter(2), f.GetParameter(3));
     cout << BptReweightFunc << "\n";
+    f.Write();
   }
+  fout.Close();
 }
 
 void reweightInY(TH1D* GptMC, TGraphAsymmErrors* gaeBplusReference, TCut weightpthat, TCut GenCut) {
