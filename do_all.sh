@@ -1,5 +1,16 @@
 #! /bin/bash
 
+sync_with_main () {
+    mkdir -p BP/EffAna/BDTWeights/
+    mkdir -p Bs/EffAna/BDTWeights/
+    rsync -a ../braa_nohbhe_trk/BP/EffAna/BDTWeights/BPw.root BP/EffAna/BDTWeights/BPw.root
+    rsync -a ../braa_nohbhe_trk/Bs/EffAna/BDTWeights/Bsw.root Bs/EffAna/BDTWeights/Bsw.root
+    rsync -a ../braa_nohbhe_trk/NewBptStudies/ResultFile/BptWeight_BP.root NewBptStudies/ResultFile/BptWeight_BP.root
+    rsync -a ../braa_nohbhe_trk/NewBptStudies/ResultFile/BptWeight_Bs.root NewBptStudies/ResultFile/BptWeight_Bs.root
+
+    rsync -a 
+}
+
 maketnp () {
     ## run TnP and attach them to the unskimmed MC files
     pushd MakeMCTnP/
@@ -28,7 +39,7 @@ bpEff () {
     # takes unskimmed MC sample as input
     echo "Takes BPw.root as input. Make sure it is up to date"
     ls -l BDTWeights/BPw.root
-    #root -b -l -q MCEff.C'(1,0)' > eff.log # >> bpsyst2d.root
+    # root -b -l -q MCEff.C'(1,0)' > eff.log # >> bpsyst2d.root
     # CrossSectionAna.C contains 1 By cuts
     root -b -l -q CrossSectionAna.C'(1)'
     # root -b -l -q CrossSectionAnaMult.C'(1)'
@@ -130,6 +141,8 @@ paperPlots () {
 # bpYield &
 # bsYield &
 # wait
+
+# sync_with_main
 
 # bpEff &
 # bsEff &

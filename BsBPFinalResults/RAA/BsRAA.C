@@ -178,7 +178,7 @@ void BsRAA(){
 		BsTotalSystDownRatio[i] = TMath::Sqrt(TMath::Power(BsTrackingSyst[i], 2) + TMath::Power(BsMCDataSyst[i], 2) +
                                           TMath::Power(BsPDFSyst[i], 2) + TMath::Power(BsTrackSelSyst[i], 2) +
                                           TMath::Power(BsPtShapeSyst[i], 2) + TMath::Power(BsTnPSystDown[i], 2)) / 100;
-    BsTotalSystDownRatio[i] = BsTotalSystUpRatio[i];
+    BsTotalSystUpRatio[i] = BsTotalSystDownRatio[i];
 	}
 
 
