@@ -205,15 +205,17 @@ void MCStatCal(){
 	if(NBins == 7){
 
 
-		ptbinsvec.push_back(5);
+		// ptbinsvec.push_back(5);
 		ptbinsvec.push_back(7);
 		ptbinsvec.push_back(10);
 		ptbinsvec.push_back(15);
 		ptbinsvec.push_back(20);
-		ptbinsvec.push_back(30);
+		// ptbinsvec.push_back(30);
 
 		ptbinsvec.push_back(50);
 		ptbinsvec.push_back(60);
+		ptbinsvec.push_back(100);
+		ptbinsvec.push_back(150);
 
 
 
