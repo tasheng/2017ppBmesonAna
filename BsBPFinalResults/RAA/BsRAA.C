@@ -610,7 +610,7 @@ void BsRAA(){
   std::vector<float> globUncert(NBins, 0.077);
   // summary of errors (in ratio, not percent)
   std::vector<int> ptbins = {7, 10, 15, 20, 50};
-  std::vector<float> abscissae = {8.75, 12.5, 17.5, 35.0};
+  std::vector<float> abscissae = {8.5, 12.5, 17.5, 35.0};
 
   string outFile = "../../MakeFinalPlots/NominalPlots/RAA/dataSource/RAA_pt_Bs_New.txt";
   ofstream out;
@@ -633,7 +633,8 @@ void BsRAA(){
       BsRAAYSystUpRatio[i] << std::setw(columnWidth) <<
       BsRAAYSystDownRatio[i] << std::setw(columnWidth) <<
       globUncert[i] << std::setw(columnWidth) <<
-      globUncert[i] << std::setw(columnWidth) << abscissae[i] << "\n";
+      globUncert[i] << std::setw(columnWidth) <<
+      setprecision(3) << abscissae[i] << "\n";
   }
   out.close();
 }

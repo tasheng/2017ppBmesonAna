@@ -748,7 +748,8 @@ void BsComparison(){
       BsTotalSystDownRatio[i] << std::setw(columnWidth) <<
       BsTotalSystDownRatio[i] << std::setw(columnWidth) <<
       globUncert[i] << std::setw(columnWidth) <<
-      globUncert[i] << std::setw(columnWidth) << abscissae[i] << "\n";
+      globUncert[i] << std::setw(columnWidth) <<
+      setprecision(3) << abscissae[i] << "\n";
   }
   out.close();
 

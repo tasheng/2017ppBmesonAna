@@ -135,8 +135,14 @@ void BPRAA(){
 	float BPXSecPPYSystUp[NBins];
 	float BPXSecPPYSystDown[NBins];
 
-	float BsTnPSystDown[NBins];
-	float BsTnPSystUp[NBins];
+  // percent error
+	float BPTrackingSyst[NBins] = {[0 ... NBins - 1] = 5};
+	float BPMCDataSyst[NBins];
+	float BPPDFSyst[NBins];
+	float BPTrackSelSyst[NBins];
+	float BPPtShapeSyst[NBins];
+	float BPTnPSystDown[NBins];
+	float BPTnPSystUp[NBins];
 
   // Get systematics from input files
   for (auto ibin = 0; ibin < NBins; ++ibin) {
@@ -529,7 +535,7 @@ void BPRAA(){
   std::vector<float> globUncert(NBins, 0.035);
   // summary of errors (in ratio, not percent)
   std::vector<int> ptbins = {5, 7, 10, 15, 20, 30, 50, 60};
-  std::vector<float> abscissae = {6.0, 8.75, 12.5, 17.5, 25, 40, 55};
+  std::vector<float> abscissae = {6.0, 8.5, 12.5, 17.5, 25, 40, 55};
 
   string outFile = "../../MakeFinalPlots/NominalPlots/RAA/dataSource/RAA_pt_Bp_New.txt";
   ofstream out;
@@ -552,7 +558,8 @@ void BPRAA(){
       BPRAAYSystUpRatio[i] << std::setw(columnWidth) <<
       BPRAAYSystDownRatio[i] << std::setw(columnWidth) <<
       globUncert[i] << std::setw(columnWidth) <<
-      globUncert[i] << std::setw(columnWidth) << abscissae[i] << "\n";
+      globUncert[i] << std::setw(columnWidth) <<
+      setprecision(3) << abscissae[i] << "\n";
   }
   out.close();
 }
