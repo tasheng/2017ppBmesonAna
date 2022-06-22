@@ -21,16 +21,20 @@ bp_list = [
 ]
 
 bp_pdf_list = [
-    "BP/RawYieldFits/signal_systematics_table_Bpt_ntKp.tex",
-    "BP/RawYieldFits/background_systematics_table_Bpt_ntKp.tex",
+    "henri2022/filesbp/signal_systematics_table_Bpt_ntKp.tex",
+    "henri2022/filesbp/background_systematics_table_Bpt_ntKp.tex",
+    # "BP/RawYieldFits/signal_systematics_table_Bpt_ntKp.tex",
+    # "BP/RawYieldFits/background_systematics_table_Bpt_ntKp.tex",
     # "BP/RawYieldFits/general_systematics_table_Bpt_ntKp.tex",
     ]
 
 bp_list.extend(bp_pdf_list)
 
 bs_pdf_list = [
-    "Bs/RawYieldFits/signal_systematics_table_Bpt_ntphi.tex",
-    "Bs/RawYieldFits/background_systematics_table_Bpt_ntphi.tex",
+    "henri2022/filesbs/signal_systematics_table_Bpt_ntphi.tex",
+    "henri2022/filesbs/background_systematics_table_Bpt_ntphi.tex",
+    # "Bs/RawYieldFits/signal_systematics_table_Bpt_ntphi.tex",
+    # "Bs/RawYieldFits/background_systematics_table_Bpt_ntphi.tex",
     # "BP/RawYieldFits/general_systematics_table_Bpt_ntKp.tex",
     ]
 
@@ -48,15 +52,16 @@ def get_pdf_syst(inFileList, outfile, hname, nbins):
     return the root mean squared error
     """
     error_sig_bkg = np.zeros([2, nbins])
-    nshape = [2, 2]
+    # num of signal, num of bkg
+    nshape = [3, 3]
     for itype, file in enumerate(inFileList):
         with open(file) as fin:
             lines = fin.readlines()[2:]
-        xgroups = re.findall('\d+\D+\d+', lines[0])
-        xs = [np.mean([float(num) for num in re.findall('\d+', g)]) for g in xgroups]
+        xgroups = re.findall(r'\d+\D+\d+', lines[0])
+        xs = [np.mean([float(num) for num in re.findall(r'\d+', g)]) for g in xgroups]
         err = np.zeros([nshape[itype], nbins])
         for ishape in range(nshape[itype]):
-            err[ishape] = np.array(re.findall('\d+\.\d*', lines[ishape + 1]), 'd')
+            err[ishape] = np.array(re.findall(r'\d+\.\d*', lines[ishape + 1]), 'd')
         bigger_error = np.amax(err, axis=0)
         error_sig_bkg[itype] = bigger_error
     error_sum = np.sqrt(np.sum(error_sig_bkg ** 2, axis=0))
@@ -71,8 +76,8 @@ def get_pdf_syst(inFileList, outfile, hname, nbins):
     fout.Close()
     return
 
-# get_pdf_syst(bp_pdf_list, "bp_pdf.root", "bp_error", 7)
-# get_pdf_syst(bs_pdf_list, "bs_pdf.root", "bs_error", 4)
+get_pdf_syst(bp_pdf_list, "bp_pdf.root", "bp_error", 7)
+get_pdf_syst(bs_pdf_list, "bs_pdf.root", "bs_error", 4)
 
 def make_line(item, array, suf = '', form = '{:.2f}'):
     entry = [item.ljust(22)] + [form.format(num) + suf for num in array]
@@ -123,7 +128,7 @@ def read_tracking_syst(inYield, nbins):
 
 
 
-def get_tracking_syst(inFileList, outfile, out_table):
+def get_tracking_syst(outfile, out_table):
     in_file_bp = "BP/EffAna/FinalFiles/BPPPCorrYieldPT.root"
     in_file_bs = "Bs/EffAna/FinalFiles/BsPPCorrYieldPT.root"
     g_bp, t_bp = read_tracking_syst(in_file_bp, 7)
@@ -135,12 +140,12 @@ def get_tracking_syst(inFileList, outfile, out_table):
     g_bs.Write()
     fout.Close()
     with open(out_table, 'w') as fout:
-        fout.write('\PBp track selection systematics\n')
+        fout.write('\\PBp track selection systematics\n')
         fout.write(t_bp)
         fout.write('\n')
-        fout.write('\PBs track selection systematics\n')
+        fout.write('\\PBs track selection systematics\n')
         fout.write(t_bs)
 
 
 
-get_tracking_syst(bp_pdf_list, "syst_track_sel.root", "syst_track_sel.txt")
+get_tracking_syst("syst_track_sel.root", "syst_track_sel.txt")
