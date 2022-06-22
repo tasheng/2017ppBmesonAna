@@ -46,6 +46,7 @@ TRGPbPbMC="(Bpt>0)"
 
 echo "TRGPbPb="$TRGPbPb
 
+mkdir ROOTfiles/
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_FULL="ROOTfiles/yields_Bs_full_${CENTPbPbMIN}_${CENTPbPbMAX}.root"
 
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_DOUBLE_1ST="ROOTfiles/yields_Bs_binned_cent_1st_pt.root"
