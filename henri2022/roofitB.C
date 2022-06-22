@@ -2,7 +2,7 @@
 #include "CMS_lumi.C"
 #include "parameter.h"
 #include "parametersNew.h"
-
+#include "TSystem.h"
 
 int syst=1;
 
@@ -273,15 +273,10 @@ cout << endl << endl;
 	dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,RooArgSet(*mass, *pt, *y, *nMult));
 	//    TString ptbinning;
 
-	// std::vector<std::string> background = {"1st", "2nd2", "3rd"};
 	std::vector<std::string> background = {"1st", "2nd","mass_range"};
-	std::vector<std::vector<double>> background_syst;
-	// std::vector<std::string> signal = {"3gauss", "fixed", "scal", "perr", "merr", "scal+", "scal-"};
-	//std::vector<std::string> signal = {"3gauss", "fixed","scal+", "scal-"};
-	//	 std::vector<std::string> signal = {"3gauss"};
 	std::vector<std::string> signal = {"3gauss", "fixed", "gauss_cb"};
-	//std::vector<std::string> signal = {"3gauss", "1gauss","fixed", "scal", "perr", "merr"};
-	// std::vector<std::string> signal = {"3gauss", "1gauss", "fixed_mean", "scaling", "-_error", "+_error"};
+	
+	std::vector<std::vector<double>> background_syst;
 	std::vector<std::vector<double>> signal_syst;
 	std::vector<std::vector<double>> general_syst;
 	std::vector<double> nominal_yields;
@@ -293,8 +288,7 @@ cout << endl << endl;
 	for(int i=0;i<_nBins;i++)
 	{
 		_count++;
-		std::cout<<"I'm in the for"<<std::endl;
-		TCanvas* c= new TCanvas(Form("c%d",_count),"",600,600);
+		TCanvas* c= new TCanvas(Form("c%d",_count),"",600,550);
 		TCanvas* cMC= new TCanvas(Form("cMC%d",_count),"",600,600);
 		//		c->cd();
 		//	if(fitOnSaved == 0){
@@ -311,22 +305,16 @@ cout << endl << endl;
 		//fout->Close();
 		//      skimtreeMC = (TTree*)ntMC->CopyTree(Form("%s*(%s&&%s>%f&&%s<%f)",weightmc.Data(),Form("%s&&BgenNew==23333",selmc.Data()),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1]), "skimtreeMC");
 		//			ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new, RooArgSet(*mass, *pt));
-		std::cout<<varExp<<" bin = "<<_ptBins[i]<<" "<<_ptBins[i+1]<<std::endl;
 		//      return;
 		RooDataSet* ds_cut;
-		std::cout<< "Pass 1" << std::endl;
 		//if(doubly==0) ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y, *BDT_pt_5_10, *BDT_pt_10_15, *BDT_pt_15_20,*BDT_pt_20_50), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f&&(Bpt > 5 &&  Bpt < 10 && BDT_pt_5_10_New > 0.10)&&(Bpt > 10 &&  Bpt < 15 && BDT_pt_10_15_New > 0.10)&&(Bpt > 15 &&  Bpt < 20 && BDT_pt_15_20_New > 0.10)&&(Bpt > 20 &&  Bpt < 50 && BDT_pt_20_50_New > 0.10)",varExp.Data(),_ptBins[i],varExp.Data(),_ptBinsk[i+1],minhisto, maxhisto));
 
-
-
-		std::cout<< "THIS HERE NOW doubly:       "<<doubly << std::endl;
 
 
 		if(doubly==0) ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y),Form("(Bpt>%f && Bpt < %f)&&((Bpt < 10 && abs(By) >1.5) || (Bpt>10))",_ptBins[i], _ptBins[i+1])); 
 		if(doubly==1)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y, *nMult), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto)); 
 		if(doubly==2)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto)); 
 
-		std::cout<< "Pass 2" << std::endl;
 		//  RooRealVar* w = (RooRealVar*) data->addColumn(wFunc) ;
 		//      RooDataSet wdata(data->GetName(),data->GetTitle(),data,*data->get(),0,w->GetName()) ;
 		//dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,RooArgSet(*mass, *pt));
@@ -343,16 +331,13 @@ cout << endl << endl;
 		// create RooDataHist
 		h = new TH1D(Form("h%d",_count),"",nbinsmasshisto,minhisto,maxhisto);
 		hMC = new TH1D(Form("hMC%d",_count),"",nbinsmasshisto,minhisto,maxhisto);
-		std::cout<<"TH1D "<<std::endl;
 		if(isMC==1) skimtree_new->Project(Form("h%d",_count),"Bmass",Form("%s*(%s&&%s>%f&&%s<%f && BgenNew == 23333)*(1/%s)",weightmc.Data(),seldata.Data(),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],weightdata.Data()));
 		else        skimtree_new->Project(Form("h%d",_count),"Bmass",   Form("(%s&&%s>%f&&%s<%f)*(1/%s)",                seldata.Data(),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],weightdata.Data()));
-		std::cout<<"isMC? "<<isMC<<std::endl;
 //		std::string project_str=Form("(%s&&%s>%f&&%s<%f)*(1/%s)",                seldata.Data(),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],weightdata.Data());
 //		std::cout<<"string= "<<project_str<<std::endl;
 //		std::string project_str_mc= Form("%s*(%s&&%s>%f&&%s<%f && BgenNew == 23333)*(1/%s)",weightmc.Data(),seldata.Data(),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],weightdata.Data());
 //		std::cout<<"string isMC= "<<project_str_mc<<std::endl;
 		skimtreeMC_new->Project(Form("hMC%d",_count),"Bmass",Form("%s*(%s&&%s>%f&&%s<%f)",weightmc.Data(),Form("%s&&BgenNew==23333",selmc.Data()),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1]));
-		std::cout<<"skim_tree "<<std::endl;
 		dh = new RooDataHist(Form("dh%d",_count),"",*mass,Import(*h));
 		dhMC = new RooDataHist(Form("dhMC%d",_count),"",*mass,Import(*hMC));
 		std::cout<<"RooDataHist "<<std::endl;
@@ -361,7 +346,6 @@ cout << endl << endl;
 		outputw->import(*dsMC);
 		outputw->import(*dh);
 		outputw->import(*dhMC);
-		std::cout<<"import "<<std::endl;
 		//}
 		/*if(fitOnSaved == 1){
 		  inputw = (RooWorkspace*)inf->Get("w");
@@ -524,7 +508,9 @@ cout << endl << endl;
 		//lat->DrawLatex(0.48,0.70,Form("Significance: S/#sqrt{S+B} = %.1f", Significance));
 		lat->DrawLatex(0.64,0.70,Form("Significance: %.1f", real_significance));
 */
-		std::cout<<"Canvas Updated"<<std::endl;
+		gSystem->mkdir("filesbp",true); 
+		gSystem->mkdir("filesbs",true); 
+		gSystem->mkdir(Form("%s", outplotf.Data()),true); 
 	//	c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_cutY%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_postfix.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1], doubly)+tree+".pdf");
 		c->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_cutY%d_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1], doubly)+tree+".png");
 		//c->SaveAs(Form("%s%s/%s_%s_%d%s_%s_%d%d_cutY%d",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_postfix.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1], doubly)+tree+".C");
@@ -589,7 +575,7 @@ cout << endl << endl;
 				CMS_lumi(c,19011,0);
 				c->Update();
 				
-				c->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_", outplotf.Data(), _prefix.Data(), _isMC.Data(), _isPbPb.Data(), varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],background[j].c_str(), doubly)+tree+".png");
+				c->SaveAs(Form("%s/%s_%s_%s_%d_%d_%s_cutY%d_", outplotf.Data(), _isMC.Data(), _isPbPb.Data(), varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],background[j].c_str(), doubly)+tree+".png");
 			
 				modelcurve_back = frame->getCurve(Form("model%d",_count));
 				RooRealVar* fitYield_back = static_cast<RooRealVar*>(f_back->floatParsFinal().at(f_back->floatParsFinal().index(Form("nsig%d",_count))));

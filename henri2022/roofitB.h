@@ -330,21 +330,8 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	// a0.setConstant();
 
 /*	
-	ds->plotOn(frame,Name(Form("ds_cut%d",_count)),Binning(nbinsmasshisto),MarkerSize(1),MarkerStyle(20),MarkerColor(1),LineColor(1),LineWidth(2),LineColor(1));//draw an transparent hist
-	if(npfit != "1"){
-		model->plotOn(frame, Name(Form("peakbg%d",_count)) ,Components(peakbg), Normalization(1.0,RooAbsReal::RelativeExpected), RooFit::NormRange("m_range"), Precision(1e-6),DrawOption("L"),FillStyle(3005),FillColor(kGreen+4),LineStyle(1),LineColor(kGreen+4),LineWidth(3));
-		model->plotOn(frame, Name(Form("peakbgF%d",_count)),Components(peakbg), Normalization(1.0,RooAbsReal::RelativeExpected), RooFit::NormRange("m_range"), Precision(1e-6),DrawOption("F"),FillStyle(3005),FillColor(kGreen+4),LineStyle(1),LineColor(kGreen+4),LineWidth(3));
-			}
-	model->plotOn(frame,Name(Form("bkg%d",_count))  ,Components(bkg), Normalization(1.0,RooAbsReal::RelativeExpected),RooFit::NormRange("m_range"),Precision(1e-6),DrawOption("L"),LineStyle(7),LineColor(4),LineWidth(3));
-	model->plotOn(frame,Name(Form("model%d",_count)),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),RooFit:: NormRange("m_range"),DrawOption("L"),LineColor(2),LineWidth(3));
-	
-	if(pdf!="1gauss"){
-		model->plotOn(frame,Name(Form("sig%d",_count)),Components(*sig),Normalization(1.0,RooAbsReal::RelativeExpected) ,RooFit::NormRange("m_range"), Precision(1e-6),DrawOption("L"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(3));
-		model->plotOn(frame,Name(Form("sigF%d",_count)),Components(*sig),Normalization(1.0,RooAbsReal::RelativeExpected), RooFit::NormRange("m_range"), Precision(1e-6),DrawOption("F"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(3));
-	} else {
-		model->plotOn(frame,Name(Form("sig%d",_count)),Components(sig1),Normalization(1.0,RooAbsReal::RelativeExpected), NormRange("m_range"),Precision(1e-6),DrawOption("L"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(3));
-		model->plotOn(frame,Name(Form("sigF%d",_count)),Components(sig1),Normalization(1.0,RooAbsReal::RelativeExpected),NormRange("m_range"),Precision(1e-6),DrawOption("F"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(3));
-	}
+}
+	model->plotOn(frame,Name(Form("model%d",_count)),Precision(1e-6),RooFit:: NormRange("m_range"),DrawOption("L"),LineColor(2),LineWidth(3));
 */
 
 	ds->plotOn(frame,Name(Form("ds_cut%d",_count)),Binning(nbinsmasshisto),MarkerSize(1),MarkerStyle(20),MarkerColor(1),LineColor(1),LineWidth(2),LineColor(1));//draw an transparent hist
