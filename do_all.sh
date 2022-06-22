@@ -7,8 +7,6 @@ sync_with_main () {
     rsync -a ../braa_nohbhe_trk/Bs/EffAna/BDTWeights/Bsw.root Bs/EffAna/BDTWeights/Bsw.root
     rsync -a ../braa_nohbhe_trk/NewBptStudies/ResultFile/BptWeight_BP.root NewBptStudies/ResultFile/BptWeight_BP.root
     rsync -a ../braa_nohbhe_trk/NewBptStudies/ResultFile/BptWeight_Bs.root NewBptStudies/ResultFile/BptWeight_Bs.root
-
-    rsync -a 
 }
 
 maketnp () {
@@ -23,11 +21,13 @@ maketnp () {
 # new bpt reweighting uses FONLL and doesn't depend on acceptance
 # function >> MCEff.C
 
-bpYield () {
+yield () {
     ## yield extraction
-    pushd BP/RawYieldFits
+    pushd henri2022
     # roofitB.C contains 2 By cuts
-    source doRoofit.sh
+    source bpdoRoofit.sh &
+    source bsdoRoofit.sh &
+    wait
     popd
 }
 
@@ -47,13 +47,6 @@ bpEff () {
     popd
 }
 
-
-bsYield () {
-    cd Bs/RawYieldFits
-    # roofitB.C contains 2 By cuts
-    source doRoofit.sh
-    cd ../..
-}
 
 bsEff () {
     pushd Bs/EffAna
@@ -138,15 +131,13 @@ paperPlots () {
 }
 # maketnp
 
-# bpYield &
-# bsYield &
-# wait
+yield
 
-# sync_with_main
+sync_with_main
 
-# bpEff &
-# bsEff &
-# wait
+bpEff &
+bsEff &
+wait
 
 nominal
 syst

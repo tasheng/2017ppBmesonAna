@@ -69,7 +69,7 @@ void BPComparison(){
 	const int NBins = ptbinsvec.size() - 1;
 
 	float BPXsecPPY[NBins];
-	float BPXsecPPX[NBins] = {6,8.5,12.5,17.5,25,40,55};
+	float BPXsecPPX[NBins];
 
 	float BPXSecPPYErrUp[NBins];
 	float BPXSecPPYErrDown[NBins];
