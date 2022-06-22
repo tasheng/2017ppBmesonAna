@@ -18,8 +18,10 @@ const unsigned nptBins = 4;
 const std::array<double, nptBins + 1> ptbinsvec = { 7, 10, 15, 20, 50};
 
 
-const unsigned nptBinsBP = 7;
-const std::array<double, nptBinsBP + 1> ptbinsvecBP = { 5, 7, 10, 15, 20, 30, 50, 60};
+// const unsigned nptBinsBP = 7;
+// const std::array<double, nptBinsBP + 1> ptbinsvecBP = { 5, 7, 10, 15, 20, 30, 50, 60};
+const unsigned nptBinsBP = nptBins;
+const std::array<double, nptBinsBP + 1> ptbinsvecBP (ptbinsvec);
 
 
 // 7 bins
