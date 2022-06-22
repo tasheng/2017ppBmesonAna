@@ -125,7 +125,8 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	//RooRealVar sig3fracMC(Form("sig3fracMC%d_%s",_count, pdf.Data()),"",0.5,0.,1.);
 
 	RooAddPdf* sigMC;
-	RooRealVar nsigMC(Form("nsigMC%d_%s",_count, pdf.Data()),"",1,0,1e8);
+	RooRealVar nsigMC(Form("nsigMC%d_%s",_count, pdf.Data()),"",
+                    1, 0, 1.2 * dsMC->sumEntries());
 
 	//if((variation=="" && pdf=="") || (variation=="sigonly" && pdf=="") || variation== "background" || (variation=="signal" &&(pdf=="fixed" || pdf=="scal" || pdf=="merr" || pdf == "perr"|| pdf=="scal+" || pdf== "scal-"))) sigMC = new RooAddPdf(Form("sigMC%d_%s",_count,pdf.Data()),"",RooArgList(sig1MC,sig2MC),sig1fracMC);
 	if((variation=="" && pdf=="") || variation== "background" || (variation=="signal" && pdf=="fixed" )) sigMC = new RooAddPdf(Form("sigMC%d_%s",_count,pdf.Data()),"",RooArgList(sig1MC,sig2MC),sig1fracMC);
@@ -532,10 +533,10 @@ else if (ptmin == 20) { (frame->GetYaxis())->SetRangeUser(0,340);}}
 	//ds->plotOn(frame,Name(Form("ds%d",_count)),Binning(nbinsmasshisto),MarkerSize(1.55),MarkerStyle(20),LineColor(1),LineWidth(4));
 
 
-	double width = 0.08;
-	double BmassH = BS_MASS + width;
-	double BmassL = BS_MASS - width;
-	mass->setRange("signal",BmassL,BmassH);
+	// double width = 0.08;
+	// double BmassH = BS_MASS + width;
+	// double BmassL = BS_MASS - width;
+	// mass->setRange("signal",BmassL,BmassH);
 	RooAbsReal *bkgIntegral = bkg.createIntegral(*mass,NormSet(*mass),Range("signal"));
 	// bkgIntegralErr = bkgIntegral->getPropagatedError(*fitResult);	
 	cout<<"bkg integral: "<<bkgIntegral->getVal()<<endl;
