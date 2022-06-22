@@ -1,4 +1,5 @@
-DOANALYSISPbPb_ROOFIT_BINNED_PT_BS=1
+DOANALYSISPbPb_ROOFIT_BINNED_PT_BS=0
+DOANALYSISPbPb_ROOFIT_BINNED_PT_BS_TRK=1
 DOANALYSISPbPb_ROOFIT_BINNED_MULT_BS=0
 DOANALYSISPbPb_ROOFIT_BINNED_Y_BS=0
 DOANALYSISPbPb_ROOFIT_FULL_BS=0
@@ -11,8 +12,8 @@ CENTPbPbMAX=90
 #INPUTDATAPbPbCANDWISE_BS="../../SkimmedSamples/BsData.root"
 #INPUTMCPbPbCANDWISE_BS="../../SkimmedSamples/OfficialMC/BsMC.root"
 
-INPUTDATAPbPbCANDWISE_BS="~/work/files/BsData.root"
-INPUTMCPbPbCANDWISE_BS="~/work/files/BsMC.root"
+INPUTDATAPbPbCANDWISE_BS="../CutSkim/BsData.root"
+INPUTMCPbPbCANDWISE_BS="../CutSkim/BsMC.root"
 
 #INPUTDATAPbPbCANDWISE_BS="/data/szhaozho/ppNewTMVA/CMSSW_10_3_2/src/Bs/NewCut/BsData.root"
 #INPUTMCPbPbCANDWISE_BS="/data/szhaozho/ppNewTMVA/CMSSW_10_3_2/src/Bs/NewCut/BsMC.root"
@@ -37,7 +38,7 @@ CUTPbPb=${BASECUTPbPb}"&&((Bpt>5&&Bpt<10&&BDT_pt_5_10>0.17)||(Bpt>10&&Bpt<15&&BD
 CUTPbPb=${CUTPbPb}"&&abs(PVz)<15&&pclusterCompatibilityFilter&&pprimaryVertexFilter"
 
 
-CUTPbPb="Bsize>0"
+CUTPbPb="1"
 
 #TRGPbPb="(HLT_HIL1DoubleMu0_v1||HLT_HIL1DoubleMu0_part1_v1||HLT_HIL1DoubleMu0_part2_v1||HLT_HIL1DoubleMu0_part3_v1)"
 #TRGPbPbMC="(HLT_HIL1DoubleMu0_v1||HLT_HIL1DoubleMu0_part1_v1||HLT_HIL1DoubleMu0_part2_v1||HLT_HIL1DoubleMu0_part3_v1)"
@@ -55,6 +56,7 @@ OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_DOUBLE_1ST_Y="ROOTfiles/yields_Bs_binned_cent_1
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_DOUBLE_2ND_Y="ROOTfiles/yields_Bs_binned_cent_2nd_y.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_Y="ROOTfiles/yields_Bs_binned_y.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_PT="ROOTfiles/yields_Bs_binned_pt.root"
+OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_PT_trk="ROOTfiles/yields_Bs_binned_pt_trk.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_MULT="ROOTfiles/yields_Bs_binned_Mult.root"
 
 NPROOFIT_PbPb="1"
@@ -91,6 +93,18 @@ if [ $DOANALYSISPbPb_ROOFIT_BINNED_PT_BS  -eq 1  ]; then
 root -b  -q 'roofitB.C+('0','\"ntphi\"','0','1','0','\"$INPUTDATAPbPbCANDWISE_BS\"','\"$INPUTMCPbPbCANDWISE_BS\"','\"Bpt\"','\"$TRGPbPb\"','\"$CUTPbPb\"','\"$SELGENPbPb\"','$ISMCPbPb','1','$ISDOWEIGHTPbPb','\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_PT\"','\"results/Bs/Bpt\"','\"$NPROOFIT_PbPb\"','0')'
 
 rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
+fi
+
+if [ $DOANALYSISPbPb_ROOFIT_BINNED_PT_BS_TRK -eq 1  ]; then
+    cut_trk_tight="(track>1)"
+    root -b  -q 'roofitB.C('0','\"ntphi\"','0','1','0', \
+'\"$INPUTDATAPbPbCANDWISE_BS\"', \
+'\"$INPUTMCPbPbCANDWISE_BS\"','\"Bpt\"', \
+'\"$TRGPbPb\"','\"$cut_trk_tight\"','\"$SELGENPbPb\"', \
+'$ISMCPbPb','1','$ISDOWEIGHTPbPb', \
+'\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_PT_trk\"', \
+'\"results/Bs/trk_tight_roofit\"','\"$NPROOFIT_PbPb\"', \
+'0')' |& tee binned_pt_trk.log
 fi
 
 if [ $DOANALYSISPbPb_ROOFIT_BINNED_Y_BS  -eq 1  ]; then

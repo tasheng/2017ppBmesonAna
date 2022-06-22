@@ -4,7 +4,7 @@
 #include "parametersNew.h"
 #include "TSystem.h"
 
-int syst=1;
+int syst=0;
 
 TTree* makeTTree(TTree* intree, TString treeTitle) 
 {
@@ -65,23 +65,23 @@ cout << endl << endl;
 /*	if(varExp=="nMult"){
 		if(full==0) {
 			nBins_check = nBins_Mult;
-			ptBins_check = MultBins;
+			_ptBins = MultBins;
 			_nBins = nBins_Mult;
 			_ptBins = MultBins;
 		}
 		else if(full==1){
 			nBins_check = nBins_full;
-			ptBins_check = nMults_full;
+			_ptBins = nMults_full;
 		}
 	}
 	else if(varExp=="abs(By)"){
 		if(full==0) {
 			nBins_check = nBinsY;
-			ptBins_check = ptBinsY;
+			_ptBins = ptBinsY;
 		}
 		else if(full==1){
 			nBins_check = nBins_full;
-			ptBins_check = hiBins_full;
+			_ptBins = hiBins_full;
 		}
 
 	}*/
@@ -109,11 +109,11 @@ cout << endl << endl;
 	else
 	{
 		std::cout<<"DEBUG 4 else"<<std::endl;
-		seldata = Form("%s&&%s&&Bsize>0",trgselection.Data(),cut.Data());
+		seldata = Form("%s&&%s",trgselection.Data(),cut.Data());
 		std::cout<<"DEBUG 5"<<std::endl;
-		selmc = Form("%s&&Bsize>0",cut.Data());
+		selmc = Form("%s",cut.Data());
 		std::cout<<"DEBUG 6"<<std::endl;
-		selmcgen = Form("%s&&Bsize>0",cutmcgen.Data());
+		selmcgen = Form("%s",cutmcgen.Data());
 		std::cout<<"DEBUG 7"<<std::endl;
 		std::cout<<"cut = "<<cut<<std::endl;
 		std::cout<<"seldata= "<<seldata<<std::endl;
@@ -227,7 +227,8 @@ cout << endl << endl;
 	RooRealVar* y = new RooRealVar("By","By",-2.4, 2.4);
 //	RooRealVar* HiBin = new RooRealVar("hiBinNew","hiBinNew",0.,90.*2);
 	RooRealVar* nMult = new RooRealVar("nMult","nMult",0,200);
-//	RooRealVar* w = new RooRealVar("pthatweightNew","pthatweightNew",0.,12.) ;
+	RooRealVar* trackSelection = new RooRealVar("track", "track", 0, 5);
+//	RooRealVar* w = new RooRealVar("Pthatweight","Pthatweight",0.,12.) ;
 	RooDataSet* ds = new RooDataSet();
 	RooDataSet* dsMC = new RooDataSet();   
 	std::cout<<"Created dataset"<<std::endl;
@@ -269,8 +270,10 @@ cout << endl << endl;
 	TFile* outf = new TFile(outputf.Data(),"recreate");
 	outf->cd();
 
-	ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new, RooArgSet(*mass, *pt, *y, *nMult));
-	dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,RooArgSet(*mass, *pt, *y, *nMult));
+	ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new,
+                      RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
+	dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,
+                        RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
 	//    TString ptbinning;
 
 	std::vector<std::string> background = {"1st", "2nd","mass_range"};
@@ -307,13 +310,18 @@ cout << endl << endl;
 		//			ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new, RooArgSet(*mass, *pt));
 		//      return;
 		RooDataSet* ds_cut;
-		//if(doubly==0) ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y, *BDT_pt_5_10, *BDT_pt_10_15, *BDT_pt_15_20,*BDT_pt_20_50), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f&&(Bpt > 5 &&  Bpt < 10 && BDT_pt_5_10_New > 0.10)&&(Bpt > 10 &&  Bpt < 15 && BDT_pt_10_15_New > 0.10)&&(Bpt > 15 &&  Bpt < 20 && BDT_pt_15_20_New > 0.10)&&(Bpt > 20 &&  Bpt < 50 && BDT_pt_20_50_New > 0.10)",varExp.Data(),_ptBins[i],varExp.Data(),_ptBinsk[i+1],minhisto, maxhisto));
-
-
-
-		if(doubly==0) ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y),Form("(Bpt>%f && Bpt < %f)&&((Bpt < 10 && abs(By) >1.5) || (Bpt>10))",_ptBins[i], _ptBins[i+1])); 
+		if(doubly==0) {
+      ds_cut =
+        new RooDataSet(Form("ds_cut%d",_count),"",ds,
+                       RooArgSet(*mass, *pt, *y, *trackSelection),
+                       Form("(Bpt>%f && Bpt < %f)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))",_ptBins[i] , _ptBins[i+1]));
+    }
 		if(doubly==1)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y, *nMult), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto)); 
 		if(doubly==2)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto)); 
+
+
+
+
 
 		//  RooRealVar* w = (RooRealVar*) data->addColumn(wFunc) ;
 		//      RooDataSet wdata(data->GetName(),data->GetTitle(),data,*data->get(),0,w->GetName()) ;
@@ -321,14 +329,28 @@ cout << endl << endl;
 
 
 		RooDataSet* dsMC_cut;
-		if(doubly==0) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt,  *y), Form("(%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto));
-//		if(doubly==1) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto), "1"); 
+		if(doubly==0) {
+      dsMC_cut =
+        new RooDataSet(Form("dsMC_cut%d",_count), "", dsMC,
+                       RooArgSet(*mass, *pt, *y, *trackSelection), Form("(%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto));
+
+    }
 
 		if(doubly==1) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y, *nMult), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto), "1"); 
 		if(doubly==2) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt,  *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto), "1"); 
 
 
-		// create RooDataHist
+    // Apply track selection cut
+    std::cout << "data entries: " << ds_cut->sumEntries() << "\n";
+    std::cout << "MC entries: " << dsMC_cut->sumEntries() << "\n";
+    ds_cut = (RooDataSet*) ds_cut->reduce(seldata);
+    dsMC_cut = (RooDataSet*) dsMC_cut->reduce(selmc);
+    std::cout << "data entries: " << ds_cut->sumEntries() << "\n";
+    std::cout << "MC entries: " << dsMC_cut->sumEntries() << "\n";
+
+		std::cout<<"Really created datasets"<<std::endl;
+				// create RooDataHist
+		
 		h = new TH1D(Form("h%d",_count),"",nbinsmasshisto,minhisto,maxhisto);
 		hMC = new TH1D(Form("hMC%d",_count),"",nbinsmasshisto,minhisto,maxhisto);
 		if(isMC==1) skimtree_new->Project(Form("h%d",_count),"Bmass",Form("%s*(%s&&%s>%f&&%s<%f && BgenNew == 23333)*(1/%s)",weightmc.Data(),seldata.Data(),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],weightdata.Data()));
