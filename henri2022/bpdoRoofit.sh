@@ -44,7 +44,7 @@ TRGPbPb="(Bpt>0)"
 TRGPbPbMC="(Bpt>0)"
 echo "TRGPbPb="$TRGPbPb
 
-mkdir ROOTfiles/
+mkdir -p ROOTfiles/
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_FULL="ROOTfiles/yields_Bp_full.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_Y="ROOTfiles/yields_Bp_binned_y.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT="ROOTfiles/yields_Bp_binned_pt.root"
