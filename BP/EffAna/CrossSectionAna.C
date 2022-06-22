@@ -700,11 +700,12 @@ void CrossSectionAna(int DoTnP){
 
 		//TnP Syst DONE//
 
-	TFile * RawYield = new TFile("../RawYieldFits/ROOTfiles/yields_Bp_binned_pt.root");
+  TString fYield = "../../henri2022/ROOTfiles/yields_Bp_binned_pt.root";
+	TFile * RawYield = new TFile(fYield);
 	RawYield->cd();
 	TH1D * hPt = (TH1D *) RawYield->Get("hPt");
 
-	TFile * RawYieldTight = new TFile("../RawYieldFits/ROOTfiles/yields_Bp_binned_pt_trk.root");
+	TFile * RawYieldTight = new TFile(TString(fYield(0, fYield.Length() - 5)) + "_trk.root");
 	TH1D * hPtTight = (TH1D *) RawYieldTight->Get("hPt");
 
 
