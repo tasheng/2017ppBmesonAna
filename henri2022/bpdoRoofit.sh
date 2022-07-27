@@ -5,19 +5,13 @@
 
 DOANALYSISPbPb_ROOFIT_FULL_BP=0
 DOANALYSISPbPb_ROOFIT_BINNED_PT_BP=0
-DOANALYSISPbPb_ROOFIT_BINNED_PT_BP_TRK=1
-DOANALYSISPbPb_ROOFIT_BINNED_Y_BP=0
+DOANALYSISPbPb_ROOFIT_BINNED_PT_BP_TRK=0
+DOANALYSISPbPb_ROOFIT_BINNED_Y_BP=1
 DOANALYSISPbPb_ROOFIT_BINNED_MULTI_BP=0
 
 
-#INPUTMCPbPbCANDWISE_BP="../../SkimmedSamples/BPMC.root"
-
-#INPUTMCPbPbCANDWISE_BP="../../SkimmedSamples/OfficialMC/BPMC.root"
-#INPUTDATAPbPbCANDWISE_BP="../../SkimmedSamples/BPData.root"
-
-
-INPUTMCPbPbCANDWISE_BP="../CutSkim/BPMC.root"
-INPUTDATAPbPbCANDWISE_BP="../CutSkim/BPData.root"
+INPUTMCPbPbCANDWISE_BP="~/trk5/BPMC.root"
+INPUTDATAPbPbCANDWISE_BP="~/trk5/BPData.root"
 
 #LUMIPbPb=13.1983052423 #paper 20170227
 LUMIPbPb=56.564165324
@@ -84,7 +78,7 @@ fi
 
 
 if [ $DOANALYSISPbPb_ROOFIT_BINNED_Y_BP  -eq 1  ]; then
-root -b  -q 'roofitB.C+('1','\"ntKp\"','0','1','0','\"$INPUTDATAPbPbCANDWISE_BP\"','\"$INPUTMCPbPbCANDWISE_BP\"','\"abs\(By\)\"','\"$TRGPbPb\"','\"$CUTPbPb\"','\"$SELGENPbPb\"','$ISMCPbPb','1','$ISDOWEIGHTPbPb','\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_Y\"','\"results/BP/By\"','\"$NPROOFIT_PbPb_BP\"','0')'
+root -b  -q 'roofitB.C+('1','\"ntKp\"','0','1','0','\"$INPUTDATAPbPbCANDWISE_BP\"','\"$INPUTMCPbPbCANDWISE_BP\"','\"By\"','\"$TRGPbPb\"','\"$CUTPbPb\"','\"$SELGENPbPb\"','$ISMCPbPb','1','$ISDOWEIGHTPbPb','\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_Y\"','\"results/BP/By\"','\"$NPROOFIT_PbPb_BP\"','0')'
 
 rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
 fi
