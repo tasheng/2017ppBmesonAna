@@ -20,6 +20,16 @@ bpYield () {
     popd
 }
 
+yield () {
+    ## yield extraction
+    pushd henri2022
+    # roofitB.C contains 2 By cuts
+    bash bpdoRoofit.sh &
+    bash bsdoRoofit.sh &
+    wait
+    popd
+}
+
 bpEff () {
     ## eff correction (2d map)
     # this is everything from yield to syst, other than MC syst

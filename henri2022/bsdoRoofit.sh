@@ -8,8 +8,10 @@ DOANALYSISPbPb_ROOFIT_FULL_BS=0
 #INPUTDATAPbPbCANDWISE_BS="../../SkimmedSamples/BsData.root"
 #INPUTMCPbPbCANDWISE_BS="../../SkimmedSamples/OfficialMC/BsMC.root"
 
-INPUTDATAPbPbCANDWISE_BS="~/forHenrique/trk5/BsData.root"
-INPUTMCPbPbCANDWISE_BS="~/forHenrique/trk5/BsMC.root"
+# INPUTDATAPbPbCANDWISE_BS="~/forHenrique/trk5/BsData.root"
+# INPUTMCPbPbCANDWISE_BS="~/forHenrique/trk5/BsMC.root"
+INPUTDATAPbPbCANDWISE_BS="../CutSkim/BsData.root"
+INPUTMCPbPbCANDWISE_BS="../CutSkim/BsMC.root"
 #INPUTDATAPbPbCANDWISE_BS="/data/szhaozho/ppNewTMVA/CMSSW_10_3_2/src/Bs/NewCut/BsData.root"
 #INPUTMCPbPbCANDWISE_BS="/data/szhaozho/ppNewTMVA/CMSSW_10_3_2/src/Bs/NewCut/BsMC.root"
 
