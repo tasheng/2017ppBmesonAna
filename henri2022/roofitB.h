@@ -94,6 +94,13 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	frameMC->GetXaxis()->SetNdivisions(-50205);
 
 	cMC->cd();
+	TLatex* texB;
+	texB = new TLatex(0.25,0.80, Form("BIN:%f_%f",ptmin,ptmax));
+	texB->SetNDC();
+	texB->SetTextFont(62);
+	texB->SetTextSize(0.065);
+	texB->SetLineWidth(2);
+	texB->Draw();
 	double init_mean;
 	if(tree=="ntphi") init_mean = BS_MASS;
 	if(tree=="ntKp") init_mean = BP_MASS;
@@ -121,7 +128,6 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 
 	RooRealVar sig1fracMC(Form("sig1fracMC%d_%s",_count, pdf.Data()),"", 0.2, 0.001, 0.99);
 	RooRealVar sig2fracMC(Form("sig2fracMC%d_%s",_count, pdf.Data()),"", 0.7, 0.001, 0.99);
-	//RooRealVar sig3fracMC(Form("sig3fracMC%d_%s",_count, pdf.Data()),"",0.5,0.,1.);
 
 	RooRealVar nsigMC(Form("nsigMC%d_%s",_count, pdf.Data()),"",0.5 * dsMC->sumEntries(), 0, 1.2 * dsMC->sumEntries());
 
@@ -189,10 +195,11 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	RooRealVar* m_jpsipi_sigma1l = 0;
   	RooRealVar* m_jpsipi_sigma1r = 0;
 	RooProduct* m_jpsipi_width = 0;
-	RooPolynomial* poly_jpsi = 0;
+	//RooPolynomial* poly_jpsi = 0;
+	RooExponential poly_pjsi;
 
 	meannp = new RooRealVar(Form("meannp%d",_count),"meannp",5.366,5.366-0.1,5.366+0.2);
-   	sigma1np = new RooRealVar(Form("sigma1np%d",_count),"sigma1np",0.02,0.01,0.7);
+   	sigma1np = new RooRealVar(Form("sigma1np%d",_count),"sigma1np",0.02,0.01,0.5);
 	ratio_sigma12np = new RooRealVar(Form("ratio_sigma12np%d",_count),"ratio_sigma12np", 2, 0.01, 10);
 	sigma2np = new RooProduct(Form("sigma2np%d",_count), "sigma2np", RooArgList(*sigma1np, *ratio_sigma12np));
 	cofs_b_np = new RooRealVar(Form("cofs_b_np%d",_count), "cofs_b_np", 0.3, 0., 1.);
@@ -200,11 +207,11 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
   	RooGaussian* signal2_b_np = new RooGaussian(Form("signal2_b_np%d",_count),"signal_gauss2_b_np",*mass,*meannp,*sigma2np); 
 	RooAddPdf* signalnp = new RooAddPdf(Form("signalnp%d",_count), "signalnp", RooArgList(*signal1_b_np,*signal2_b_np),*cofs_b_np);
 
-	m_nonprompt_scale = new RooRealVar(Form("m_nonprompt_scale%d",_count), "m_nonprompt_scale",0.05, 0.02, 0.7);
-  	m_nonprompt_shift = new RooRealVar(Form("m_nonprompt_shift%d",_count), "m_nonprompt_shift", 5.14425, 5.1, 5.4);
+	m_nonprompt_scale = new RooRealVar(Form("m_nonprompt_scale%d",_count), "m_nonprompt_scale",0.04, 0.02, 0.065);
+  	m_nonprompt_shift = new RooRealVar(Form("m_nonprompt_shift%d",_count), "m_nonprompt_shift", 5.13425, 5.1, 5.25);
 	RooGenericPdf erf (Form("erf%d",_count), "erf", Form("TMath::Erfc((Bmass-m_nonprompt_shift%d)/m_nonprompt_scale%d)",_count,_count), RooArgList(*mass, *m_nonprompt_scale, *m_nonprompt_shift));
 	
-	m_jpsipi_fraction2 = new RooRealVar(Form("m_jpsipi_fraction2%d",_count),"m_jpsipi_fraction2",0.234646,0.0,1.0);
+	m_jpsipi_fraction2 = new RooRealVar(Form("m_jpsipi_fraction2%d",_count),"m_jpsipi_fraction2",0.234646,0.0,0.8);
 	m_jpsipi_mean1 = new RooRealVar(Form("m_jpsipi_mean1%d",_count),"m_jpsipi_mean1",5.2, 5.3, 5.5);
 	RooRealVar jpsipi_to_signal_width_ratio(Form("jpsipi_to_signal_width_ratio%d",_count), "jpsipi_to_signal_width_ratio", 1 / sigma1np->getVal());
 	RooRealVar jpsipi_to_signal_ratio(Form("jpsipi_to_signal_ratio%d",_count), "jpsipi_to_signal_ratio",0.05, 0, 1);
@@ -222,14 +229,20 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	RooBifurGauss m_jpsipi_gaussian1(Form("m_jpsipi_gaussian1%d",_count), "m_jpsipi_gaussian1", *mass,*m_jpsipi_mean1, jpsipi_sigma1l, jpsipi_sigma1r);
 	RooAddPdf* jpsipi = new RooAddPdf(Form("jpsipi%d",_count), "jpsipi", RooArgList(m_jpsipi_gaussian2, m_jpsipi_gaussian1), RooArgList(*m_jpsipi_fraction2));
 
-  	RooRealVar *np_p1; 
-	np_p1 = new RooRealVar(Form("np_p1%d",_count),"np_p1", -0.15, -1000., 1000.);
-	poly_jpsi = new RooPolynomial(Form("poly_jpsi%d",_count), "poly_jpsi", *mass, RooArgList(*np_p1));
+	// COmb. Bckg of inclusive MC
+  	RooRealVar*np_p1; 
+	//np_p1 = new RooRealVar(Form("np_p1%d",_count),"np_p1", -0.15, -1000., 1000.);
+	//poly_jpsi = new RooPolynomial(Form("poly_jpsi%d",_count), "poly_jpsi", *mass, RooArgList(*np_p1));
+	
+	if (ptmin==50){ 
+		np_p1 = new RooRealVar(Form("np_p1%d", _count), "np_p1",-0.1, -2, -0.05);}
+	else{np_p1 = new RooRealVar(Form("np_p1%d", _count), "np_p1",-0.6, -3., 1.);}
+	RooExponential poly_jpsi(Form("poly_jpsi%d",_count),"poly_jpsi",*mass, *np_p1);
 
-  	RooRealVar jpsinp_poly_fraction(Form("jpsinp_poly_fraction%d",_count), "fraction", 0.8, 0.2, 2);
+  	RooRealVar jpsinp_poly_fraction(Form("jpsinp_poly_fraction%d",_count), "fraction", 0.35, 0.2, 1);
   	// fraction of B+ -> J/psi pi+ in the NP
   	
-  	RooAddPdf model_jpsinp_cont(Form("m_jpsinp_cont%d",_count), "model for jpsi nonprompt bg", RooArgList(*poly_jpsi, erf), RooArgList(jpsinp_poly_fraction));
+  	RooAddPdf model_jpsinp_cont(Form("m_jpsinp_cont%d",_count), "model for jpsi nonprompt bg", RooArgList(poly_jpsi, erf), RooArgList(jpsinp_poly_fraction));
   	
 	w.import(*signalnp);
 	w.import(model_jpsinp_cont);
@@ -740,7 +753,7 @@ void fit_jpsinp(RooWorkspace& w, Double_t pta, Double_t ptb, bool includeSignal)
   plot_mcfit(w, &jpsipi_ext, ds_jpsipi, jpsipiPlot2, "NP gen-matched B^{+} #rightarrow J/#psi #pi^{+}",
              RooFit::Name("MCFit"), NormRange("bjpsipi"), LineColor(kRed), LineStyle(1), LineWidth(2));
 
-  if(pti == 5 || pti == 30 || pti == 60){sigma1_np->setVal(0.019);}  // some fits are not very trustable to lear the width ...
+  if(pti == 5 || pti == 30 || pti == 60){sigma1_np->setVal(0.019);}  // some fits are not very trustable to learn the width ...
 
   double  jpsipi_width_val = sigma1_np->getVal() / jpsipi_width_allpt;  
 	
@@ -755,6 +768,7 @@ void fit_jpsinp(RooWorkspace& w, Double_t pta, Double_t ptb, bool includeSignal)
   fix_parameters(w, cont_par_list);
   if (!includeSignal) {return;}
 
+  // NP background fit with no B+ or J/psi pi component
   // Fit pure signal
   Bmass.setRange("bmc", 5.18, 5.38);
   RooExtendPdf signal_ext("signal_ext", "extended signal pdf", *signalnp, n_signal);
