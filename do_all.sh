@@ -11,6 +11,13 @@ maketnp () {
 
 # new bpt reweighting uses FONLL and doesn't depend on acceptance
 # function >> MCEff.C
+bptshape () {
+    pushd NewBptStudies
+    root -q -b -l ReweightBpt.C'(0)' &
+    root -q -b -l ReweightBpt.C'(1)' &
+    python ReweightY.py &
+    wait
+}
 
 bpYield () {
     ## yield extraction
@@ -137,8 +144,9 @@ paperPlots () {
 }
 # maketnp
 
-# bpYield &
-# bsYield &
+# bptshape
+
+# yield
 # wait
 
 # bpEff &
