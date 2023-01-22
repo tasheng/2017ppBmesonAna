@@ -178,8 +178,7 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	// FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp
 
 	/*Fit the non-prompt J/psi MC sample
-   	The shapes of erf, signal and J/psi pi peak are determined
-   	by their individual components.
+   	The shapes of erfc, signal and J/psi pi peak are determined
    	The relative yields and widths between signal and J/psi pi are fixed
    	during successive fits*/
 
@@ -194,15 +193,15 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	RooRealVar* m_jpsipi_mean1 = 0;
 	RooRealVar* m_jpsipi_sigma1l = 0;
   	RooRealVar* m_jpsipi_sigma1r = 0;
-	RooProduct* m_jpsipi_width = 0;
-	//RooPolynomial* poly_jpsi = 0;
+	RooRealVar* np_p1; 
 	RooExponential poly_pjsi;
-
+	
 	meannp = new RooRealVar(Form("meannp%d",_count),"meannp",5.366,5.366-0.1,5.366+0.2);
-   	sigma1np = new RooRealVar(Form("sigma1np%d",_count),"sigma1np",0.02,0.01,0.5);
-	ratio_sigma12np = new RooRealVar(Form("ratio_sigma12np%d",_count),"ratio_sigma12np", 2, 0.01, 10);
+   	sigma1np = new RooRealVar(Form("sigma1np%d",_count),"sigma1np",0.015,0.01,0.03);
+	ratio_sigma12np = new RooRealVar(Form("ratio_sigma12np%d",_count),"ratio_sigma12np", 2.4, 0.5, 5);
 	sigma2np = new RooProduct(Form("sigma2np%d",_count), "sigma2np", RooArgList(*sigma1np, *ratio_sigma12np));
-	cofs_b_np = new RooRealVar(Form("cofs_b_np%d",_count), "cofs_b_np", 0.3, 0., 1.);
+	cofs_b_np = new RooRealVar(Form("cofs_b_np%d",_count), "cofs_b_np", 0.5, 0., 1.);
+
   	RooGaussian* signal1_b_np = new RooGaussian(Form("signal1_b_np%d",_count),"signal_gauss1_b_np",*mass,*meannp,*sigma1np);
   	RooGaussian* signal2_b_np = new RooGaussian(Form("signal2_b_np%d",_count),"signal_gauss2_b_np",*mass,*meannp,*sigma2np); 
 	RooAddPdf* signalnp = new RooAddPdf(Form("signalnp%d",_count), "signalnp", RooArgList(*signal1_b_np,*signal2_b_np),*cofs_b_np);
@@ -213,27 +212,17 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	
 	m_jpsipi_fraction2 = new RooRealVar(Form("m_jpsipi_fraction2%d",_count),"m_jpsipi_fraction2",0.234646,0.0,0.8);
 	m_jpsipi_mean1 = new RooRealVar(Form("m_jpsipi_mean1%d",_count),"m_jpsipi_mean1",5.2, 5.3, 5.5);
-	RooRealVar jpsipi_to_signal_width_ratio(Form("jpsipi_to_signal_width_ratio%d",_count), "jpsipi_to_signal_width_ratio", 1 / sigma1np->getVal());
 	RooRealVar jpsipi_to_signal_ratio(Form("jpsipi_to_signal_ratio%d",_count), "jpsipi_to_signal_ratio",0.05, 0, 1);
 
-	m_jpsipi_width = new RooProduct(Form("m_jpsipi_width%d",_count),"m_jpsipi_width",RooArgList(jpsipi_to_signal_width_ratio, *sigma1np));
 	RooRealVar m_jpsipi_sigma2l(Form("m_jpsipi_sigma2l%d",_count),"m_jpsipi_sigma2l",0.0994712,0.020,0.500);
   	RooRealVar m_jpsipi_sigma2r(Form("m_jpsipi_sigma2r%d",_count),"m_jpsipi_sigma2r",0.0994712,0.020,0.500);
 	m_jpsipi_sigma1l = new RooRealVar(Form("m_jpsipi_sigma1l%d",_count),"m_jpsipi_sigma1l",0.0290762,0.010,0.150);
   	m_jpsipi_sigma1r = new RooRealVar(Form("m_jpsipi_sigma1r%d",_count),"m_jpsipi_sigma1r",0.0652519,0.010,0.350);
-	RooProduct jpsipi_sigma2l(Form("jpsipi_sigma2l%d",_count), "jpsipi_sigma2l",RooArgList(*m_jpsipi_width, m_jpsipi_sigma2l));
-  	RooProduct jpsipi_sigma2r(Form("jpsipi_sigma2r%d",_count), "jpsipi_sigma2r",RooArgList(*m_jpsipi_width, m_jpsipi_sigma2r));
-	RooProduct jpsipi_sigma1l(Form("jpsipi_sigma1l%d",_count), "jpsipi_sigma1l",RooArgList(*m_jpsipi_width, *m_jpsipi_sigma1l));
-  	RooProduct jpsipi_sigma1r(Form("jpsipi_sigma1r%d",_count), "jpsipi_sigma1r",RooArgList(*m_jpsipi_width, *m_jpsipi_sigma1r));
-	RooBifurGauss m_jpsipi_gaussian2(Form("m_jpsipi_gaussian2%d",_count), "m_jpsipi_gaussian2", *mass, *m_jpsipi_mean1, jpsipi_sigma2l, jpsipi_sigma2r);
-	RooBifurGauss m_jpsipi_gaussian1(Form("m_jpsipi_gaussian1%d",_count), "m_jpsipi_gaussian1", *mass,*m_jpsipi_mean1, jpsipi_sigma1l, jpsipi_sigma1r);
+
+	RooBifurGauss m_jpsipi_gaussian2(Form("m_jpsipi_gaussian2%d",_count), "m_jpsipi_gaussian2", *mass, *m_jpsipi_mean1, m_jpsipi_sigma2l, m_jpsipi_sigma2r);
+	RooBifurGauss m_jpsipi_gaussian1(Form("m_jpsipi_gaussian1%d",_count), "m_jpsipi_gaussian1", *mass, *m_jpsipi_mean1, *m_jpsipi_sigma1l, *m_jpsipi_sigma1r);
 	RooAddPdf* jpsipi = new RooAddPdf(Form("jpsipi%d",_count), "jpsipi", RooArgList(m_jpsipi_gaussian2, m_jpsipi_gaussian1), RooArgList(*m_jpsipi_fraction2));
 
-	// COmb. Bckg of inclusive MC
-  	RooRealVar*np_p1; 
-	//np_p1 = new RooRealVar(Form("np_p1%d",_count),"np_p1", -0.15, -1000., 1000.);
-	//poly_jpsi = new RooPolynomial(Form("poly_jpsi%d",_count), "poly_jpsi", *mass, RooArgList(*np_p1));
-	
 	if (ptmin==50){ 
 		np_p1 = new RooRealVar(Form("np_p1%d", _count), "np_p1",-0.1, -2, -0.05);}
 	else{np_p1 = new RooRealVar(Form("np_p1%d", _count), "np_p1",-0.6, -3., 1.);}
@@ -247,7 +236,6 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	w.import(*signalnp);
 	w.import(model_jpsinp_cont);
   	w.import(*jpsipi);
-	w.import(jpsipi_to_signal_width_ratio);
 	w.import(jpsipi_to_signal_ratio);
 
 	if(npfit != "1" && variation=="" && pdf==""){
@@ -337,7 +325,6 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
     m_nonprompt_shift->setConstant();
 
     m_jpsipi_mean1->setVal(w.var(Form("m_jpsipi_mean1%d",_count))->getVal());
-	jpsipi_to_signal_width_ratio.setVal(w.var(Form("jpsipi_to_signal_width_ratio%d",_count))->getVal());
 	jpsipi_to_signal_ratio.setVal(w.var(Form("jpsipi_to_signal_ratio%d",_count))->getVal());
 	m_jpsipi_sigma2l.setVal(w.var(Form("m_jpsipi_sigma2l%d",_count))->getVal());
 	m_jpsipi_sigma2r.setVal(w.var(Form("m_jpsipi_sigma2r%d",_count))->getVal());
@@ -345,7 +332,6 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	m_jpsipi_sigma1r->setVal(w.var(Form("m_jpsipi_sigma1r%d",_count))->getVal());
 	m_jpsipi_fraction2->setVal(w.var(Form("m_jpsipi_fraction2%d",_count))->getVal());
 	m_jpsipi_mean1->setConstant();
-	jpsipi_to_signal_width_ratio.setConstant();
 	jpsipi_to_signal_ratio.setConstant();
 	m_jpsipi_sigma2l.setConstant();
 	m_jpsipi_sigma2r.setConstant();
@@ -659,6 +645,13 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	return fitResult;
 }
 
+
+
+
+
+
+
+
 void fit_jpsinp(RooWorkspace& w, Double_t pta, Double_t ptb, bool includeSignal) {
  
   	int pti = pta;
@@ -724,10 +717,7 @@ void fit_jpsinp(RooWorkspace& w, Double_t pta, Double_t ptb, bool includeSignal)
   RooRealVar n_jpsipi_ext(Form("n_jpsipi_ext%d",_count), "n_jpsipi_ext", 0.1 * n_signal.getVal() , 0., (d_s->sumEntries())*2);
   w.import(n_jpsipi_ext);
   RooExtendPdf jpsipi_ext(Form("jpsipi_ext%d",_count), "extended jpsipi", *jpsipi, n_jpsipi_ext);
-   
-  // The width of jpsi pi is a constant relative to that of the signal's
-  sigma1_np->setConstant();
-  
+     
 // FITFITFIT
   Bmass.setRange("bjpsipi", 5.22, 5.8);
   auto jpsipi_result = jpsipi_ext.fitTo(*ds_jpsipi, Range("bjpsipi"), Save(), Extended());
@@ -740,7 +730,6 @@ void fit_jpsinp(RooWorkspace& w, Double_t pta, Double_t ptb, bool includeSignal)
   // fix the shape
   fix_parameters(w, jpsipi_par_list);
   double jpsipi_width_allpt = sigma1_np->getVal();
-  sigma1_np->setConstant(false);
 
   // jpsi pi fit with pT selection
   ds_jpsipi = (RooDataSet*) d_s->reduce("Bgen == 23335");
@@ -750,13 +739,10 @@ void fit_jpsinp(RooWorkspace& w, Double_t pta, Double_t ptb, bool includeSignal)
   jpsipi_result = jpsipi_ext.fitTo(*ds_jpsipi, Range("bjpsipi_narrow"), Save(), Extended());
   jpsipi_par_list = jpsipi_result->floatParsFinal();
 // FITFITFIT
+
   plot_mcfit(w, &jpsipi_ext, ds_jpsipi, jpsipiPlot2, "NP gen-matched B^{+} #rightarrow J/#psi #pi^{+}",
-             RooFit::Name("MCFit"), NormRange("bjpsipi"), LineColor(kRed), LineStyle(1), LineWidth(2));
+            RooFit::Name("MCFit"), NormRange("bjpsipi"), LineColor(kRed), LineStyle(1), LineWidth(2));
 
-  if(pti == 5 || pti == 30 || pti == 60){sigma1_np->setVal(0.019);}  // some fits are not very trustable to learn the width ...
-
-  double  jpsipi_width_val = sigma1_np->getVal() / jpsipi_width_allpt;  
-	
   // NP background fit with no B+ or J/psi pi component
   // FITFITFIT
   auto cont_result = model_cont->fitTo(*ds_cont, Save());
@@ -791,11 +777,7 @@ void fit_jpsinp(RooWorkspace& w, Double_t pta, Double_t ptb, bool includeSignal)
   jpsipi_to_signal_ratio->setConstant();
 
   RooProduct* n_jpsipi = new RooProduct(Form("n_jpsipi_by_signal%d",_count), "number of jpsis pi with fixed ratio to n_signal", RooArgList(n_signal, *jpsipi_to_signal_ratio));
-
-  // Fix the width of jpsipi
-  RooRealVar* jpsipi_to_signal_width_ratio = w.var(Form("jpsipi_to_signal_width_ratio%d",_count));   
-  jpsipi_to_signal_width_ratio->setVal(jpsipi_width_val / sigma1_np->getVal());
-
+  
   // include signal pdf
   RooAddPdf* model_inclusive = new RooAddPdf(Form("np_signal%d",_count), "NP with B+", RooArgList(*signalnp, *jpsipi, *erf, *poly), RooArgList(n_signal, *n_jpsipi, n_erf, n_cont));
 
