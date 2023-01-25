@@ -9,28 +9,11 @@
 #include "TMultiGraph.h"
 #include "TGraphErrors.h"
 
-// PDF VARIATION FOR SYST STUDIES
-int syst=1;
+void read_samples(RooWorkspace& w, std::vector<TString>, TString fName, TString treeName, TString sample);
 
-TTree* makeTTree(TTree* intree, TString treeTitle) 
-{
-	TTree* outtree = new TTree(treeTitle.Data(),treeTitle.Data());
-	float mass;
-	outtree->Branch("mass",&mass,"mass/F") ;
-	int Bsize;
-	float Bmass[20000];
-	intree->SetBranchAddress("Bsize",&Bsize);
-	intree->SetBranchAddress("Bmass",Bmass);
-	int nentries = intree->GetEntries();
-	for(int n=0; n<nentries; n++){
-		intree->GetEntry(n);
-		for(int b=0; b<Bsize; b++){
-			mass = Bmass[b];
-			outtree->Fill();
-		}
-	}
-	return outtree ;
-}
+// PDF VARIATION FOR SYST STUDIES
+int syst_study=1;
+
 
 void roofitB(int doubly = 0, TString tree = "ntphi", int full = 0, int usePbPb = 0, int fitOnSaved = 0, TString inputdata = "", TString inputmc = "", TString varExp = "", TString trgselection = "",  TString cut = "", TString cutmcgen = "", int isMC = 0, Double_t luminosity = 1., int doweight = 1, TString outputfile = "", TString outplotf = "", TString npfit = "", int doDataCor = 0){ 
 
@@ -55,7 +38,6 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 0, int usePbPb =
 		else if(tree=="ntKp"){ _nBins = nptBinsBP;}
 		//else if(tree=="ntKp"){ _nBins = nptBinsBP_test;}
 		}
-	
 	} else if(varExp == "By"){
 		if(full == 1){_nBins = 1;}
 		else if(full == 0){ cout << "bins?" << nyBins_both << endl;
@@ -71,14 +53,14 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 0, int usePbPb =
 
 	if(varExp == "Bpt"){ 
 	if(full == 1){
-                if(tree=="ntphi"){for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBins_full[c];}}
-				else if(tree=="ntKp"){for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBins_fullBP[c];}}
+            if(tree=="ntphi"){for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBins_full[c];}}
+			else if(tree=="ntKp"){for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptBins_fullBP[c];}}
 	}else if(full == 0) {
 		if(tree=="ntphi"){for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptbinsvec[c];}}
 		//if(tree=="ntphi"){for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptbinsvec_test[c];}}
 		else if(tree=="ntKp"){for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptbinsvecBP[c];}}
 		//else if(tree=="ntKp"){for( int c=0; c<_nBins+1; c++){_ptBins[c]=ptbinsvecBP_test[c];}}
-	                     }
+	                    }
 	} else if(varExp == "By"){
 		if(full == 0){
 			for(int c=0; c<_nBins+1; c++){_ptBins[c]=ybinsvec[c];}
@@ -129,7 +111,6 @@ cout << endl << endl;
 		_ptBins = ptBinsY;
 		}*/
 	
-
 	if (!(usePbPb==1||usePbPb==0)) std::cout<<"ERROR!!, you are using a non valid isPbPb option"<<std::endl;
 	bool isPbPb=(bool)(usePbPb);
 
@@ -174,7 +155,6 @@ cout << endl << endl;
 	TFile* infMC = new TFile(inputmc.Data());
 	std::cout<<"MC file: "<<inputmc.Data()<<std::endl;
 	TTree* skimtreeMC_new = (TTree*)infMC->Get(tree);
-	//TTree* skimtreeMC_new =skimtreeMC->CloneTree();
 
 	TH1D* h;
 	TH1D* hMC;
@@ -211,7 +191,6 @@ cout << endl << endl;
 		ws->import(BDT_pt_50_60);
 
 	RooRealVar* trackSelection = new RooRealVar("track", "track", 0, 5);
-//	RooRealVar* w = new RooRealVar("Pthatweight","Pthatweight",0.,12.) ;
 	RooDataSet* ds = new RooDataSet();
 	RooDataSet* dsMC = new RooDataSet();   
 	std::cout<<"Created dataset"<<std::endl;
@@ -238,22 +217,18 @@ cout << endl << endl;
 	TString _isMC = "data";
 	if(isMC) _isMC = "mcAsData";
 	TString _isPbPb = "pp";
-	TString _postfix = "";
-	if(weightdata!="1") _postfix = "_EFFCOR";
 
-
-	std::cout<<"Passed AddFriends"<<std::endl;
 	TString outputf;
 	outputf = Form("%s",outputfile.Data());
-	std::cout<<"Formed outputf "<<outputf<<std::endl;
 	TFile* outf = new TFile(outputf.Data(),"recreate");
 	outf->cd();
 	dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
 	ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new,RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
-	//    TString ptbinning;
 
+	//MODELS MODELS for syst studies
 	std::vector<std::string> background = {"1st", "2nd","mass_range"};
 	std::vector<std::string> signal = {"3gauss", "fixed", "gauss_cb"};
+	//MODELS MODELS for syst studies
 	
 	std::vector<std::vector<double>> background_syst;
 	std::vector<std::vector<double>> signal_syst;
@@ -261,6 +236,7 @@ cout << endl << endl;
 	std::vector<double> nominal_yields;
 	std::vector<std::vector<double>> back_syst_rel_values;
 	std::vector<std::vector<double>> sig_syst_rel_values;
+	std::vector<std::vector<double>> stat_error;
 
 	double yield_vec[_nBins];
 	double yield_vec_err_low[_nBins];
@@ -268,8 +244,6 @@ cout << endl << endl;
 	double scale_vec[_nBins];
 	double scale_vec_err_low[_nBins];
 	double scale_vec_err_high[_nBins];
-
-	//////////// work in progress
 	double resol_vec[_nBins];
 	double resol_vec_err_low[_nBins];
 	double resol_vec_err_high[_nBins];
@@ -278,16 +252,120 @@ cout << endl << endl;
 	double var_mean_av[_nBins];
 	double hori_av_low[_nBins];
 	double hori_av_high[_nBins];
-	////////////
 
-	std::vector<std::vector<double>> stat_error;
+	
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp
+	//Fit the J/psi pi MC sample
+   	//The shapes of J/psi pi peak is determined
+	if(npfit != "1"){
+
+		RooRealVar* m_jpsipi_fraction2 = 0;
+		RooRealVar* m_jpsipi_mean1 = 0;
+		RooRealVar* m_jpsipi_sigma1l = 0;
+		RooRealVar* m_jpsipi_sigma1r = 0;
+
+		m_jpsipi_fraction2 = new RooRealVar("m_jpsipi_fraction2","m_jpsipi_fraction2",0.234646,0.0,0.8);
+		m_jpsipi_mean1 = new RooRealVar("m_jpsipi_mean1","m_jpsipi_mean1",5.2, 5.3, 5.5);
+		RooRealVar m_jpsipi_sigma2l("m_jpsipi_sigma2l","m_jpsipi_sigma2l",0.0994712,0.020,0.500);
+		RooRealVar m_jpsipi_sigma2r("m_jpsipi_sigma2r","m_jpsipi_sigma2r",0.0994712,0.020,0.500);
+		m_jpsipi_sigma1l = new RooRealVar("m_jpsipi_sigma1l","m_jpsipi_sigma1l",0.0290762,0.010,0.150);
+		m_jpsipi_sigma1r = new RooRealVar("m_jpsipi_sigma1r","m_jpsipi_sigma1r",0.0652519,0.010,0.350);
+		RooBifurGauss m_jpsipi_gaussian2("m_jpsipi_gaussian2", "m_jpsipi_gaussian2", *mass, *m_jpsipi_mean1, m_jpsipi_sigma2l, m_jpsipi_sigma2r);
+		RooBifurGauss m_jpsipi_gaussian1("m_jpsipi_gaussian1", "m_jpsipi_gaussian1", *mass, *m_jpsipi_mean1, *m_jpsipi_sigma1l, *m_jpsipi_sigma1r);
+		RooAddPdf* jpsipi = new RooAddPdf("jpsipi", "jpsipi", RooArgList(m_jpsipi_gaussian2, m_jpsipi_gaussian1), RooArgList(*m_jpsipi_fraction2));
+		ws->import(*jpsipi);
+
+	// FORM INCLUSIVE BIN
+	std::vector<TString> jpsi_vars = {"By", "Bpt", "Bgen","BDT_pt_5_7", "BDT_pt_7_10", "BDT_pt_10_15","BDT_pt_15_20", "BDT_pt_20_50"};
+	//read_samples(*ws, jpsi_vars, "/data3/hlegoinha/data/jpsinp_inclusive.root", "ntnp", "jpsinp");
+	read_samples(*ws, jpsi_vars, "/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/jpsinp_inclusive.root", "ntnp", "jpsinp");
+	RooDataSet* fullds_shape_fix = (RooDataSet*) ws->data("jpsinp");
+	fullds_shape_fix = (RooDataSet*)fullds_shape_fix->reduce("Bgen == 23335");
+	fullds_shape_fix = (RooDataSet*)fullds_shape_fix->reduce("(BDT_pt_5_7 > 0.08 && Bpt >= 5 && Bpt < 7) || (BDT_pt_7_10 > 0.07 && Bpt >= 7 && Bpt < 10) || (BDT_pt_10_15 > 0.0 && Bpt >= 10 && Bpt < 15) || (BDT_pt_15_20 > 0.02 && Bpt >= 15 && Bpt < 20) || (BDT_pt_20_50 > 0.04 && Bpt >= 20 && Bpt < 50) || (Bpt >= 20 && Bpt < 50) ");
+	fullds_shape_fix = (RooDataSet*)fullds_shape_fix->reduce("(Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10)");
+	// FORM INCLUSIVE BIN
+
+	//[START] FIX SHAPE (J/Psi pi) 
+	RooRealVar n_jpsipi_ext(Form("n_jpsipi_ext%d",_count), "n_jpsipi_ext", 1000 , 0., (fullds_shape_fix->sumEntries())*2);
+	ws->import(n_jpsipi_ext);
+	RooExtendPdf jpsipi_ext(Form("jpsipi_ext%d",_count), "extended jpsipi", *jpsipi, n_jpsipi_ext);
+	
+	// FIT
+	mass->setRange("bjpsipi", 5.22, 5.8);
+	auto jpsipi_result = jpsipi_ext.fitTo(*fullds_shape_fix, Range("bjpsipi"), Save(), Extended());
+	auto jpsipi_par_list = jpsipi_result->floatParsFinal();
+	// FIT
+
+	//PLOT   
+	TCanvas can_mc;
+	can_mc.cd();
+	TPad *p1 = new TPad("p1","p1",0.05,0.05,0.9,0.9);
+	p1->SetBorderMode(1); 
+	p1->SetFrameBorderMode(0); 
+	p1->SetBorderSize(2);
+	p1->SetBottomMargin(0.10);
+	p1->Draw(); 
+	p1->cd();
+	RooPlot* massframe = mass->frame(Title(""));
+	fullds_shape_fix->plotOn(massframe, MarkerSize(0.8));
+	jpsipi_ext.plotOn(massframe, RooFit::Name("MCFit"), NormRange("bjpsipi"), LineColor(kRed), LineStyle(1), LineWidth(2));
+	jpsipi_ext.paramOn(massframe, Layout(0.55, 1, 0.9), "", Format("NEU", AutoPrecision(1)) ) ;
+	massframe->Draw();
+	can_mc.SaveAs("./results/BP/Inclusive_JPsipi_fit.pdf");
+	// PLOT
+
+	//Fix the parameters 
+
+  	for (auto i = 0; i < jpsipi_par_list.getSize(); ++i) {
+    TString name = jpsipi_par_list[i].GetName();
+    RooRealVar* var = ws->var(name);
+    var->setConstant();
+ 			 }
+
+	//[END] FIX SHAPE (J/Psi pi)
+						}
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//BIN ANALYSIS START
+	//BIN ANALYSIS START
 	for(int i=0;i<_nBins;i++)
 	{
 		_count++;
 		TCanvas* c= new TCanvas(Form("c%d",_count),"",600,550);
 		TCanvas* cMC= new TCanvas(Form("cMC%d",_count),"",600,600);
-		
 		
 		RooDataSet* ds_cut;
 
@@ -335,8 +413,6 @@ cout << endl << endl;
 		h = new TH1D(Form("h%d",_count),"",nbinsmasshisto,minhisto,maxhisto);
 		hMC = new TH1D(Form("hMC%d",_count),"",nbinsmasshisto,minhisto,maxhisto);
 	
-		if(isMC==1) skimtree_new->Project(Form("h%d",_count),"Bmass",Form("%s*(%s&&%s>%f&&%s<%f && BgenNew == 23333)*(1/%s)",weightmc.Data(),seldata.Data(),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],weightdata.Data()));
-		else        skimtree_new->Project(Form("h%d",_count),"Bmass",   Form("(%s&&%s>%f&&%s<%f)*(1/%s)",                seldata.Data(),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],weightdata.Data()));
 		skimtreeMC_new->Project(Form("hMC%d",_count),"Bmass",Form("%s*(%s&&%s>%f&&%s<%f)",weightmc.Data(),Form("%s&&BgenNew==23333",selmc.Data()),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1]));
 	
 		dh = new RooDataHist(Form("dh%d",_count),"",*mass,Import(*h));
@@ -385,17 +461,16 @@ cout << endl << endl;
 		printf("yield: %f, yieldErr: %f\n", yield, yieldErr);
 		double _ErrCor=1;
 		yieldErr = yieldErr*_ErrCor;
-
 		yield_vec[i]=yield;
 		yield_vec_err_low[i]=yieldErr;
 		yield_vec_err_high[i]=yieldErr;
-
 		yield_vec[i]=yield_vec[i]/(_ptBins[i+1]-_ptBins[i]);
 		yield_vec_err_low[i]=yield_vec_err_low[i]/(_ptBins[i+1]-_ptBins[i]);
 		yield_vec_err_high[i]=yield_vec_err_high[i]/(_ptBins[i+1]-_ptBins[i]);
 		hori_av_low[i] = var_mean_av[i]-_ptBins[i];
 		hori_av_high[i] = _ptBins[i+1]-var_mean_av[i];
-	
+
+////////////////////////////	
 //Resolution MC
 		std::cout << "sec1sec1sec1" << endl;
 		RooRealVar* sigma1 = static_cast<RooRealVar*>(f->constPars().at(f->constPars().index(Form("sigma1%d", _count))));
@@ -429,7 +504,6 @@ cout << endl << endl;
 		if(fitOnSaved == 0){
 			TH1D* htest = new TH1D(Form("htest%d",_count),"",nbinsmasshisto,minhisto,maxhisto);
 			TString sideband = "(abs(Bmass-5.367)>0.2&&abs(Bmass-5.367)<0.3";
-			//skimtree_new->Project(Form("htest%d",_count),"Bmass",Form("%s&&%s&&%s>%f&&%s<%f)*(1/%s)",sideband.Data(),seldata.Data(),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],weightdata.Data()));
 			std::cout<<"yield bkg sideband: "<<htest->GetEntries()<<std::endl;
 		}
 
@@ -448,6 +522,7 @@ cout << endl << endl;
 			hMean->SetBinContent(i+1,fitMean->getVal());
 			hMean->SetBinError(i+1,fitMean->getError());  
 		}
+	////////////////////////////
 
 		TLatex* tex_pt;
 		TLatex* tex_nMult;
@@ -519,15 +594,6 @@ if(varExp=="nMult"){
 		tex_y->SetLineWidth(2);
 	
 	if (varExp=="Bpt"){
-	
-
-		/*   	if(varExp=="By") tex = new TLatex(0.21,0.72,Form("%.1f < y < %.1f",_ptBins[i],_ptBins[i+1]));
-				tex->SetNDC();
-				tex->SetTextFont(42);
-				tex->SetTextSize(0.045);
-				tex->SetLineWidth(2);
-				tex->Draw();*/
-
 		tex_y1->SetNDC();
 		tex_y1->SetTextFont(42);
 		tex_y1->SetTextSize(0.045);
@@ -571,39 +637,7 @@ if(varExp=="nMult"){
 		lat->DrawLatex(0.64,0.70,Form("Significance: %.1f", real_significance));*/
 
 		c->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_cutY%d_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1], doubly)+tree+".pdf");
-		// c->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_cutY%d_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1], doubly)+tree+".png");
 		cMC->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_cutY%d_",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),varExp.Data(), (int)_ptBins[i], (int)_ptBins[i+1], doubly)+tree+".pdf");
-		// cMC->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_cutY%d_",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),varExp.Data(), (int)_ptBins[i], (int)_ptBins[i+1], doubly)+tree+".png");
-
-	/*	    TH1* h = dh->createHistogram("Bmass");
-				h->GetEntries();
-				h->Sumw2(kFALSE);
-				h->SetBinErrorOption(TH1::kPoisson);roofitB.C
-				TCanvas* cpull= new TCanvas(Form("cpull%d",_count),"",600,600);
-				cpull->cd();
-				TGraphAsymmErrors* pullgraph = new TGraphAsymmErrors();
-				pullgraph->SetTitle("");
-				pullgraph->SetMaximum(5);
-				pullgraph->SetMinimum(-5);
-				pullgraph->SetMarkerSize(1.55); pullgraph->SetMarkerStyle(20); pullgraph->SetLineColor(1); pullgraph->SetLineWidth(4);
-				double x; double xfit; double y; double yfit;
-				double binerr;
-				for(int b = 0; b < h->GetNbinsX(); b++){
-				modelcurve->GetPoint(modelcurve->findPoint(h->GetBinCenter(b+1)),xfit,yfit);
-				binerr = h->GetBinContent(b+1) > yfit ? h->GetBinErrorLow(b+1) : h->GetBinErrorUp(b+1);
-				pullgraph->SetPoint(b,h->GetBinCenter(b+1),(h->GetBinContent(b+1)-yfit)/binerr);
-		//pullgraph->SetPointEYlow(b,h->GetBinErrorLow(b+1)/binerr);
-		//pullgraph->SetPointEYhigh(b,h->GetBinErrorUp(b+1)/binerr);
-		pullgraph->SetPointEYlow(b,1);
-		pullgraph->SetPointEYhigh(b,1);
-		}
-		TLine* line = new TLine(5., 0., 6., 0.);
-		line->SetLineStyle(9);
-		line->SetLineWidth(4);
-		line->SetLineColor(kGreen+1);
-		line->Draw();
-		pullgraph->Draw();
-		cpull->SaveAs(Form("%s%s/%s_%s_%d%s_pull.pdf",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),_count,_postfix.Data()));*/
 
 		RooCurve* modelcurve_back = new RooCurve();
 		std::vector<double> back_variation; 
@@ -616,7 +650,7 @@ if(varExp=="nMult"){
 		double max_back=0.;
 		double full_err=0;
 	
-		if(syst==1){
+		if(syst_study==1){
 
 				for(int j=0; j<background.size(); j++){
 				RooFitResult* f_back = fit("background", background[j], tree, c, cMC, ds_cut, dsMC_cut, dh, mass, frame, _ptBins[i], _ptBins[i+1], isMC, npfit, *ws);
@@ -681,14 +715,13 @@ if(varExp=="nMult"){
 			sig_syst_rel_values.push_back(signal_err);
 			general_syst.push_back(general_err);
 
-				yield_vec_systerr_low[i] = general_err[2] / 100 * yield_vec[i];
-				yield_vec_systerr_high[i] = general_err[2] / 100 * yield_vec[i];
+			yield_vec_systerr_low[i] = general_err[2] / 100 * yield_vec[i];
+			yield_vec_systerr_high[i] = general_err[2] / 100 * yield_vec[i];
 
 		}
 
 	//validate_fit(outputw,1,Form("model%d",_count),Form("nsig%d",_count));
 	}
-
 
 	hMean->Write();
 	hPt->Write();
@@ -700,7 +733,7 @@ if(varExp=="nMult"){
 	std::ofstream myfile;
 	myfile.open (Path + "systematics_" + tree.Data() + ".txt");
 
-	if(syst==1){ 
+	if(syst_study==1){ 
 		for(int i=0; i<_nBins; i++){
 			std::cout<<"pt bin = "<<_ptBins[i]<<" "<<_ptBins[i+1]<<std::endl;
 			std::cout<<"nominal yield = "<<nominal_yields[i]<<std::endl;
@@ -724,15 +757,6 @@ if(varExp=="nMult"){
 
 
 	myfile.close();
-
-	/*if(fitOnSaved == 1){
-	  outf->Close();	
-	  return;
-	  }
-	  ntMC->Project("hPtMC",varExp.Data(),TCut(weightmc)*(TCut(selmc.Data())&&"(BgenNew==23333)"));
-	  divideBinWidth(hPtMC);
-	//	ntGen->Project("hPtGen","Gpt",TCut(weightgen)*(TCut(selmcgen.Data())));
-	//	divideBinWidth(hPtGen);*/
 
 	TCanvas* cPt =  new TCanvas("cPt","",600,600);
 	cPt->SetLogy();
@@ -775,7 +799,7 @@ if(varExp=="nMult"){
 	
 	}
 	
-	if(syst==1 && full==0){
+	if(syst_study==1 && full==0){
 
 		latex_table(Path + "background_systematics_table_"+std::string (varExp.Data())+"_"+std::string (tree.Data()), _nBins+1,  (int)(1+background.size()),  col_name_back,labels_back,back_syst_rel_values, "Background PDF Systematic Errors");
 		latex_table(Path + "signal_systematics_table_"+std::string (varExp.Data())+"_"+std::string (tree.Data()), _nBins+1, (int)(1+signal.size()),    col_name_signal, labels_signal,sig_syst_rel_values, "Signal PDF Systematic Errors");
@@ -800,7 +824,7 @@ if(varExp=="nMult"){
 	 gr_staterr->SetLineColor(1); 
 	 mg->Add(gr_staterr);
 
-	 if(syst==1){
+	 if(syst_study==1){
 		TGraphAsymmErrors* gr_systerr = new TGraphAsymmErrors(_nBins,var_mean_av,yield_vec,nullptr,nullptr,yield_vec_systerr_low,yield_vec_systerr_high);
 		gr_systerr->SetLineColor(2);
 		mg->Add(gr_systerr,"syst");
@@ -928,3 +952,28 @@ if(varExp=="nMult"){
 //Resolution plot part ends
 
 }
+
+
+
+
+
+
+
+void read_samples(RooWorkspace& w, std::vector<TString> label, TString fName, TString treeName, TString sample){
+  TFile* fin = new TFile(fName);
+  TTree* t1;
+  t1 = (TTree*) fin->Get(treeName);
+
+  RooArgList arg_list ("arg_list");
+  // read the fitting variable
+  arg_list.add(*(w.var("Bmass")));
+
+  // read additional variables
+  for(auto lab : label){arg_list.add(*(w.var(lab)));}
+
+  RooDataSet* data_s = new RooDataSet(sample, sample, t1, arg_list);
+  cout << "input filename = " << fName << "; entries: " << data_s->sumEntries() << endl;
+  w.import(*data_s, Rename(sample));
+}
+
+
