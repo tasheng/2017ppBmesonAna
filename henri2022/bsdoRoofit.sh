@@ -6,6 +6,8 @@ DOANALYSISPbPb_ROOFIT_FULL_BS=0
 
 INPUTDATAPbPbCANDWISE_BS="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BsData.root"
 INPUTMCPbPbCANDWISE_BS="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BsMC.root"
+#INPUTMCPbPbCANDWISE_BS="../../CutSkim/BsMC.root"
+#INPUTDATAPbPbCANDWISE_BS="../../CutSkim/BsData.root"
 
 LABEL=""
 
