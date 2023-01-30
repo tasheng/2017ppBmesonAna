@@ -207,7 +207,6 @@ cout << endl << endl;
 		if(doweight == 0 ) weightmc = "1"; 
 		if(doweight == 1) weightmc = "pthatweightNew";
 	    weightmc = "1"; 
-		
 		std::cout<<"weights defined"<<std::endl;	
 				}
 
@@ -331,14 +330,14 @@ cout << endl << endl;
 		// Fix the ratio of jpsipi to signal
 		RooRealVar jpsipi_to_signal_ratio("jpsipi_to_signal_ratio", "jpsipi_to_signal_ratio",0.05, 0, 1);
   		jpsipi_to_signal_ratio.setVal(n_jpsipi_ext.getVal() / n_signal_np.getVal());
-  		cout << "jpsipi_to_signal_ratio " << jpsipi_to_signal_ratio.getVal()<< endl;
+		double jpsipi_to_signal_ratio_UNC = sqrt(pow( n_jpsipi_ext.getVal() / n_signal_np.getVal() ,2) )*sqrt( pow(n_jpsipi_ext.getError()/n_jpsipi_ext.getVal() ,2) + pow(n_signal_np.getError()/ n_signal_np.getVal() ,2));  		
+		cout << "jpsipi_to_signal_ratio_unc" << jpsipi_to_signal_ratio.getVal()<<" +/- " << jpsipi_to_signal_ratio_UNC <<  endl;
   		jpsipi_to_signal_ratio.setConstant();
 		ws->import(jpsipi_to_signal_ratio);
 		// Fix the ratio of jpsipi to signal
 						}
 	// FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp
 
-	//BIN ANALYSIS START
 	//BIN ANALYSIS START
 	for(int i=0;i<_nBins;i++){
 		_count++;
@@ -408,7 +407,6 @@ cout << endl << endl;
 		RooFitResult* f = fit("", "", tree, c, cMC, ds_cut, dsMC_cut, dh, mass, frame, _ptBins[i], _ptBins[i+1], isMC, npfit, *ws);
 
 ////////// FITFITFITFITFITFITFITFITFITFITFITFIT
-
 
 	//	validate_fit(w_val, tree, varExp, full,centmin, centmax, _ptBins[i], _ptBins[i+1]);
 		//scan_significance(w_val, tree, varExp, full,centmin, centmax, _ptBins[i], _ptBins[i+1]);

@@ -244,8 +244,8 @@ if(npfit != "1" && variation=="" && pdf==""){
 
 /////////////////  BACKGROUND FUNCTIONS
 	RooRealVar nbkg(Form("nbkg%d",_count),"",ds->sumEntries() - n_signal_initial,0.,ds->sumEntries());
-	RooRealVar a0(Form("a0%d",_count),"",1,-5,5);
-	RooRealVar a1(Form("a1%d",_count),"",1,-5,5);
+	RooRealVar a0(Form("a0%d",_count),"",-0.3,-1.5,2);
+	RooRealVar a1(Form("a1%d",_count),"",0.01,-1,0.5);
 	RooRealVar a2(Form("a2%d",_count),"",1,-5e3,5e3);
 	RooPolynomial bkg_1st(Form("bkg%d",_count),"",*mass,RooArgSet(a0));
 	RooPolynomial bkg_2nd(Form("bkg%d",_count),"",*mass,RooArgSet(a0,a1));
