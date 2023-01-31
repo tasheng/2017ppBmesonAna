@@ -85,11 +85,17 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	frameMC->SetStats(0);
 	frameMC->GetXaxis()->SetNdivisions(-50205);
 
-	double init_mean;
-	if(tree=="ntphi") init_mean = BS_MASS;
-	if(tree=="ntKp") init_mean = BP_MASS;
+	// give better initial values to the Bmesons mass
+	double init_mean = BS_MASS;
+	double m1 = 5.35;
+	double m2 = 5.38;
+	if (tree == "ntKp"){
+		init_mean = BP_MASS;
+		m1 = 5.27;
+		m2 = 5.29;}
+	// give better initial values to the Bmesons mass
 
-	RooRealVar meanMC(Form("meanMC%d_%s",_count,pdf.Data()),"",init_mean,5.2,5.4) ;
+	RooRealVar meanMC(Form("meanMC%d_%s",_count,pdf.Data()),"",init_mean,5.25,5.4) ;
 	RooRealVar sigma1MC(Form("sigma1MC%d_%s",_count,pdf.Data()),"",0.05,0.01,0.11) ;
 	RooRealVar sigma2MC(Form("sigma2MC%d_%s",_count, pdf.Data()),"",0.03,0.01,0.06) ;
 	RooRealVar sigma3MC(Form("sigma3MC%d_%s",_count, pdf.Data()),"",0.01,0.005,0.02) ;
@@ -153,11 +159,11 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	frameMC->Draw();
 	cMC->RedrawAxis();
 	TLatex* texB_pt;
-	texB_pt = new TLatex(0.2,0.80, Form("BIN:%d_%d",ptmin, ptmax));
+	texB_pt = new TLatex(0.2,0.80, Form("%d < p_{T} <%d GeV",ptmin, ptmax));
 	texB_pt->SetNDC();
 	texB_pt->SetTextFont(42);
-	texB_pt->SetTextSize(0.045);
-	texB_pt->SetLineWidth(2);
+	texB_pt->SetTextSize(0.03);
+	texB_pt->SetLineWidth(1);
 	texB_pt->Draw();
 	//cMC->SetLogy();
 
@@ -214,8 +220,9 @@ if(npfit != "1" && variation=="" && pdf==""){
 	p1->cd();
 
 ///////////////// SIGNAL FUNCTIONS
+
 	RooRealVar nsig(Form("nsig%d",_count),"",n_signal_initial,-1,ds->sumEntries()*3);
-	RooRealVar mean(Form("mean%d",_count),"",meanMC.getVal(),5.,6.) ;
+	RooRealVar mean(Form("mean%d",_count),"",meanMC.getVal(),m1,m2) ;
 	RooRealVar sigma1(Form("sigma1%d",_count),"",sigma1MC.getVal(),0.01,0.1) ;
 	RooRealVar sigma2(Form("sigma2%d",_count),"",sigma2MC.getVal(),0.01,0.1) ;
 	RooRealVar sigma3(Form("sigma3%d",_count),"",sigma3MC.getVal(),0.01,0.1) ;
@@ -240,12 +247,10 @@ if(npfit != "1" && variation=="" && pdf==""){
 	if((variation=="" && pdf=="") || variation== "background" || (variation=="signal" && pdf=="fixed")) sig = new RooAddPdf(Form("sig%d",_count),"",RooArgList(sig1,sig2),sig1frac);
 ///////////////// SIGNAL FUNCTIONS
 
-
-
 /////////////////  BACKGROUND FUNCTIONS
 	RooRealVar nbkg(Form("nbkg%d",_count),"",ds->sumEntries() - n_signal_initial,0.,ds->sumEntries());
-	RooRealVar a0(Form("a0%d",_count),"",-0.3,-1.5,2);
-	RooRealVar a1(Form("a1%d",_count),"",0.01,-1,0.5);
+	RooRealVar a0(Form("a0%d",_count),"",-0.1,-5,5);
+	RooRealVar a1(Form("a1%d",_count),"",0.01,-5,5);
 	RooRealVar a2(Form("a2%d",_count),"",1,-5e3,5e3);
 	RooPolynomial bkg_1st(Form("bkg%d",_count),"",*mass,RooArgSet(a0));
 	RooPolynomial bkg_2nd(Form("bkg%d",_count),"",*mass,RooArgSet(a0,a1));
@@ -597,7 +602,7 @@ void fit_jpsinp(RooWorkspace& w, int pti, int ptf, bool includeSignal) {
 	RooRealVar* jpsipi_to_signal_ratio = w.var("jpsipi_to_signal_ratio");  
 	RooRealVar n_cont(Form("n_cont_np%d",_count), "n_cont_np", 1000, 0., (d_s->sumEntries())*2);
 	RooRealVar n_erfc(Form("n_nonprompt%d",_count), "n_nonprompt", 1000, 0., (d_s->sumEntries())*2);
-	RooRealVar nbin_signal(Form("n_signal_np%d",_count), "n_signal_np", 1000, 0., 15000);
+	RooRealVar nbin_signal(Form("n_signal_np%d",_count), "n_signal_np", 1000, 0., 150000);
 	RooProduct* n_jpsipi = new RooProduct(Form("n_jpsipi_by_signal%d",_count), "number of jpsis pi with fixed ratio to n_signal", RooArgList(nbin_signal, *jpsipi_to_signal_ratio));
 	
 	// Unfix the signal with to better describe each pT bin peak
