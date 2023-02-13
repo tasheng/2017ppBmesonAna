@@ -41,7 +41,7 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 0, int usePbPb =
 		}
 	} else if(varExp == "By"){
 		if(full == 1){_nBins = 1;}
-		else if(full == 0){ cout << "bins?" << nyBins_both << endl;
+		else if(full == 0){ 
 			_nBins = nyBins_both;}
 	}
 		else if(varExp == "nMult"){
@@ -80,6 +80,7 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 0, int usePbPb =
 	}
 
 std::cout<<"Variable "<<varExp<<std::endl;
+cout << "Systematics " << syst_study << endl;
 cout << tree << " BINS: ";
 for(int t; t< sizeof(_ptBins)/sizeof(_ptBins[0]);t++){cout <<"__"<<  _ptBins[t]<<"__";}
 cout << endl << endl;
@@ -157,7 +158,6 @@ cout << endl << endl;
 	TH1D* h;
 	TH1D* hMC;
 	TH1D* hpull;
-
 	TH1D* hPt = new TH1D("hPt","",_nBins,_ptBins);
 	RooWorkspace* ws = new RooWorkspace("ws");
 	TH1D* hPtMC = new TH1D("hPtMC","",_nBins,_ptBins);
@@ -253,18 +253,12 @@ cout << endl << endl;
 	double hori_av_high[_nBins];
 
 	//chi2
-
 	double chi2_vec[_nBins];
 	double chi2MC_vec[_nBins];
-
 	double chi2_vec_sig[signal.size()][_nBins];
 	double chi2_vec_back[background.size()][_nBins];
 	double chi2MC_vec_sig[signal.size()][_nBins];
 	double chi2MC_vec_back[background.size()][_nBins];
-
-	double labels_x;
-	if(tree == "ntphi"){labels_x = 0.7;}
-	if(tree == "ntKp"){labels_x = 0.3;}
 	//chi2
 
 	// FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp
@@ -596,7 +590,6 @@ if(varExp=="nMult"){
 		tex_y->SetTextFont(42);
 		tex_y->SetTextSize(0.045);
 		tex_y->SetLineWidth(2);
-
 		chi_square->SetNDC();
 		chi_square->SetTextFont(42);
 		chi_square->SetTextSize(0.045);
@@ -676,7 +669,7 @@ if(varExp=="nMult"){
 
 					texB->Draw();
 					tex_pt->Draw();
-					chi_back =new TLatex(labels_x,0.75,Form("#chi^{2} value : %.2f",Mychi2_back));
+					chi_back =new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2_back));
 					chi_back->SetNDC();
 					chi_back->SetTextFont(42);
 					chi_back->SetTextSize(0.045);
@@ -715,7 +708,7 @@ if(varExp=="nMult"){
 				chi2MC_vec_sig[j][i] = frameMC_sig->chiSquare();
 				texB->Draw();
 				tex_pt->Draw();
-				chi_sig=new TLatex(labels_x,0.75,Form("#chi^{2} value : %.2f",Mychi2_sig));
+				chi_sig=new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2_sig));
 				chi_sig->SetNDC();
 				chi_sig->SetTextFont(42);
 				chi_sig->SetTextSize(0.045);
@@ -750,7 +743,6 @@ if(varExp=="nMult"){
 			general_syst.push_back(general_err);
 			yield_vec_systerr_low[i] = general_err[2] / 100 * yield_vec[i];
 			yield_vec_systerr_high[i] = general_err[2] / 100 * yield_vec[i];
-
 		}
 	}
 
@@ -766,10 +758,6 @@ if(varExp=="nMult"){
 
 	if(syst_study==1){ 
 		for(int i=0; i<_nBins; i++){
-			std::cout<<"pt bin = "<<_ptBins[i]<<" "<<_ptBins[i+1]<<std::endl;
-			std::cout<<"nominal yield = "<<nominal_yields[i]<<std::endl;
-			std::cout<<"count= "<<i<<std::endl;
-
 			for(int j=0; j<background.size(); j++){
 				std::cout<<" back sys in bin "<<i<<" ; with pdf "<< background[j] << " ="<<background_syst[i][j]<<std::endl;
 				std::cout<<" back sys in bin "<<i<<" ; with pdf "<< background[j] << " ="<<back_syst_rel_values[i][j]<<" % "<<std::endl;
@@ -802,7 +790,6 @@ if(varExp=="nMult"){
 
 	string name;
 	int m=_nBins;
-	
 	col_name_back.push_back("Background Model");
 	col_name_signal.push_back("Signal Model");
 	col_name_general.push_back("Systematic Source");
@@ -824,16 +811,12 @@ if(varExp=="nMult"){
 		col_name_general.push_back(label1);
 		col_name_general_stat.push_back(label1);
 	}
-	
 	if(syst_study==1 && full==0){
 		latex_table(Path + "background_systematics_table_"+std::string (varExp.Data())+"_"+std::string (tree.Data()), _nBins+1,  (int)(1+background.size()),  col_name_back,labels_back,back_syst_rel_values, "Background PDF Systematic Errors");
 		latex_table(Path + "signal_systematics_table_"+std::string (varExp.Data())+"_"+std::string (tree.Data()), _nBins+1, (int)(1+signal.size()),    col_name_signal, labels_signal,sig_syst_rel_values, "Signal PDF Systematic Errors");
 		latex_table(Path + "general_systematics_table_"+std::string (varExp.Data())+"_"+std::string (tree.Data()),  _nBins+1, 4 , col_name_general, labels_general, general_syst, "Overall PDF Variation Systematic Errors");	
 		latex_table(Path + "Statistical_error_table_"+std::string (varExp.Data())+"_"+std::string (tree.Data()),  _nBins+1, 2 , col_name_general_stat, labels_general_stat, stat_error, "Statistical error");	
 	}
-
-	cout << "Final Background = " << MyBackground << endl;
-	cout << "Final Yield = " << yield << endl;
 
 // Differential plot part starts
 	gSystem->mkdir("./results/Graphs",true); 
@@ -843,7 +826,6 @@ if(varExp=="nMult"){
 	 TCanvas c_diff;
 	 TMultiGraph* mg = new TMultiGraph();
 	 TLegend *leg_d = new TLegend(0.7,0.7,0.9,0.9);
-
 	 TGraphAsymmErrors* gr_staterr = new TGraphAsymmErrors(_nBins,var_mean_av,yield_vec,hori_av_low,hori_av_high,yield_vec_err_low,yield_vec_err_high);
 	 gr_staterr->SetLineColor(1); 
 	 mg->Add(gr_staterr);

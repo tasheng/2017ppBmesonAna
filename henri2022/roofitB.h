@@ -48,7 +48,7 @@ double real_significance;
 
 double minhisto=5.;
 double maxhisto=6.;
-int nbinsmasshisto=100;
+int nbinsmasshisto=50;
 
 Int_t _count=0;
 RooWorkspace* outputw = new RooWorkspace("w");
@@ -111,28 +111,26 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	// give better initial values to the Bmesons mass
 
 	RooRealVar meanMC(Form("meanMC%d_%s",_count,pdf.Data()),"",init_mean,m1,m2) ;
-	RooRealVar sigma1MC(Form("sigma1MC%d_%s",_count,pdf.Data()),"",0.01,0.005,0.5) ;
-	RooRealVar sigma2MC(Form("sigma2MC%d_%s",_count, pdf.Data()),"",0.01,0.005,0.5) ;
-	RooRealVar sigma3MC(Form("sigma3MC%d_%s",_count, pdf.Data()),"",0.01,0.005,0.5) ;
+	RooRealVar sigma1MC(Form("sigma1MC%d_%s",_count,pdf.Data()),"",0.05,0.005,0.11) ;
+	RooRealVar sigma2MC(Form("sigma2MC%d_%s",_count, pdf.Data()),"",0.03,0.01,0.06) ;
+	RooRealVar sigma3MC(Form("sigma3MC%d_%s",_count, pdf.Data()),"",0.01,0.005,0.2) ;
 	RooRealVar sigma4cbMC(Form("sigma4cbMC%d_%s",_count, pdf.Data()),"",0.0266,0.01,0.5) ;
-	RooRealVar alphaMC(Form("alphaMC%d_%s",_count,pdf.Data()),"",100.,0,1000);
-	RooRealVar nMC(Form("nMC_%d_%s", _count, pdf.Data()),"",100,0,500);
+	RooRealVar alphaMC(Form("alphaMC%d_%s",_count,pdf.Data()),"",4.,0,15);
+	RooRealVar nMC(Form("nMC_%d_%s", _count, pdf.Data()),"",10,-100,200);
 
 	RooRealVar* scale;
 	scale = new RooRealVar("scale","scale",1,0,2);
-
 	RooProduct scaled_sigma1MC(Form("scaled_sigma1MC%d_%s",_count,pdf.Data()),"scaled_sigma1MC", RooArgList(*scale,sigma1MC));
 	RooProduct scaled_sigma2MC(Form("scaled_sigma2MC%d_%s",_count,pdf.Data()),"scaled_sigma2MC", RooArgList(*scale,sigma2MC));
 	RooProduct scaled_sigma3MC(Form("scaled_sigma3MC%d_%s",_count,pdf.Data()),"scaled_sigma3MC", RooArgList(*scale,sigma3MC));
 	RooProduct scaled_sigma4cbMC(Form("scaled_sigma4cbMC%d_%s",_count,pdf.Data()),"scaled_sigma4cbMC", RooArgList(*scale,sigma4cbMC));
-
 	RooGaussian sig1MC(Form("sig1MC%d_%s",_count,pdf.Data()),"",*mass,meanMC,scaled_sigma1MC);  
 	RooGaussian sig2MC(Form("sig2MC%d_%s",_count, pdf.Data()),"",*mass,meanMC,scaled_sigma2MC);  
 	RooGaussian sig3MC(Form("sig3MC%d_%s",_count, pdf.Data()),"",*mass,meanMC,scaled_sigma3MC);  
 	RooCBShape  CBMC(Form("CBMC%d_%s",_count, pdf.Data()),"",*mass,meanMC,scaled_sigma4cbMC, alphaMC, nMC);
 
-	RooRealVar sig1fracMC(Form("sig1fracMC%d_%s",_count, pdf.Data()),"", 0.5, 0.001, 2);
-	RooRealVar sig2fracMC(Form("sig2fracMC%d_%s",_count, pdf.Data()),"", 0.5, 0.001, 2);
+	RooRealVar sig1fracMC(Form("sig1fracMC%d_%s",_count, pdf.Data()),"", 0.2, 0.001, 1);
+	RooRealVar sig2fracMC(Form("sig2fracMC%d_%s",_count, pdf.Data()),"", 0.7, 0.001, 1);
 
 	RooRealVar nsigMC(Form("nsigMC%d_%s",_count, pdf.Data()),"",0.5 * dsMC->sumEntries(), 0, 1.2 * dsMC->sumEntries());
 
@@ -394,7 +392,6 @@ if(tree == "ntphi"){
 
 	model->plotOn(frame, Name(Form("bkg%d", _count)) ,  Components(bkg), Range(fitRange), Precision(1e-6), DrawOption("L"),LineStyle(7), LineColor(4), LineWidth(3));
 	model->plotOn(frame, Name(Form("model%d_%s", _count, pdf.Data())), Range(fitRange), Precision(1e-6), DrawOption("L"), LineColor(2), LineWidth(3));
-
 	if(pdf!="1gauss") {model->plotOn(frame, Name(Form("sig%d_%s", _count, pdf.Data())),  Components(*sig), Range(fitRange), Precision(1e-6), DrawOption("LF"), FillStyle(3002), FillColor(kOrange-3), LineStyle(7), LineColor(kOrange-3), LineWidth(3));} 
 	else {model->plotOn(frame, Name(Form("sig%d", _count)),  Components(sig1), NormRange(fitRange), Precision(1e-6), DrawOption("LF"), FillStyle(3002), FillColor(kOrange-3), LineStyle(7), LineColor(kOrange-3), LineWidth(3));}
 
@@ -494,11 +491,6 @@ if(tree == "ntphi"){
 		fh->SetBinContent(i+1, fitArr[i]);
 		fh->SetBinError(i+1, sqrt(fitArr[i]));
 	}
-	cout<<"frame->chiSquare: "<<frame->chiSquare(Form("model%d_%s",_count,pdf.Data()),Form("ds_cut%d",_count), fitResult->floatParsFinal().getSize())<<endl;
-	cout<<"pars= "<<fitResult->floatParsFinal().getSize()<<endl;
-	cout<<"chi2: "<<frame->chiSquare(Form("model%d_%s",_count,pdf.Data()),Form("ds%d",_count))<<endl;
-	//RooChi2Var chi2_lowstat("chi2_lowstat","chi2",*model,*dh);
-	//cout<<chi2_lowstat.getVal()<<endl;
 
 	double chiRoo = frame->chiSquare(Form("model%d_%s",_count,pdf.Data()),Form("ds_cut%d",_count), fitResult->floatParsFinal().getSize());
 	double chi2Std = 0;
@@ -552,21 +544,9 @@ if(tree == "ntphi"){
 	std::cout<<"REAL SIGNIFICANCE= "<<real_significance<<std::endl;
 	std::cout<<"***********************************************************************"<<std::endl;
 
-	std::cout<<"sigma1_MC error hi= "<<sigma1MC.getAsymErrorHi()<<std::endl;
-	std::cout<<"sigma1_MC error = "<<sigma1MC.getError()<<std::endl;
-	std::cout<<"sigma2_MC error hi= "<<sigma2MC.getAsymErrorHi()<<std::endl;
-	std::cout<<"sigma2_MC error = "<<sigma2MC.getError()<<std::endl;
-	//RooFitResult* fitResult = model->fitTo(*ds,Save(),Minos());
-	//ds->plotOn(frame,Name(Form("ds%d",_count)),Binning(nbinsmasshisto),MarkerSize(1.55),MarkerStyle(20),LineColor(1),LineWidth(4));
-
-	// double width = 0.08;
-	// double BmassH = BS_MASS + width;
-	// double BmassL = BS_MASS - width;
-	// mass->setRange("signal",BmassL,BmassH);
 	RooAbsReal *bkgIntegral = bkg.createIntegral(*mass,NormSet(*mass),Range("signal"));
 	// bkgIntegralErr = bkgIntegral->getPropagatedError(*fitResult);	
 	cout<<"bkg integral: "<<bkgIntegral->getVal()<<endl;
-	//  cout<<"bkg integral error: "<<bkgIntegralErr<<endl;
 
 	bkgd = nbkg.getVal()*bkgIntegral->getVal();
 	Significance = yield/sqrt(bkgd+yield);
