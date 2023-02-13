@@ -724,27 +724,17 @@ void latex_table(std::string filename, int n_col, int n_lin, std::vector<std::st
 	file_check << "\\usepackage{booktabs}" << std::endl;
 	file_check << "\\geometry{a4paper, total={170mm,257mm}, left=20mm, top=20mm,}" << std::endl;
 
-	file_check << "\\title{Bs/B+}" << std::endl;
-	file_check << "\\author{Henrique Legoinha}" << std::endl;
-	file_check << "\\date{June 2022}" << std::endl;
 	file_check << "\\begin{document}" << std::endl;
-	file_check << "\\maketitle" << std::endl;
-
-	// Create table                                                                                                                                
-	//file_check << "\\begin{table}[!h]" << std::endl;
-	//file_check << "\\centering" << std::endl;                                                                                                         
-	//setup table size                                                                                                                             
+	// Create table                                                                                                                                                                                                                                                
 	std::string col="c";
-	//std::setprecision(3);
-
 	for(int i=1; i<n_col; i++)
 		col+="|c";
 
-	file_check << "\\begin{sidewaystable}"<< std::endl;
-	file_check << "\\begin{tabular}{"+col+"}" << std::endl;
-	file_check << "\\toprule" << std::endl;
-	file << "\\begin{tabular}{"+col+"}" << std::endl;
-	file << "\\toprule" << std::endl;
+		file_check << "\\begin{sidewaystable}"<< std::endl;
+		file_check << "\\begin{tabular}{"+col+"}" << std::endl;
+		file_check << "\\toprule" << std::endl;
+		file << "\\begin{tabular}{"+col+"}" << std::endl;
+		file << "\\toprule" << std::endl;
 
 	for(int c=0; c<n_col-1; c++){
 		file << col_name[c] << " & ";
@@ -753,7 +743,6 @@ void latex_table(std::string filename, int n_col, int n_lin, std::vector<std::st
 
 	file << col_name[n_col-1] << " \\\\ \\midrule" << std::endl;
 	file_check << col_name[n_col-1] << " \\\\ \\midrule" << std::endl;
-
 
 	for(int i=1; i<n_lin; i++)
 	{
@@ -785,7 +774,6 @@ void latex_table(std::string filename, int n_col, int n_lin, std::vector<std::st
 
 	file.close();
 	file_check.close();
-
 	system(("pdflatex " + filename+ "_check.tex").c_str());
 	system(("open " + filename + "_check.pdf").c_str());
 }
