@@ -223,8 +223,10 @@ cout << endl << endl;
 	ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new,RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
 
 	//MODELS for syst studies
-	std::vector<std::string> background = {"1st", "2nd","mass_range"};
-	std::vector<std::string> signal = {"3gauss", "fixed", "gauss_cb"};
+	std::vector<std::string> background;
+	if (tree == "ntKp"){background = {/*"1st", "2nd", "mass_range", */"jpsi_sig"};} 
+	else if (tree == "ntphi"){background = {"1st", "2nd", "mass_range"};}
+	std::vector<std::string> signal = {/*"3gauss", "fixed",*/ "gauss_cb"};
 	//MODELS for syst studies
 	
 	std::vector<std::vector<double>> background_syst;
@@ -234,6 +236,7 @@ cout << endl << endl;
 	std::vector<std::vector<double>> back_syst_rel_values;
 	std::vector<std::vector<double>> sig_syst_rel_values;
 	std::vector<std::vector<double>> stat_error;
+
 	double yield_vec[_nBins];
 	double yield_vec_err_low[_nBins];
 	double yield_vec_err_high[_nBins];
@@ -248,6 +251,21 @@ cout << endl << endl;
 	double var_mean_av[_nBins];
 	double hori_av_low[_nBins];
 	double hori_av_high[_nBins];
+
+	//chi2
+
+	double chi2_vec[_nBins];
+	double chi2MC_vec[_nBins];
+
+	double chi2_vec_sig[signal.size()][_nBins];
+	double chi2_vec_back[background.size()][_nBins];
+	double chi2MC_vec_sig[signal.size()][_nBins];
+	double chi2MC_vec_back[background.size()][_nBins];
+
+	double labels_x;
+	if(tree == "ntphi"){labels_x = 0.7;}
+	if(tree == "ntKp"){labels_x = 0.3;}
+	//chi2
 
 	// FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp
 	//Fit the J/psi pi MC sample
@@ -329,9 +347,11 @@ cout << endl << endl;
 
 		// Fix the ratio of jpsipi to signal
 		RooRealVar jpsipi_to_signal_ratio("jpsipi_to_signal_ratio", "jpsipi_to_signal_ratio",0.05, 0, 1);
-  		jpsipi_to_signal_ratio.setVal(n_jpsipi_ext.getVal() / n_signal_np.getVal());
-		double jpsipi_to_signal_ratio_UNC = sqrt(pow( n_jpsipi_ext.getVal() / n_signal_np.getVal() ,2) )*sqrt( pow(n_jpsipi_ext.getError()/n_jpsipi_ext.getVal() ,2) + pow(n_signal_np.getError()/ n_signal_np.getVal() ,2));  		
-		cout << "jpsipi_to_signal_ratio_unc" << jpsipi_to_signal_ratio.getVal()<<" +/- " << jpsipi_to_signal_ratio_UNC <<  endl;
+		jpsipi_to_signal_ratio.setVal(0.0384);   		// from PDG 										
+		//jpsipi_to_signal_ratio.setVal(n_jpsipi_ext.getVal() / n_signal_np.getVal());              // from the inclusive bin analysis
+		//double jpsipi_to_signal_ratio_UNC = sqrt(pow( n_jpsipi_ext.getVal() / n_signal_np.getVal() ,2) )*sqrt( pow(n_jpsipi_ext.getError()/n_jpsipi_ext.getVal() ,2) + pow(n_signal_np.getError()/ n_signal_np.getVal() ,2));  		
+		//cout << "jpsipi_to_signal_ratio_unc" << jpsipi_to_signal_ratio.getVal()<<" +/- " << jpsipi_to_signal_ratio_UNC <<  endl;
+
   		jpsipi_to_signal_ratio.setConstant();
 		ws->import(jpsipi_to_signal_ratio);
 		// Fix the ratio of jpsipi to signal
@@ -378,23 +398,24 @@ cout << endl << endl;
 		if(doubly==2) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt,  *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto), "1"); 
 
 
-    // Apply track selection cut
-    std::cout << "data entries: " << ds_cut->sumEntries() << "\n";
-    std::cout << "MC entries: " << dsMC_cut->sumEntries() << "\n";
-    ds_cut = (RooDataSet*) ds_cut->reduce(seldata);
-    dsMC_cut = (RooDataSet*) dsMC_cut->reduce(selmc);
-    std::cout << "data entries: " << ds_cut->sumEntries() << "\n";
-    std::cout << "MC entries: " << dsMC_cut->sumEntries() << "\n";
+		// Apply track selection cut
+		std::cout << "data entries: " << ds_cut->sumEntries() << "\n";
+		std::cout << "MC entries: " << dsMC_cut->sumEntries() << "\n";
+		ds_cut = (RooDataSet*) ds_cut->reduce(seldata);
+		dsMC_cut = (RooDataSet*) dsMC_cut->reduce(selmc);
+		std::cout << "data entries: " << ds_cut->sumEntries() << "\n";
+		std::cout << "MC entries: " << dsMC_cut->sumEntries() << "\n";
 
 		// create RooDataHist
 		h = new TH1D(Form("h%d",_count),"",nbinsmasshisto,minhisto,maxhisto);
 		hMC = new TH1D(Form("hMC%d",_count),"",nbinsmasshisto,minhisto,maxhisto);
+
+		if(isMC==1) skimtree_new->Project(Form("h%d",_count),"Bmass",Form("%s*(%s&&%s>%f&&%s<%f && BgenNew == 23333)*(1/%s)",weightmc.Data(),seldata.Data(),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],weightdata.Data()));
+		else        skimtree_new->Project(Form("h%d",_count),"Bmass",   Form("(%s&&%s>%f&&%s<%f)*(1/%s)", seldata.Data(),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],weightdata.Data()));
 	
-		skimtreeMC_new->Project(Form("hMC%d",_count),"Bmass",Form("%s*(%s&&%s>%f&&%s<%f)",weightmc.Data(),Form("%s&&BgenNew==23333",selmc.Data()),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1]));
-	
+		skimtreeMC_new->Project(Form("hMC%d",_count),"Bmass",Form("%s*(%s&&%s>%f&&%s<%f)",weightmc.Data(),Form("%s&&BgenNew==23333",selmc.Data()),varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1]));	
 		dh = new RooDataHist(Form("dh%d",_count),"",*mass,Import(*h));
 		dhMC = new RooDataHist(Form("dhMC%d",_count),"",*mass,Import(*hMC));
-		
 		h->SetAxisRange(0,h->GetMaximum()*1.4,"Y");
 		outputw->import(*ds);
 		outputw->import(*dsMC);
@@ -403,22 +424,30 @@ cout << endl << endl;
 
 ////////// FITFITFITFITFITFITFITFITFITFITFITFIT
 
-		cout << "Starting the fiting fucntion" << endl;
+		cout << "Starting the fiting function" << endl;
 		RooFitResult* f = fit("", "", tree, c, cMC, ds_cut, dsMC_cut, dh, mass, frame, _ptBins[i], _ptBins[i+1], isMC, npfit, *ws);
 
 ////////// FITFITFITFITFITFITFITFITFITFITFITFIT
 
-	//	validate_fit(w_val, tree, varExp, full,centmin, centmax, _ptBins[i], _ptBins[i+1]);
+	//	validate_fit(w_val, "", tree, varExp, full,centmin, centmax, _ptBins[i], _ptBins[i+1]);
 		//scan_significance(w_val, tree, varExp, full,centmin, centmax, _ptBins[i], _ptBins[i+1]);
 		/*for(int q= 0; q < 100; q++){
-			validate_fit(w_val, tree, varExp, full,q);}*/
+			validate_fit(w_val, tree, varExp, full,q);} ?? */
 		//datahist = frame->getHist("ds");
 		//TGraphAsymmErrors* datagraph = static_cast<TGraphAsymmErrors*>(datahist);
+		
+		//chi2
 
-		RooRealVar* fitYield = static_cast<RooRealVar*>(f->floatParsFinal().at(f->floatParsFinal().index(Form("nsig%d",_count))));
-		modelcurve = frame->getCurve(Form("model%d",_count));
+		RooAbsPdf* model = (RooAbsPdf*)ws->pdf(Form("model%d_%s",_count,""));
+		RooAbsPdf* modelMC = (RooAbsPdf*)ws->pdf(Form("modelMC%d_%s",_count,""));
+		RooPlot* frameMC_chi2 = mass->frame(Title(Form("frameMC_chi2%d_%s",_count,"")), Bins(nbinsmasshisto));
+			
+		//chi2
+
+		RooRealVar* fitYield = static_cast<RooRealVar*>(f->floatParsFinal().at(f->floatParsFinal().index(Form("nsig%d_%s",_count,""))));
+		modelcurve = frame->getCurve(Form("model%d_%s",_count,""));   
 		yield = fitYield->getVal();
-		RooRealVar* BackGround = static_cast<RooRealVar*>(f->floatParsFinal().at(f->floatParsFinal().index(Form("nbkg%d",_count))));
+		RooRealVar* BackGround = static_cast<RooRealVar*>(f->floatParsFinal().at(f->floatParsFinal().index(Form("nbkg%d_%s",_count,""))));
 		MyBackground = BackGround->getVal();
 		RooRealVar* width_scale = static_cast<RooRealVar*>(f->floatParsFinal().at(f->floatParsFinal().index("scale")));
 		double Myscale = width_scale->getVal();
@@ -442,13 +471,13 @@ cout << endl << endl;
 
 ////////////////////////////	
 //Resolution MC
-		RooRealVar* sigma1 = static_cast<RooRealVar*>(f->constPars().at(f->constPars().index(Form("sigma1%d", _count))));
+		RooRealVar* sigma1 = static_cast<RooRealVar*>(f->constPars().at(f->constPars().index(Form("sigma1%d_", _count))));
 		double Mysigma1 = sigma1->getVal();
 		double Mysigma1_err = sigma1->getError();
-		RooRealVar* sigma2 = static_cast<RooRealVar*>(f->constPars().at(f->constPars().index(Form("sigma2%d", _count))));
+		RooRealVar* sigma2 = static_cast<RooRealVar*>(f->constPars().at(f->constPars().index(Form("sigma2%d_", _count))));
 		double Mysigma2 = sigma2->getVal();
 		double Mysigma2_err = sigma2->getError();
-		RooRealVar* weight = static_cast<RooRealVar*>(f->constPars().at(f->constPars().index(Form("sig1frac%d", _count))));
+		RooRealVar* weight = static_cast<RooRealVar*>(f->constPars().at(f->constPars().index(Form("sig1frac%d_", _count))));
 		double Myweight  = weight->getVal();
 		double Myweight_err = weight->getError();
 		double scale_err_rel = Myscale_err / Myscale;
@@ -458,6 +487,15 @@ cout << endl << endl;
 		resol_vec_err_low[i] = resol_err;
 		resol_vec_err_high[i] = resol_err;
 //Resolution 
+
+		//chi2  
+		RooChi2Var chi2(Form("chi2%d",_count),"chi2",*model,*dh);
+		double Mychi2 = chi2.getVal()/(nbinsmasshisto - f->floatParsFinal().getSize()); //normalised chi square
+		std::cout << "Chi square value is " << Mychi2 << endl;
+		chi2_vec[i] = Mychi2;
+		chi2MC_vec[i] = frameMC_chi2->chiSquare();
+		//chi2
+
 		std::vector<double> aa;
 		double a=yield_vec_err_low[i]/yield_vec[i]*100;
 		aa.push_back(a);
@@ -475,8 +513,8 @@ cout << endl << endl;
 			hPt->SetBinContent(i+1,yield/(_ptBins[1] - _ptBins[0]));
 			hPt->SetBinError(i+1,yieldErr/(_ptBins[1] - _ptBins[0]));
 		}
-		if(f->floatParsFinal().index(Form("nsig%d",_count)) != -1){
-			RooRealVar* fitMean = static_cast<RooRealVar*>(f->floatParsFinal().at(f->floatParsFinal().index(Form("mean%d",_count))));
+		if(f->floatParsFinal().index(Form("nsig%d_",_count)) != -1){
+			RooRealVar* fitMean = static_cast<RooRealVar*>(f->floatParsFinal().at(f->floatParsFinal().index(Form("mean%d_",_count))));
 			hMean->SetBinContent(i+1,fitMean->getVal());
 			hMean->SetBinError(i+1,fitMean->getError());  
 		}
@@ -488,6 +526,9 @@ cout << endl << endl;
 		TLatex* tex_y1;
 		TLatex* tex_y11;
 		TLatex* tex_y2;
+		TLatex* chi_square;
+		TLatex* chi_back;
+		TLatex* chi_sig;
 		
 	if(varExp=="Bpt"){
       //for the paper run these
@@ -498,6 +539,7 @@ cout << endl << endl;
         tex_y1 = new TLatex(0.65,0.34,"1.5 < |y| < 2.4");
         tex_y11 =new TLatex(0.65,0.34,"|y| < 2.4");
         tex_nMult = new TLatex(0.21,0.62,"0 < nTrks < 100");
+		chi_square=new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2));
       } else {
         //for the AN run these
         tex_pt = new TLatex(0.65,0.8,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
@@ -506,6 +548,7 @@ cout << endl << endl;
         tex_y1 = new TLatex(0.65,0.74,"1.5 < |y| < 2.4");
         tex_y11 = new TLatex(0.65,0.74,"|y| < 2.4");
         tex_nMult = new TLatex(0.21,0.62,"0 < nTrks < 100");
+		chi_square=new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2));
       }
 		}
 
@@ -515,11 +558,13 @@ if(varExp=="By"){
         tex_pt = new TLatex(0.55,0.4,"0 < p_{T} < 100 GeV/c");
         tex_y = new TLatex(0.55,0.34,Form("%d < y < %d ",(int)_ptBins[i],(int)_ptBins[i+1]));
         tex_nMult = new TLatex(0.21,0.62,"0 < nTrks < 100");
+		chi_square=new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2));
       } else {
         //fr the AN run these
         tex_pt = new TLatex(0.55,0.8,"0 < p_{T} < 100 GeV/c");
         tex_y = new TLatex(0.55,0.74,Form("%d < y < %d ",(int)_ptBins[i],(int)_ptBins[i+1]));
         tex_nMult = new TLatex(0.21,0.62,"0 < nTrks < 100");
+		chi_square=new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2));
       }
 		}
 if(varExp=="nMult"){ 
@@ -528,14 +573,15 @@ if(varExp=="nMult"){
       	tex_nMult = new TLatex(0.21,0.62,Form("%d < nTrks < %d",(int)_ptBins[i],(int)_ptBins[i+1]));
         tex_pt = new TLatex(0.55,0.4,"0 < p_{T} < 100 GeV/c");
         tex_y = new TLatex(0.55,0.34,"|y| < 2.4");
+		chi_square=new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2));
       } else {
         //fr the AN run these
         tex_nMult = new TLatex(0.21,0.62,Form("%d < nTrks < %d",(int)_ptBins[i],(int)_ptBins[i+1]));
         tex_pt = new TLatex(0.55,0.8,"0 < p_{T} < 100 GeV/c");
         tex_y = new TLatex(0.55,0.74,"|y| < 2.4");
+		chi_square=new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2));
       }
 	}
-
 		tex_pt->SetNDC();
 		tex_pt->SetTextFont(42);
 		tex_pt->SetTextSize(0.045);
@@ -550,6 +596,12 @@ if(varExp=="nMult"){
 		tex_y->SetTextFont(42);
 		tex_y->SetTextSize(0.045);
 		tex_y->SetLineWidth(2);
+
+		chi_square->SetNDC();
+		chi_square->SetTextFont(42);
+		chi_square->SetTextSize(0.045);
+		chi_square->SetLineWidth(2);
+		chi_square->Draw();
 	
 	if (varExp=="Bpt"){
 		tex_y1->SetNDC();
@@ -611,35 +663,64 @@ if(varExp=="nMult"){
 		if(syst_study==1){
 
 				for(int j=0; j<background.size(); j++){
-				RooFitResult* f_back = fit("background", background[j], tree, c, cMC, ds_cut, dsMC_cut, dh, mass, frame, _ptBins[i], _ptBins[i+1], isMC, npfit, *ws);
-				
-				texB->Draw();
-				tex_pt->Draw();
-				if (varExp=="Bpt"){
-					if(_ptBins[i] >= 10){tex_y11->Draw();}
-					else if(_ptBins[i+1]==50){
+					RooFitResult* f_back = fit("background", background[j], tree, c, cMC, ds_cut, dsMC_cut, dh, mass, frame, _ptBins[i], _ptBins[i+1], isMC, npfit, *ws);
+					RooAbsPdf* model_back = (RooAbsPdf*)ws->pdf(Form("model%d_%s",_count,background[j].c_str()));
+					RooChi2Var chi2_back("chi2_back","chi2_back",*model_back,*dh);
+					RooPlot* frameMC_back = mass->frame(Title(Form("frameMC_back%d_%s",_count,background[j].c_str())), Bins(nbinsmasshisto));	
+					RooAbsPdf* modelMC_back = (RooAbsPdf*)ws->pdf(Form("modelMC%d_%s",_count,background[j].c_str()));
+					dsMC_cut->plotOn(frameMC_back);
+					modelMC_back->plotOn(frameMC_back);
+					double Mychi2_back = chi2_back.getVal()/(nbinsmasshisto - f_back->floatParsFinal().getSize()); //normalised chi square
+					chi2_vec_back[j][i] = Mychi2_back;
+					chi2MC_vec_back[j][i] = frameMC_back->chiSquare();
+
+					texB->Draw();
+					tex_pt->Draw();
+					chi_back =new TLatex(labels_x,0.75,Form("#chi^{2} value : %.2f",Mychi2_back));
+					chi_back->SetNDC();
+					chi_back->SetTextFont(42);
+					chi_back->SetTextSize(0.045);
+					chi_back->SetLineWidth(2);
+					chi_back->Draw();
+					if (varExp=="Bpt"){
+						if(_ptBins[i] >= 10){tex_y11->Draw();}
+						else if(_ptBins[i+1]==50){
 							tex_y->Draw();
 							tex_y2->Draw();}
-					else{tex_y1->Draw();}
-				}else{tex_y->Draw();}
-				CMS_lumi(c,19011,0);
-				c->Update();
-				c->SaveAs(Form("%s/%s_%s_%s_%d_%d_%s_cutY%d_", outplotf.Data(), _isMC.Data(), _isPbPb.Data(), varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],background[j].c_str(), doubly)+tree+".pdf");
-			
-				modelcurve_back = frame->getCurve(Form("model%d",_count));
-				RooRealVar* fitYield_back = static_cast<RooRealVar*>(f_back->floatParsFinal().at(f_back->floatParsFinal().index(Form("nsig%d",_count))));
-				back_variation.push_back(fitYield_back->getVal());
-				back_err.push_back(abs(((yield-fitYield_back->getVal())/yield)*100));
-				if(abs(((yield-fitYield_back->getVal())/yield)*100)>max_back) max_back=abs(((yield-fitYield_back->getVal())/yield)*100);
-			}
+						else{tex_y1->Draw();}
+					}else{tex_y->Draw();}
+					CMS_lumi(c,19011,0);
+					c->Update();
+					c->SaveAs(Form("%s/%s_%s_%s_%d_%d_%s_cutY%d_", outplotf.Data(), _isMC.Data(), _isPbPb.Data(), varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],background[j].c_str(), doubly)+tree+".pdf");
+				
+					modelcurve_back = frame->getCurve(Form("model%d_%s",_count,background[j].c_str()));
+					RooRealVar* fitYield_back = static_cast<RooRealVar*>(f_back->floatParsFinal().at(f_back->floatParsFinal().index(Form("nsig%d_%s",_count,background[j].c_str()))));
+					back_variation.push_back(fitYield_back->getVal());
+					back_err.push_back(abs(((yield-fitYield_back->getVal())/yield)*100));
+					if(abs(((yield-fitYield_back->getVal())/yield)*100)>max_back) max_back=abs(((yield-fitYield_back->getVal())/yield)*100);
+				}
 
 			general_err.push_back(max_back);
 
 			for(int j=0; j<signal.size(); j++){
 				RooFitResult* f_signal = fit("signal", signal[j], tree, c, cMC, ds_cut, dsMC_cut, dh, mass, frame, _ptBins[i], _ptBins[i+1], isMC, npfit, *ws);
-				
+				RooAbsPdf* model_sig = (RooAbsPdf*)ws->pdf(Form("model%d_%s",_count,signal[j].c_str()));
+				RooAbsPdf* modelMC_sig = (RooAbsPdf*)ws->pdf(Form("modelMC%d_%s",_count,signal[j].c_str()));
+				RooChi2Var chi2_sig("chi2_sig","chi2_sig",*model_sig,*dh);
+				RooPlot* frameMC_sig = mass->frame(Title(Form("frameMC_sig%d_%s",_count,signal[j].c_str())), Bins(nbinsmasshisto));
+				dsMC_cut->plotOn(frameMC_sig);
+				modelMC_sig->plotOn(frameMC_sig);
+				double Mychi2_sig = chi2_sig.getVal()/(nbinsmasshisto - f_signal->floatParsFinal().getSize()); //normalised chi square
+				chi2_vec_sig[j][i] = Mychi2_sig;
+				chi2MC_vec_sig[j][i] = frameMC_sig->chiSquare();
 				texB->Draw();
 				tex_pt->Draw();
+				chi_sig=new TLatex(labels_x,0.75,Form("#chi^{2} value : %.2f",Mychi2_sig));
+				chi_sig->SetNDC();
+				chi_sig->SetTextFont(42);
+				chi_sig->SetTextSize(0.045);
+				chi_sig->SetLineWidth(2);
+				chi_sig->Draw();
 				if (varExp=="Bpt"){
 					if(_ptBins[i] >= 10){tex_y11->Draw();}
 					else if(_ptBins[i+1]==50){
@@ -652,8 +733,8 @@ if(varExp=="nMult"){
 
 				cMC->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),varExp.Data(), (int)_ptBins[i], (int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");
 				c->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");
-				modelcurve_signal = frame->getCurve(Form("model%d",_count));
-				RooRealVar* fitYield_signal = static_cast<RooRealVar*>(f_signal->floatParsFinal().at(f_signal->floatParsFinal().index(Form("nsig%d",_count))));
+				modelcurve_signal = frame->getCurve(Form("model%d_%s",_count,signal[j].c_str()));
+				RooRealVar* fitYield_signal = static_cast<RooRealVar*>(f_signal->floatParsFinal().at(f_signal->floatParsFinal().index(Form("nsig%d_%s",_count,signal[j].c_str()))));
 				signal_variation.push_back(fitYield_signal->getVal());
 				signal_err.push_back(abs(((yield-fitYield_signal->getVal())/yield)*100));
 				if(abs(((yield-fitYield_signal->getVal())/yield)*100)>max_signal) max_signal=abs(((yield-fitYield_signal->getVal())/yield)*100);
@@ -671,8 +752,6 @@ if(varExp=="nMult"){
 			yield_vec_systerr_high[i] = general_err[2] / 100 * yield_vec[i];
 
 		}
-
-	//validate_fit(outputw,1,Form("model%d",_count),Form("nsig%d",_count));
 	}
 
 	hMean->Write();
@@ -702,7 +781,6 @@ if(varExp=="nMult"){
 				myfile<<" signal sys in bin "<<i<<" ; with pdf "<< signal[j] << " ="<<sig_syst_rel_values[i][j]<<" % "<<std::endl;
 			}
 		}
-
 	}
 
 	myfile.close();
@@ -891,6 +969,317 @@ if(varExp=="nMult"){
 	 c_resol.SaveAs(pathc_resol);
 
 //Resolution plot part ends
+ double chi2_max = 0;
+	 double chi2_min = 10;
+	for(int i = 0; i < _nBins; i++){
+		if(chi2_vec[i] > chi2_max){
+		chi2_max = chi2_vec[i];
+		}
+		else if(chi2MC_vec[i] > chi2_max){
+			chi2_max = chi2MC_vec[i];
+		}
+		if(chi2_vec[i] < chi2_min){
+			chi2_min = chi2_vec[i];
+		}
+		else if(chi2MC_vec[i] < chi2_min){
+			chi2_min = chi2MC_vec[i];
+		}
+}
+TCanvas c_chi2;
+TMultiGraph* mg_chi2 = new TMultiGraph();
+TLegend *leg_chi2 = new TLegend(0.7,0.8,0.9,0.9);
+
+TGraphAsymmErrors* gr_chi2 = new TGraphAsymmErrors(_nBins,var_mean_av,chi2_vec,hori_av_low,hori_av_high,nullptr,nullptr);
+gr_chi2->SetLineColor(1); 
+TGraphAsymmErrors* grMC_chi2 = new TGraphAsymmErrors(_nBins,var_mean_av,chi2MC_vec,hori_av_low,hori_av_high,nullptr,nullptr);
+grMC_chi2->SetLineColor(2); 
+
+
+if(varExp == "By"){
+ mg_chi2->GetXaxis()->SetTitle("Rapidity (y)");
+ mg_chi2->GetYaxis()->SetTitle("#chi^{2}/NDF");
+ mg_chi2->GetXaxis()->SetLimits(-2.4 ,2.4);
+ //mg_par->GetYaxis()->SetLimits(0, 2.0);
+
+}
+if(varExp == "Bpt"){
+ mg_chi2->GetXaxis()->SetTitle("Transverse Momentum (p_{T})");
+ mg_chi2->GetYaxis()->SetTitle("#chi^{2}/NDF");
+ if (tree == "ntKp"){ mg_chi2->GetXaxis()->SetLimits(0 ,80); }
+ if (tree == "ntphi"){ mg_chi2->GetXaxis()->SetLimits(0 ,60); }
+ //mg_par->GetYaxis()->SetLimits(0, 2.0);
+}
+if(varExp == "nMult"){
+ mg_chi2->GetXaxis()->SetTitle("Multiplicity (Mult)");
+ mg_chi2->GetYaxis()->SetTitle("#chi^{2}/NDF");
+ mg_chi2->GetXaxis()->SetLimits(0, 110);
+ //mg_par->GetYaxis()->SetLimits(0, 2.0);
+}
+mg_chi2->GetYaxis()->SetRangeUser(0.0, chi2_max*1.4);
+mg_chi2->Add(gr_chi2);
+mg_chi2->Add(grMC_chi2);
+mg_chi2->Draw("ap");
+
+leg_chi2->AddEntry(gr_chi2, "Data", "e");
+leg_chi2->AddEntry(grMC_chi2, "Monte Carlo", "e");
+leg_chi2->SetBorderSize(0);
+leg_chi2->SetFillStyle(0);
+leg_chi2->SetTextSize(0);
+leg_chi2->Draw();
+
+
+const char* pathc_chi2 =Form("./results/Graphs/chi2_%s_%s.png",tree.Data(),varExp.Data()); 
+c_chi2.SaveAs(pathc_chi2);
+
+if(syst_study==1){
+	for(int j=0; j<background.size(); j++){
+
+	double chi2_max_back = 0;
+	double chi2_min_back = 10;
+	for(int i = 0; i < _nBins; i++){
+		if(chi2_vec_back[j][i] > chi2_max_back){
+			chi2_max_back = chi2_vec_back[j][i];
+		}else if(chi2MC_vec_back[j][i] > chi2_max_back){
+			chi2_max_back = chi2MC_vec_back[j][i];
+		}
+		if(chi2_vec_back[j][i] < chi2_min_back){
+			chi2_min_back = chi2_vec_back[j][i];
+		}else if(chi2MC_vec_back[j][i] < chi2_min_back){
+			chi2_min_back = chi2MC_vec_back[j][i];
+		}
+	}
+
+TCanvas c_chi2_back;
+TMultiGraph* mg_chi2_back = new TMultiGraph();
+TLegend *leg_chi2_back = new TLegend(0.7,0.8,0.9,0.9);
+
+TGraphAsymmErrors* gr_chi2_back = new TGraphAsymmErrors(_nBins,var_mean_av,chi2_vec_back[j],hori_av_low,hori_av_high,nullptr,nullptr);
+gr_chi2_back->SetLineColor(1); 
+TGraphAsymmErrors* grMC_chi2_back = new TGraphAsymmErrors(_nBins,var_mean_av,chi2MC_vec_back[j],hori_av_low,hori_av_high,nullptr,nullptr);
+grMC_chi2_back->SetLineColor(2); 
+
+if(varExp == "By"){
+ mg_chi2_back->GetXaxis()->SetTitle("Rapidity (y)");
+ mg_chi2_back->GetYaxis()->SetTitle("#chi^{2}/NDF");
+ mg_chi2_back->GetXaxis()->SetLimits(-2.4 ,2.4);
+ //mg_par->GetYaxis()->SetLimits(0, 2.0);
+}
+if(varExp == "Bpt"){
+ mg_chi2_back->GetXaxis()->SetTitle("Transverse Momentum (p_{T})");
+ mg_chi2_back->GetYaxis()->SetTitle("#chi^{2}/NDF");
+ if (tree == "ntKp"){ mg_chi2_back->GetXaxis()->SetLimits(0 ,80); }
+ if (tree == "ntphi"){ mg_chi2_back->GetXaxis()->SetLimits(0 ,60); }
+ //mg_par->GetYaxis()->SetLimits(0, 2.0);
+}
+if(varExp == "nMult"){
+ mg_chi2_back->GetXaxis()->SetTitle("Multiplicity (Mult)");
+ mg_chi2_back->GetYaxis()->SetTitle("#chi^{2}/NDF");
+ mg_chi2_back->GetXaxis()->SetLimits(0, 110);
+ //mg_par->GetYaxis()->SetLimits(0, 2.0);
+}
+mg_chi2_back->GetYaxis()->SetRangeUser(0.0, chi2_max_back*1.4);
+mg_chi2_back->Add(gr_chi2_back);
+mg_chi2_back->Add(grMC_chi2_back);
+mg_chi2_back->Draw("ap");
+
+leg_chi2_back->AddEntry(gr_chi2_back, "Data", "e");
+leg_chi2_back->AddEntry(grMC_chi2_back, "Monte Carlo", "e");
+leg_chi2_back->SetBorderSize(0);
+leg_chi2_back->SetFillStyle(0);
+leg_chi2_back->SetTextSize(0);
+leg_chi2_back->Draw();
+
+const char* pathc_chi2_back =Form("./results/Graphs/chi2_%s_%s_%s.png",tree.Data(),varExp.Data(),background[j].c_str()); 
+c_chi2_back.SaveAs(pathc_chi2_back);
+	}
+
+	for(int j=0; j<signal.size(); j++){
+
+	double chi2_max_sig = 0;
+	double chi2_min_sig = 10;
+	for(int i = 0; i < _nBins; i++){
+		if(chi2_vec_sig[j][i] > chi2_max_sig){
+			chi2_max_sig = chi2_vec_sig[j][i];
+		}else if(chi2MC_vec_sig[j][i] > chi2_max_sig){
+			chi2_max_sig = chi2MC_vec_sig[j][i];
+		}
+		if(chi2_vec_sig[j][i] < chi2_min_sig){
+			chi2_min_sig = chi2_vec_sig[j][i];
+		}else if(chi2MC_vec_sig[j][i] < chi2_min_sig){
+			chi2_min_sig = chi2MC_vec_sig[j][i];
+		}
+	}
+
+TCanvas c_chi2_sig;
+TMultiGraph* mg_chi2_sig = new TMultiGraph();
+TLegend *leg_chi2_sig = new TLegend(0.7,0.8,0.9,0.9);
+
+TGraphAsymmErrors* gr_chi2_sig = new TGraphAsymmErrors(_nBins,var_mean_av,chi2_vec_sig[j],hori_av_low,hori_av_high,nullptr,nullptr);
+gr_chi2_sig->SetLineColor(1); 
+TGraphAsymmErrors* grMC_chi2_sig = new TGraphAsymmErrors(_nBins,var_mean_av,chi2MC_vec_sig[j],hori_av_low,hori_av_high,nullptr,nullptr);
+grMC_chi2_sig->SetLineColor(2); 
+
+
+if(varExp == "By"){
+ mg_chi2_sig->GetXaxis()->SetTitle("Rapidity (y)");
+ mg_chi2_sig->GetYaxis()->SetTitle("#chi^{2}/NDF");
+ mg_chi2_sig->GetXaxis()->SetLimits(-2.4 ,2.4);
+ //mg_par->GetYaxis()->SetLimits(0, 2.0);
+}
+if(varExp == "Bpt"){
+ mg_chi2_sig->GetXaxis()->SetTitle("Transverse Momentum (p_{T})");
+ mg_chi2_sig->GetYaxis()->SetTitle("#chi^{2}/NDF");
+ if (tree == "ntKp"){ mg_chi2_sig->GetXaxis()->SetLimits(0 ,80); }
+ if (tree == "ntphi"){ mg_chi2_sig->GetXaxis()->SetLimits(0 ,60); }
+ //mg_par->GetYaxis()->SetLimits(0, 2.0);
+}
+if(varExp == "nMult"){
+ mg_chi2_sig->GetXaxis()->SetTitle("Multiplicity (Mult)");
+ mg_chi2_sig->GetYaxis()->SetTitle("#chi^{2}/NDF");
+ mg_chi2_sig->GetXaxis()->SetLimits(0, 110);
+ //mg_par->GetYaxis()->SetLimits(0, 2.0);
+}
+mg_chi2_sig->GetYaxis()->SetRangeUser(0.0, chi2_max_sig*1.4);
+mg_chi2_sig->Add(gr_chi2_sig);
+mg_chi2_sig->Add(grMC_chi2_sig);
+mg_chi2_sig->Draw("ap");
+
+leg_chi2_sig->AddEntry(gr_chi2_sig, "Data", "e");
+leg_chi2_sig->AddEntry(grMC_chi2_sig, "Monte Carlo", "e");
+leg_chi2_sig->SetBorderSize(0);
+leg_chi2_sig->SetFillStyle(0);
+leg_chi2_sig->SetTextSize(0);
+leg_chi2_sig->Draw();
+
+
+const char* pathc_chi2_sig =Form("./results/Graphs/chi2_%s_%s_%s.png",tree.Data(),varExp.Data(),signal[j].c_str()); 
+c_chi2_sig.SaveAs(pathc_chi2_sig);
+
+	}
+	//chi2 plot part (signal) ends
+
+
+//chi2 plot part (sigsum) starts
+
+TCanvas c_chi2_sigsum;
+TMultiGraph* mg_chi2_sigsum = new TMultiGraph();
+TLegend *leg_chi2_sigsum = new TLegend(0.7,0.8,0.9,0.9);
+
+	double chi2_max_sigsum = 0;
+	double chi2_min_sigsum = 10;
+
+	for(int j=0; j<signal.size(); j++){
+	for(int i = 0; i < _nBins; i++){
+		if(chi2_vec_sig[j][i] > chi2_max_sigsum){
+			chi2_max_sigsum = chi2_vec_sig[j][i];
+		}
+
+		if(chi2_vec_sig[j][i] < chi2_min_sigsum){
+			chi2_min_sigsum = chi2_vec_sig[j][i];
+		}
+	}
+
+TGraphAsymmErrors* gr_chi2_sigsum = new TGraphAsymmErrors(_nBins,var_mean_av,chi2_vec_sig[j],hori_av_low,hori_av_high,nullptr,nullptr);
+gr_chi2_sigsum->SetLineColor(j+2);
+mg_chi2_sigsum->Add(gr_chi2_sigsum);
+leg_chi2_sigsum->AddEntry(gr_chi2_sigsum, Form("%s",signal[j].c_str()), "e");
+
+	}
+
+if(varExp == "By"){
+ mg_chi2_sigsum->GetXaxis()->SetTitle("Rapidity (y)");
+ mg_chi2_sigsum->GetYaxis()->SetTitle("#chi^{2}/NDF");
+ mg_chi2_sigsum->GetXaxis()->SetLimits(-2.4 ,2.4);
+ //mg_par->GetYaxis()->SetLimits(0, 2.0);
+}
+if(varExp == "Bpt"){
+ mg_chi2_sigsum->GetXaxis()->SetTitle("Transverse Momentum (p_{T})");
+ mg_chi2_sigsum->GetYaxis()->SetTitle("#chi^{2}/NDF");
+ if (tree == "ntKp"){ mg_chi2_sigsum->GetXaxis()->SetLimits(0 ,80); }
+ if (tree == "ntphi"){ mg_chi2_sigsum->GetXaxis()->SetLimits(0 ,60); }
+ //mg_par->GetYaxis()->SetLimits(0, 2.0);
+}
+if(varExp == "nMult"){
+ mg_chi2_sigsum->GetXaxis()->SetTitle("Multiplicity (Mult)");
+ mg_chi2_sigsum->GetYaxis()->SetTitle("#chi^{2}/NDF");
+ mg_chi2_sigsum->GetXaxis()->SetLimits(0, 110);
+ //mg_par->GetYaxis()->SetLimits(0, 2.0);
+}
+mg_chi2_sigsum->Add(gr_chi2);
+mg_chi2_sigsum->GetYaxis()->SetRangeUser(0.0, chi2_max_sigsum*1.4);
+mg_chi2_sigsum->Draw("ap");
+
+leg_chi2_sigsum->AddEntry(gr_chi2, "Nominal", "e");
+leg_chi2_sigsum->SetFillStyle(0);
+leg_chi2_sigsum->SetTextSize(0);
+leg_chi2_sigsum->Draw();
+
+
+const char* pathc_chi2_sigsum =Form("./results/Graphs/chi2_%s_%s_signal_summary.png",tree.Data(),varExp.Data()); 
+c_chi2_sigsum.SaveAs(pathc_chi2_sigsum);
+
+//chi2 plot part (sigsum) ends
+
+//chi2 plot part (backsum) starts
+TCanvas c_chi2_backsum;
+TMultiGraph* mg_chi2_backsum = new TMultiGraph();
+TLegend *leg_chi2_backsum = new TLegend(0.7,0.8,0.9,0.9);
+
+	double chi2_max_backsum = 0;
+	double chi2_min_backsum = 10;
+
+	for(int j=0; j<background.size(); j++){
+	for(int i = 0; i < _nBins; i++){
+		if(chi2_vec_back[j][i] > chi2_max_backsum){
+			chi2_max_backsum = chi2_vec_back[j][i];
+		}
+
+		if(chi2_vec_back[j][i] < chi2_min_backsum){
+			chi2_min_backsum = chi2_vec_back[j][i];
+		}
+	}
+
+TGraphAsymmErrors* gr_chi2_backsum = new TGraphAsymmErrors(_nBins,var_mean_av,chi2_vec_back[j],hori_av_low,hori_av_high,nullptr,nullptr);
+gr_chi2_backsum->SetLineColor(j+2);
+mg_chi2_backsum->Add(gr_chi2_backsum);
+leg_chi2_backsum->AddEntry(gr_chi2_backsum, Form("%s",background[j].c_str()), "e");
+
+	}
+
+if(varExp == "By"){
+ mg_chi2_backsum->GetXaxis()->SetTitle("Rapidity (y)");
+ mg_chi2_backsum->GetYaxis()->SetTitle("#chi^{2}/NDF");
+ mg_chi2_backsum->GetXaxis()->SetLimits(-2.4 ,2.4);
+ //mg_par->GetYaxis()->SetLimits(0, 2.0);
+}
+if(varExp == "Bpt"){
+ mg_chi2_backsum->GetXaxis()->SetTitle("Transverse Momentum (p_{T})");
+ mg_chi2_backsum->GetYaxis()->SetTitle("#chi^{2}/NDF");
+ if (tree == "ntKp"){ mg_chi2_backsum->GetXaxis()->SetLimits(0 ,80); }
+ if (tree == "ntphi"){ mg_chi2_backsum->GetXaxis()->SetLimits(0 ,60); }
+ //mg_par->GetYaxis()->SetLimits(0, 2.0);
+}
+if(varExp == "nMult"){
+ mg_chi2_backsum->GetXaxis()->SetTitle("Multiplicity (Mult)");
+ mg_chi2_backsum->GetYaxis()->SetTitle("#chi^{2}/NDF");
+ mg_chi2_backsum->GetXaxis()->SetLimits(0, 110);
+ //mg_par->GetYaxis()->SetLimits(0, 2.0);
+}
+mg_chi2_backsum->Add(gr_chi2);
+mg_chi2_backsum->GetYaxis()->SetRangeUser(0.0, chi2_max_backsum*1.4);
+mg_chi2_backsum->Draw("ap");
+
+leg_chi2_backsum->AddEntry(gr_chi2, "Nominal", "e");
+leg_chi2_backsum->SetFillStyle(0);
+leg_chi2_backsum->SetTextSize(0);
+leg_chi2_backsum->Draw();
+
+
+const char* pathc_chi2_backsum =Form("./results/Graphs/chi2_%s_%s_background_summary.png",tree.Data(),varExp.Data()); 
+c_chi2_backsum.SaveAs(pathc_chi2_backsum);
+//chi2 plot part (backsum) ends
+}	
+//chi2 plot part ends
 
 }
 
@@ -935,4 +1324,6 @@ void read_samples(RooWorkspace& w, std::vector<TString> label, TString fName, TS
   RooDataSet* data_s = new RooDataSet(sample, sample, t1, arg_list);
   cout << "input filename = " << fName << "; entries: " << data_s->sumEntries() << endl;
   w.import(*data_s, Rename(sample));
+
+  
 }
