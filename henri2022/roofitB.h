@@ -322,7 +322,6 @@ if(npfit != "1" && variation=="" && pdf==""){
 							jpsipi_to_signal_ratio = new RooRealVar("jpsipi_to_signal_ratio","jpsipi_to_signal_ratio", 0.0517);         // from average of pT bins
 							jpsipi_to_signal_ratio->setConstant();}      
 		else { jpsipi_to_signal_ratio = w.var("jpsipi_to_signal_ratio"); }
-		cout << "valor " << jpsipi_to_signal_ratio->getVal() << endl;
 		nbkg_peaking = new RooProduct(Form("nbkg_peaking%d_%s",_count,pdf.Data()), "number of jpsi pi with fixed ratio to n_signal", RooArgList(nsig, *jpsipi_to_signal_ratio));
 				}
 	// B+ PEAKING AND PART. RECONSTRUCTED BACKGROUNDS

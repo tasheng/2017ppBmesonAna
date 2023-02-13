@@ -224,9 +224,9 @@ cout << endl << endl;
 
 	//MODELS for syst studies
 	std::vector<std::string> background;
-	if (tree == "ntKp"){background = {/*"1st", "2nd", "mass_range", */"jpsi_sig"};} 
+	if (tree == "ntKp"){background = {"1st", "2nd", "mass_range", "jpsi_sig"};} 
 	else if (tree == "ntphi"){background = {"1st", "2nd", "mass_range"};}
-	std::vector<std::string> signal = {/*"3gauss", "fixed",*/ "gauss_cb"};
+	std::vector<std::string> signal = {"3gauss", "fixed", "gauss_cb"};
 	//MODELS for syst studies
 	
 	std::vector<std::vector<double>> background_syst;
@@ -791,7 +791,7 @@ if(varExp=="nMult"){
 	hPt->SetYTitle("Uncorrected dN(B_{s})/dp_{T}");
 	hPt->Draw();
 
-	std::vector<std::string> labels_back = {"Linear", "2nd Poly", "mass range" };
+	std::vector<std::string> labels_back = {"Linear", "2nd Poly", "mass range", "jpsipi/JpsiK" };
 	std::vector<std::string> col_name_back;
 	std::vector<std::string> labels_signal = {"Triple Gaussian", "Fixed Mean", "CB+Gaussian", "Double CB"};
 	std::vector<std::string> labels_general = {"Background", "Signal", "Total"};
