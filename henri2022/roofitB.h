@@ -48,7 +48,7 @@ double real_significance;
 
 double minhisto=5.;
 double maxhisto=6.;
-int nbinsmasshisto=50;
+int nbinsmasshisto=100;
 
 Int_t _count=0;
 RooWorkspace* outputw = new RooWorkspace("w");
