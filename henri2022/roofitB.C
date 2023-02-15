@@ -14,7 +14,7 @@ void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotN
 void read_samples(RooWorkspace& w, std::vector<TString>, TString fName, TString treeName, TString sample);
 
 // PDF VARIATION FOR SYST STUDIES
-int syst_study=1;
+int syst_study=0;
 
 void roofitB(int doubly = 0, TString tree = "ntphi", int full = 0, int usePbPb = 0, int fitOnSaved = 0, TString inputdata = "", TString inputmc = "", TString varExp = "", TString trgselection = "",  TString cut = "", TString cutmcgen = "", int isMC = 0, Double_t luminosity = 1., int doweight = 1, TString outputfile = "", TString outplotf = "", TString npfit = "", int doDataCor = 0){ 
 
@@ -25,7 +25,7 @@ void roofitB(int doubly = 0, TString tree = "ntphi", int full = 0, int usePbPb =
 
 	double MyBackground;
 	double yield;
-	int _nBins;
+	int _nBins = 1;
 	TString seldata;
 	TString selmc;
 	TString selmcgen;
@@ -154,7 +154,6 @@ cout << endl << endl;
 	TTree* skimtree_new = (TTree*)inf->Get(tree);
 	TFile* infMC = new TFile(inputmc.Data());
 	TTree* skimtreeMC_new = (TTree*)infMC->Get(tree);
-
 	TH1D* h;
 	TH1D* hMC;
 	TH1D* hpull;
@@ -358,10 +357,10 @@ cout << endl << endl;
 		TCanvas* c= new TCanvas(Form("c%d",_count),"",600,550);
 		TCanvas* cMC= new TCanvas(Form("cMC%d",_count),"",600,600);
 		
-		RooDataSet* ds_cut;
+		RooDataSet* ds_cut ;
 		if(doubly==0) {
 			if(varExp == "Bpt"){
-				ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds,RooArgSet(*mass, *pt, *y, *trackSelection),Form("(Bpt>%f && Bpt < %f)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))",_ptBins[i] , _ptBins[i+1]));
+				ds_cut = new RooDataSet(Form("ds_cut%d",_count), "", ds, RooArgSet(*mass, *pt, *y, *trackSelection), Form("(Bpt>%f && Bpt < %f)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))", _ptBins[i] , _ptBins[i+1]));
 				var_mean_av[i] = ds_cut->mean(*pt);}     	
 			
 			else if(varExp == "By"){
@@ -391,14 +390,16 @@ cout << endl << endl;
 		if(doubly==1) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt, *y, *nMult), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto), "1"); 
 		if(doubly==2) dsMC_cut = new RooDataSet(Form("dsMC_cut%d",_count),"",dsMC, RooArgSet(*mass, *pt,  *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto), "1"); 
 
-
 		// Apply track selection cut
 		std::cout << "data entries: " << ds_cut->sumEntries() << "\n";
 		std::cout << "MC entries: " << dsMC_cut->sumEntries() << "\n";
 		ds_cut = (RooDataSet*) ds_cut->reduce(seldata);
 		dsMC_cut = (RooDataSet*) dsMC_cut->reduce(selmc);
+		RooRealVar * Events_in_MC = new RooRealVar(Form("Events_in_MC_%d",_count),"Events_in_MC", dsMC_cut->sumEntries());
+		ws->import(*Events_in_MC);
 		std::cout << "data entries: " << ds_cut->sumEntries() << "\n";
 		std::cout << "MC entries: " << dsMC_cut->sumEntries() << "\n";
+		std::cout << "MC entries: " << Events_in_MC->getVal() << "\n";
 
 		// create RooDataHist
 		h = new TH1D(Form("h%d",_count),"",nbinsmasshisto,minhisto,maxhisto);
@@ -418,6 +419,8 @@ cout << endl << endl;
 
 ////////// FITFITFITFITFITFITFITFITFITFITFITFIT
 
+		mass->setRange("m_range", 5.19 , 6.);    //set a range to be used if pdf = mass_range
+		mass->setRange("all", minhisto, maxhisto);    
 		cout << "Starting the fiting function" << endl;
 		RooFitResult* f = fit("", "", tree, c, cMC, ds_cut, dsMC_cut, dh, mass, frame, _ptBins[i], _ptBins[i+1], isMC, npfit, *ws);
 
@@ -429,14 +432,7 @@ cout << endl << endl;
 			validate_fit(w_val, tree, varExp, full,q);} ?? */
 		//datahist = frame->getHist("ds");
 		//TGraphAsymmErrors* datagraph = static_cast<TGraphAsymmErrors*>(datahist);
-		
-		//chi2
 
-		RooAbsPdf* model = (RooAbsPdf*)ws->pdf(Form("model%d_%s",_count,""));
-		RooAbsPdf* modelMC = (RooAbsPdf*)ws->pdf(Form("modelMC%d_%s",_count,""));
-		RooPlot* frameMC_chi2 = mass->frame(Title(Form("frameMC_chi2%d_%s",_count,"")), Bins(nbinsmasshisto));
-			
-		//chi2
 
 		RooRealVar* fitYield = static_cast<RooRealVar*>(f->floatParsFinal().at(f->floatParsFinal().index(Form("nsig%d_%s",_count,""))));
 		modelcurve = frame->getCurve(Form("model%d_%s",_count,""));   
@@ -482,12 +478,18 @@ cout << endl << endl;
 		resol_vec_err_high[i] = resol_err;
 //Resolution 
 
-		//chi2  
+		
+		//chi2
+
+		RooAbsPdf* model = (RooAbsPdf*)ws->pdf(Form("model%d_%s",_count,""));
+		RooAbsPdf* modelMC = (RooAbsPdf*)ws->pdf(Form("modelMC%d_%s",_count,""));
+		RooPlot* frameMC_chi2 = mass->frame(Title(Form("frameMC_chi2%d_%s",_count,"")), Bins(nbinsmasshisto));
 		RooChi2Var chi2(Form("chi2%d",_count),"chi2",*model,*dh);
 		double Mychi2 = chi2.getVal()/(nbinsmasshisto - f->floatParsFinal().getSize()); //normalised chi square
 		std::cout << "Chi square value is " << Mychi2 << endl;
 		chi2_vec[i] = Mychi2;
 		chi2MC_vec[i] = frameMC_chi2->chiSquare();
+
 		//chi2
 
 		std::vector<double> aa;
@@ -514,15 +516,15 @@ cout << endl << endl;
 		}
 	////////////////////////////
 
-		TLatex* tex_pt;
-		TLatex* tex_nMult;
-	  	TLatex* tex_y;
-		TLatex* tex_y1;
-		TLatex* tex_y11;
-		TLatex* tex_y2;
-		TLatex* chi_square;
-		TLatex* chi_back;
-		TLatex* chi_sig;
+		TLatex* tex_pt = new TLatex(0.5,0.5,"");
+		TLatex* tex_nMult = new TLatex(0.5,0.5,"");
+	  	TLatex* tex_y = new TLatex(0.5,0.5,"");
+		TLatex* tex_y1 = new TLatex(0.5,0.5,"");
+		TLatex* tex_y11 = new TLatex(0.5,0.5,"");
+		TLatex* tex_y2 = new TLatex(0.5,0.5,"");
+		TLatex* chi_square = new TLatex(0.5,0.5,"");
+		TLatex* chi_back = new TLatex(0.5,0.5,"");
+		TLatex* chi_sig = new TLatex(0.5,0.5,"");
 		
 	if(varExp=="Bpt"){
       //for the paper run these
@@ -533,7 +535,7 @@ cout << endl << endl;
         tex_y1 = new TLatex(0.65,0.34,"1.5 < |y| < 2.4");
         tex_y11 =new TLatex(0.65,0.34,"|y| < 2.4");
         tex_nMult = new TLatex(0.21,0.62,"0 < nTrks < 100");
-		chi_square=new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2));
+		chi_square = new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2));
       } else {
         //for the AN run these
         tex_pt = new TLatex(0.65,0.8,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
@@ -621,7 +623,7 @@ if(varExp=="nMult"){
 
 	CMS_lumi(c,19011,0);
 	c->Update();
-	TLatex* texB;
+	TLatex* texB = new TLatex(0.5,0.5,"");
 	if(tree=="ntphi"){ texB = new TLatex(0.21,0.82, "B^{0}_{s}");}
 	if(tree=="ntKp"){ texB = new TLatex(0.21,0.8, "B^{#pm}");}
 	texB->SetNDC();
@@ -658,7 +660,9 @@ if(varExp=="nMult"){
 				for(int j=0; j<background.size(); j++){
 					RooFitResult* f_back = fit("background", background[j], tree, c, cMC, ds_cut, dsMC_cut, dh, mass, frame, _ptBins[i], _ptBins[i+1], isMC, npfit, *ws);
 					RooAbsPdf* model_back = (RooAbsPdf*)ws->pdf(Form("model%d_%s",_count,background[j].c_str()));
-					RooChi2Var chi2_back("chi2_back","chi2_back",*model_back,*dh);
+					TString chi2_fitRange = (background[j] == "mass_range") ? "m_range" : "all";
+					cout << "chi2_fitRange " << chi2_fitRange << endl;
+					RooChi2Var chi2_back("chi2_back","chi2_back",*model_back,*dh, Range(chi2_fitRange));
 					RooPlot* frameMC_back = mass->frame(Title(Form("frameMC_back%d_%s",_count,background[j].c_str())), Bins(nbinsmasshisto));	
 					RooAbsPdf* modelMC_back = (RooAbsPdf*)ws->pdf(Form("modelMC%d_%s",_count,background[j].c_str()));
 					dsMC_cut->plotOn(frameMC_back);
@@ -779,7 +783,7 @@ if(varExp=="nMult"){
 	hPt->SetYTitle("Uncorrected dN(B_{s})/dp_{T}");
 	hPt->Draw();
 
-	std::vector<std::string> labels_back = {"Linear", "2nd Poly", "mass range", "jpsipi/JpsiK" };
+	std::vector<std::string> labels_back = {"1st Poly", "2nd Poly", "mass range", "jpsipi/JpsiK" };
 	std::vector<std::string> col_name_back;
 	std::vector<std::string> labels_signal = {"Triple Gaussian", "Fixed Mean", "CB+Gaussian", "Double CB"};
 	std::vector<std::string> labels_general = {"Background", "Signal", "Total"};

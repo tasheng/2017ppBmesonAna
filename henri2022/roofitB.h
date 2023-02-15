@@ -117,7 +117,6 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	RooRealVar sigma4cbMC(Form("sigma4cbMC%d_%s",_count, pdf.Data()),"",0.0266,0.01,0.5) ;
 	RooRealVar alphaMC(Form("alphaMC%d_%s",_count,pdf.Data()),"",4.,0,15);
 	RooRealVar nMC(Form("nMC_%d_%s", _count, pdf.Data()),"",10,-100,200);
-
 	RooRealVar* scale;
 	scale = new RooRealVar("scale","scale",1,0,2);
 	RooProduct scaled_sigma1MC(Form("scaled_sigma1MC%d_%s",_count,pdf.Data()),"scaled_sigma1MC", RooArgList(*scale,sigma1MC));
@@ -128,12 +127,9 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	RooGaussian sig2MC(Form("sig2MC%d_%s",_count, pdf.Data()),"",*mass,meanMC,scaled_sigma2MC);  
 	RooGaussian sig3MC(Form("sig3MC%d_%s",_count, pdf.Data()),"",*mass,meanMC,scaled_sigma3MC);  
 	RooCBShape  CBMC(Form("CBMC%d_%s",_count, pdf.Data()),"",*mass,meanMC,scaled_sigma4cbMC, alphaMC, nMC);
-
 	RooRealVar sig1fracMC(Form("sig1fracMC%d_%s",_count, pdf.Data()),"", 0.2, 0.001, 1);
 	RooRealVar sig2fracMC(Form("sig2fracMC%d_%s",_count, pdf.Data()),"", 0.7, 0.001, 1);
-
-	RooRealVar nsigMC(Form("nsigMC%d_%s",_count, pdf.Data()),"",0.5 * dsMC->sumEntries(), 0, 1.2 * dsMC->sumEntries());
-
+	RooRealVar nsigMC(Form("nsigMC%d_%s",_count, pdf.Data()),"",dsMC->sumEntries(), 0.9*dsMC->sumEntries(), 1.2 * dsMC->sumEntries());
 	RooAddPdf* sigMC;
 	if((variation=="" && pdf=="") || variation== "background" || (variation=="signal" && pdf=="fixed" )) sigMC = new RooAddPdf(Form("sigMC%d_%s",_count,pdf.Data()),"",RooArgList(sig1MC,sig2MC),sig1fracMC);
 	if(variation=="signal" && pdf=="3gauss") sigMC = new RooAddPdf(Form("sigMC%d_%s",_count, pdf.Data()), "", RooArgList(sig1MC, sig2MC, sig3MC), RooArgList(sig1fracMC, sig2fracMC), true);
@@ -144,8 +140,9 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	if(variation =="" && pdf=="") modelMC = new RooAddPdf(Form("modelMC%d_%s",_count, pdf.Data()),"",RooArgList(*sigMC),RooArgList(nsigMC));
 
 //////////ROOFIT ROOFIT ROOFIT  MC MC MC MC 
-
-	mass->setRange("signal",init_mean-0.2, init_mean+0.2);    //focus the MC fit to the signal region to prevent statistical flutuations
+	double subt = 0.14;
+	if (tree == "ntphi") subt = .10;
+	mass->setRange("signal",init_mean-subt, init_mean+subt);  //focus the MC fit to the signal region to prevent statistical flutuations
 	scale->setConstant();
 	RooFitResult * fitResultMC;
 	fitResultMC = modelMC->fitTo(*dsMC,Save(), Range("signal"));
@@ -158,36 +155,40 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 //PLOT MC 
 
 	pMC1->cd();
-	dsMC->plotOn(frameMC,Name(Form("dsMC_cut%d",_count)),Binning(nbinsmasshisto),MarkerSize(1.55),MarkerStyle(20),LineColor(1),LineWidth(4));
-	modelMC->plotOn(frameMC,Name(Form("sigMC%d_%s",_count, pdf.Data())),Components(*sigMC),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),LineColor(kOrange-3),LineWidth(4));
-	modelMC->plotOn(frameMC,Name(Form("sigFMC%d_%s",_count, pdf.Data())),Components(*sigMC),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("F"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(4));
-	modelMC->plotOn(frameMC,Name(Form("modelMC%d_%s",_count, pdf.Data())),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),LineColor(2),LineWidth(4));
-	modelMC->paramOn(frameMC,Layout(0.62, 0.955, 0.9), Format("NEU",AutoPrecision(1)));
+	dsMC->plotOn(frameMC,Name(Form("dsMC_cut%d",_count)),Binning(nbinsmasshisto),MarkerSize(1.55),MarkerStyle(20),LineColor(1),LineWidth(2));
+	//modelMC->plotOn(frameMC,Name(Form("sigMC%d_%s",_count, pdf.Data())),Components(*sigMC),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("LF"),LineColor(kOrange-3),LineWidth(2));
+	modelMC->plotOn(frameMC,Name(Form("sigMC%d_%s",_count, pdf.Data())),Components(*sigMC),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("LF"),FillStyle(3002),FillColor(kOrange-3),LineStyle(7),LineColor(kOrange-3),LineWidth(2));
+	modelMC->plotOn(frameMC,Name(Form("modelMC%d_%s",_count, pdf.Data())),Normalization(1.0,RooAbsReal::RelativeExpected),Precision(1e-6),DrawOption("L"),LineColor(2),LineWidth(2));
+	modelMC->paramOn(frameMC,Layout(0.65, 0.955, 0.9), Format("NEU",AutoPrecision(1)));
 	frameMC->getAttText()->SetTextSize(0.02);
-	double plot_minMC = 5.25;
-	if(tree=="ntKp") plot_minMC = 5.1;
-	frameMC->GetXaxis()->SetRangeUser(plot_minMC, 5.5);
+	frameMC->getAttFill()->SetFillStyle(0);
+	frameMC->getAttLine()->SetLineWidth(0);
+	frameMC->GetXaxis()->SetRangeUser(init_mean-subt, init_mean+subt);
 	frameMC->Draw();
 	cMC->RedrawAxis();
-	TLatex* texB_pt;
-	texB_pt = new TLatex(0.2,0.80, Form("%d < p_{T} <%d GeV",ptmin, ptmax));
+	TLatex* texB_pt= new TLatex(0.2,0.80, Form("%d < p_{T} <%d GeV",ptmin, ptmax));
+	TLatex* texB_N_vs_count = new TLatex(0.2,0.75, Form("Bin Events: %i", int (w.var(Form("Events_in_MC_%d",_count))->getVal()) ));
 	texB_pt->SetNDC();
 	texB_pt->SetTextFont(42);
 	texB_pt->SetTextSize(0.03);
 	texB_pt->SetLineWidth(1);
 	texB_pt->Draw();
+	texB_N_vs_count->SetNDC();
+	texB_N_vs_count->SetTextFont(42);
+	texB_N_vs_count->SetTextSize(0.03);
+	texB_N_vs_count->SetLineWidth(1);
+	texB_N_vs_count->Draw();
 	//cMC->SetLogy();
 
 //PLOT MC
 //PULL MC
 
 	pMC2->cd();
-	RooRealVar x("x","",1e3,0,1e6);
-	x.setVal(0.);
+	RooRealVar x("x","",0,0,1e6);
 	RooGenericPdf* line_ref = new RooGenericPdf("ref_0", "ref_0", "x", RooArgList(x));
 	RooHist* pull_histMC = frameMC->pullHist(Form("dsMC_cut%d",_count),Form("modelMC%d_%s",_count, pdf.Data()));
 	RooPlot* pull_plotMC = mass->frame();
-	(pull_plotMC->GetXaxis())->SetRangeUser(plot_minMC, 5.5);
+	(pull_plotMC->GetXaxis())->SetRangeUser(init_mean-subt, init_mean+subt);
 	line_ref->plotOn(pull_plotMC, LineStyle(7), LineColor(13), LineWidth(2));  
 	pull_plotMC->addPlotable(static_cast<RooPlotable*>(pull_histMC),"XP");
 	pull_plotMC->SetTitle("");
@@ -366,10 +367,8 @@ if(tree == "ntphi"){
 
 //////////////// SET PARAMETERS FROM MC FITS
 
-////// ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT
+////// ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT
 
-	mass->setRange("m_range", 5.19 , 6.);    //set a range to be used if pdf = mass_range
-	mass->setRange("all", minhisto, maxhisto);    
   	TString fitRange = (pdf == "mass_range") ? "m_range" : "all";
 	RooFitResult* fitResult = model->fitTo(*ds,Save(), Minos(),Extended(kTRUE), Range(fitRange));
 	w.import(*model);
@@ -378,7 +377,7 @@ if(tree == "ntphi"){
 
 	cout << "DATA FIT Done " << endl;
 
-////// ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT
+////// ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT
 
   p1->cd();
   ds->plotOn(frame, Name(Form("ds_cut%d", _count)), Binning(nbinsmasshisto), MarkerSize(1), MarkerStyle(20), MarkerColor(1), LineColor(1), LineWidth(2)); 
@@ -386,16 +385,16 @@ if(tree == "ntphi"){
   if(npfit != "1")	{
 	//TString option = (pdf == "mass_range")? "L" : "LF";
     //RooCmdArg drawRange = (pdf == "mass_range")? Range(fitRange) : RooCmdArg();
-    model->plotOn(frame,  Name(Form("erfc%d_%s",_count,pdf.Data())) , Components(Form("erfc%d_",_count)),Range(fitRange), Precision(1e-6), DrawOption("L"), FillStyle(3005),FillColor(kGreen+4), LineStyle(1), LineColor(kGreen+4), LineWidth(3));
-  	model->plotOn(frame, RooFit::Name("B->J/#psi #pi"),Components("jpsipi"), NormRange("bmass"),LineColor(kPink+10), LineStyle(kDashed));
+    model->plotOn(frame,  Name(Form("erfc%d_%s",_count,pdf.Data())) , Components(Form("erfc%d_",_count)), Precision(1e-6), DrawOption("L"), /*FillStyle(3005),*/ FillColor(kGreen+4), LineStyle(1), LineColor(kGreen+4), LineWidth(2));
+  	model->plotOn(frame, RooFit::Name("B->J/#psi #pi"),Components("jpsipi"), NormRange("bmass"), LineColor(kPink+10), LineStyle(kDashed), LineWidth(2));
 					}
 
-	model->plotOn(frame, Name(Form("bkg%d", _count)) ,  Components(bkg), Range(fitRange), Precision(1e-6), DrawOption("L"),LineStyle(7), LineColor(4), LineWidth(3));
-	model->plotOn(frame, Name(Form("model%d_%s", _count, pdf.Data())), Range(fitRange), Precision(1e-6), DrawOption("L"), LineColor(2), LineWidth(3));
-	if(pdf!="1gauss") {model->plotOn(frame, Name(Form("sig%d_%s", _count, pdf.Data())),  Components(*sig), Range(fitRange), Precision(1e-6), DrawOption("LF"), FillStyle(3002), FillColor(kOrange-3), LineStyle(7), LineColor(kOrange-3), LineWidth(3));} 
-	else {model->plotOn(frame, Name(Form("sig%d", _count)),  Components(sig1), NormRange(fitRange), Precision(1e-6), DrawOption("LF"), FillStyle(3002), FillColor(kOrange-3), LineStyle(7), LineColor(kOrange-3), LineWidth(3));}
+	model->plotOn(frame, Name(Form("bkg%d", _count)) ,  Components(bkg), Range(fitRange), Precision(1e-6), DrawOption("L"),LineStyle(7), LineColor(4), LineWidth(2));
+	model->plotOn(frame, Name(Form("model%d_%s", _count, pdf.Data())), Range(fitRange), Precision(1e-6), DrawOption("L"), LineColor(2), LineWidth(2));
+	if(pdf!="1gauss") {model->plotOn(frame, Name(Form("sig%d_%s", _count, pdf.Data())),  Components(*sig), Range(fitRange), Precision(1e-6), DrawOption("LF"), FillStyle(3002), FillColor(kOrange-3), LineStyle(7), LineColor(kOrange-3), LineWidth(2));} 
+	else {model->plotOn(frame, Name(Form("sig%d", _count)),  Components(sig1), NormRange(fitRange), Precision(1e-6), DrawOption("LF"), FillStyle(3002), FillColor(kOrange-3), LineStyle(7), LineColor(kOrange-3), LineWidth(2));}
 
-  	if(!drawLegend){model->paramOn(frame,Layout(0.6, 0.98, 0.68), Format("NEU",AutoPrecision(3)));} 
+  	if(!drawLegend){model->paramOn(frame,Layout(0.6, 0.98, 0.68), Format("NEU",AutoPrecision(2)));} 
 
 	frame->getAttText()->SetTextSize(0.00);
 	frame->getAttFill()->SetFillStyle(0);
@@ -419,12 +418,8 @@ if(tree == "ntphi"){
 	p2->cd();
 
 	RooHist* pull_hist = frame->pullHist(Form("ds_cut%d",_count),Form("model%d_%s",_count,pdf.Data()));
-	//  RooHist* pull_hist = frame->pullHist("Data","Fit");
 	RooPlot* pull_plot = mass->frame();
 	(pull_plot->GetXaxis())->SetRangeUser(minhisto,maxhisto); //maxhisto
-	//RooRealVar x("x","",1e3,0,1e6);
-	//x.setVal(0.);
-	//RooGenericPdf* line_ref = new RooGenericPdf("ref_0", "ref_0", "x", RooArgList(x));
 	line_ref->plotOn(pull_plot, LineStyle(7), LineColor(13), LineWidth(2));  
 	pull_plot->addPlotable(static_cast<RooPlotable*>(pull_hist),"XP");
 	pull_plot->SetTitle("");
@@ -492,20 +487,8 @@ if(tree == "ntphi"){
 		fh->SetBinError(i+1, sqrt(fitArr[i]));
 	}
 
-	double chiRoo = frame->chiSquare(Form("model%d_%s",_count,pdf.Data()),Form("ds_cut%d",_count), fitResult->floatParsFinal().getSize());
-	double chi2Std = 0;
-	double chi2Neyman = 0;
-	double chi2Peason = 0;
-	double chi2BakerCousins = 0;
-	chi2Cal(dataArr, dataErrArr, fitArr, nbinsmasshisto, chi2Std, chi2Neyman, chi2Peason, chi2BakerCousins);
-	printf("chi2 Standard: %f\n",chi2Std);
-	printf("chi2 Neyman: %f\n",chi2Neyman);
-	printf("chi2 Peason: %f\n",chi2Peason);
-	printf("chi2 Baker & Cousins: %f\n",chi2BakerCousins);
-
 	TLegend *leg = new TLegend(0.62,0.55,0.89,0.75,NULL,"brNDC"); 
 	leg = new TLegend(0.65/1.20+0.10,0.42,0.89+0.10,0.90,NULL,"brNDC");
-	
 	leg->SetBorderSize(0);
 	leg->SetTextSize(0.04);
 	leg->SetTextFont(42);
@@ -516,21 +499,6 @@ if(tree == "ntphi"){
 	leg->AddEntry(frame->findObject(Form("bkg%d_%s",_count,pdf.Data())),"Background","l");
 	if(npfit != "1") leg -> AddEntry(frame->findObject(Form("erfc%d_%s",_count,pdf.Data())),"B #rightarrow J/#psi X","f");
   	if (drawLegend) {leg -> Draw();}
-
-	float posit = 0.58;
-	int nDOF = nbinsmasshisto-(fitResult->floatParsFinal().getSize());
-	float nChi2 = chi2BakerCousins/(nbinsmasshisto-(fitResult->floatParsFinal().getSize()));
-	int nDigit_chi2BakerCousins = 2;
-	int nDigit_nChi2 = 2;
-	chi2BakerCousins = roundToNdigit(chi2BakerCousins);
-	nChi2 = roundToNdigit(nChi2);
-	nDigit_chi2BakerCousins = sigDigitAfterDecimal(chi2BakerCousins);
-	nDigit_nChi2 = sigDigitAfterDecimal(nChi2);
-	TLatex* texChi = new TLatex(0.65,0.64, Form("#chi^{2}/nDOF = %2f", chiRoo));
-	texChi->SetNDC();
-	texChi->SetTextAlign(12);
-	texChi->SetTextSize(0.03);
-	texChi->SetTextFont(42);
 
 	nsig.setVal(0.);
 	nsig.setConstant();
@@ -753,7 +721,6 @@ void latex_table(std::string filename, int n_col, int n_lin, std::vector<std::st
 			file << std::setprecision(3)<< numbers[c-1][i-1]<< " \\% & ";
 			file_check << std::setprecision(3) << numbers[c-1][i-1]<< " \\% & ";
 									}
-
 		file << std::setprecision(3)<< numbers[n_col-2][i-1]<< " \\% \\\\" << std::endl;
 		file_check << std::setprecision(3)<< numbers[n_col-2][i-1]<< " \\% \\\\" << std::endl; 
 	}
