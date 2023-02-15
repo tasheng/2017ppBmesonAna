@@ -214,10 +214,6 @@ cout << endl << endl;
 	if(isMC) _isMC = "mcAsData";
 	TString _isPbPb = "pp";
 
-	TString outputf;
-	outputf = Form("%s",outputfile.Data());
-	TFile* outf = new TFile(outputf.Data(),"recreate");
-	outf->cd();
 	dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
 	ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new,RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
 
@@ -307,7 +303,7 @@ cout << endl << endl;
 		RooDataSet* full_data_MC = (RooDataSet*) ws->data("jpsinp");
 		full_data_MC = (RooDataSet*)full_data_MC->reduce("(BDT_pt_5_7 > 0.08 && Bpt >= 5 && Bpt < 7) || (BDT_pt_7_10 > 0.07 && Bpt >= 7 && Bpt < 10) || (BDT_pt_10_15 > 0.0 && Bpt >= 10 && Bpt < 15) || (BDT_pt_15_20 > 0.02 && Bpt >= 15 && Bpt < 20) || (BDT_pt_20_50 > 0.04 && Bpt >= 20 && Bpt < 50) || (Bpt >= 20 && Bpt < 50) ");
 		full_data_MC = (RooDataSet*)full_data_MC->reduce("(Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10)");
-		
+	
 		// FORM INCLUSIVE SIGNAL AND PEAKING Background BINS
 		RooDataSet* ds_sig = (RooDataSet*) full_data_MC->reduce("Bgen == 23333");
 		RooDataSet* fullds_JPSI_shape_fix = (RooDataSet*)full_data_MC->reduce("Bgen == 23335");
@@ -477,7 +473,6 @@ cout << endl << endl;
 		resol_vec_err_low[i] = resol_err;
 		resol_vec_err_high[i] = resol_err;
 //Resolution 
-
 		
 		//chi2
 
@@ -750,6 +745,8 @@ if(varExp=="nMult"){
 		}
 	}
 
+	TFile* outf = new TFile(Form("%s",outputfile.Data()),"recreate");
+	outf->cd();
 	hMean->Write();
 	hPt->Write();
 	outf->Close();	
@@ -1105,7 +1102,6 @@ gr_chi2_sig->SetLineColor(1);
 TGraphAsymmErrors* grMC_chi2_sig = new TGraphAsymmErrors(_nBins,var_mean_av,chi2MC_vec_sig[j],hori_av_low,hori_av_high,nullptr,nullptr);
 grMC_chi2_sig->SetLineColor(2); 
 
-
 if(varExp == "By"){
  mg_chi2_sig->GetXaxis()->SetTitle("Rapidity (y)");
  mg_chi2_sig->GetYaxis()->SetTitle("#chi^{2}/NDF");
@@ -1169,7 +1165,6 @@ TGraphAsymmErrors* gr_chi2_sigsum = new TGraphAsymmErrors(_nBins,var_mean_av,chi
 gr_chi2_sigsum->SetLineColor(j+2);
 mg_chi2_sigsum->Add(gr_chi2_sigsum);
 leg_chi2_sigsum->AddEntry(gr_chi2_sigsum, Form("%s",signal[j].c_str()), "e");
-
 	}
 
 if(varExp == "By"){

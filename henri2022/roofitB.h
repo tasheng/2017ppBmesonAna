@@ -657,7 +657,7 @@ void plot_jpsifit(RooWorkspace& w, TString pdf, RooAbsPdf* model, RooDataSet* ds
 /* Fix or release the parameters for a given PDF */
 void fix_parameters(RooWorkspace& w, TString pdfName, bool release) {
   RooAbsPdf* pdf = w.pdf(pdfName);
-  RooAbsData* ds = w.data("data");
+  RooAbsData* ds = w.data("jpsinp");
   RooArgSet* par_set = pdf->getParameters(*ds);
   auto itr = par_set->createIterator();
   bool toFix = ! release;
