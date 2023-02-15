@@ -8,13 +8,15 @@
 #include <TGraph.h>
 #include "TMultiGraph.h"
 #include "TGraphErrors.h"
+#include<stdio.h>
+
 
 template<typename... Targs>
 void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotName,  Targs... options);
 void read_samples(RooWorkspace& w, std::vector<TString>, TString fName, TString treeName, TString sample);
 
 // PDF VARIATION FOR SYST STUDIES
-int syst_study=0;
+int syst_study=1;
 
 void roofitB(int doubly = 0, TString tree = "ntphi", int full = 0, int usePbPb = 0, int fitOnSaved = 0, TString inputdata = "", TString inputmc = "", TString varExp = "", TString trgselection = "",  TString cut = "", TString cutmcgen = "", int isMC = 0, Double_t luminosity = 1., int doweight = 1, TString outputfile = "", TString outplotf = "", TString npfit = "", int doDataCor = 0){ 
 
@@ -214,6 +216,7 @@ cout << endl << endl;
 	if(isMC) _isMC = "mcAsData";
 	TString _isPbPb = "pp";
 
+
 	dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
 	ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new,RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
 
@@ -303,7 +306,7 @@ cout << endl << endl;
 		RooDataSet* full_data_MC = (RooDataSet*) ws->data("jpsinp");
 		full_data_MC = (RooDataSet*)full_data_MC->reduce("(BDT_pt_5_7 > 0.08 && Bpt >= 5 && Bpt < 7) || (BDT_pt_7_10 > 0.07 && Bpt >= 7 && Bpt < 10) || (BDT_pt_10_15 > 0.0 && Bpt >= 10 && Bpt < 15) || (BDT_pt_15_20 > 0.02 && Bpt >= 15 && Bpt < 20) || (BDT_pt_20_50 > 0.04 && Bpt >= 20 && Bpt < 50) || (Bpt >= 20 && Bpt < 50) ");
 		full_data_MC = (RooDataSet*)full_data_MC->reduce("(Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10)");
-	
+		
 		// FORM INCLUSIVE SIGNAL AND PEAKING Background BINS
 		RooDataSet* ds_sig = (RooDataSet*) full_data_MC->reduce("Bgen == 23333");
 		RooDataSet* fullds_JPSI_shape_fix = (RooDataSet*)full_data_MC->reduce("Bgen == 23335");
@@ -419,6 +422,7 @@ cout << endl << endl;
 		mass->setRange("all", minhisto, maxhisto);    
 		cout << "Starting the fiting function" << endl;
 		RooFitResult* f = fit("", "", tree, c, cMC, ds_cut, dsMC_cut, dh, mass, frame, _ptBins[i], _ptBins[i+1], isMC, npfit, *ws);
+		
 
 ////////// FITFITFITFITFITFITFITFITFITFITFITFIT
 
@@ -454,6 +458,11 @@ cout << endl << endl;
 		yield_vec_err_high[i]=yield_vec_err_high[i]/(_ptBins[i+1]-_ptBins[i]);
 		hori_av_low[i] = var_mean_av[i]-_ptBins[i];
 		hori_av_high[i] = _ptBins[i+1]-var_mean_av[i];
+		cout<<"AQUIIIIIIIIIIIIIIIIi"<<endl;
+		cout<<var_mean_av[i]<<endl;
+		cout<<hori_av_high[i]<<endl;
+		cout<<hori_av_low[i]<<endl;
+		cout<<"AQUIIIIIIIIIIIIIIIIi"<<endl;
 
 ////////////////////////////	
 //Resolution MC
@@ -473,17 +482,22 @@ cout << endl << endl;
 		resol_vec_err_low[i] = resol_err;
 		resol_vec_err_high[i] = resol_err;
 //Resolution 
+
 		
 		//chi2
 
 		RooAbsPdf* model = (RooAbsPdf*)ws->pdf(Form("model%d_%s",_count,""));
 		RooAbsPdf* modelMC = (RooAbsPdf*)ws->pdf(Form("modelMC%d_%s",_count,""));
 		RooPlot* frameMC_chi2 = mass->frame(Title(Form("frameMC_chi2%d_%s",_count,"")), Bins(nbinsmasshisto));
+		dsMC_cut->plotOn(frameMC_chi2);
+		modelMC->plotOn(frameMC_chi2);
 		RooChi2Var chi2(Form("chi2%d",_count),"chi2",*model,*dh);
 		double Mychi2 = chi2.getVal()/(nbinsmasshisto - f->floatParsFinal().getSize()); //normalised chi square
+		
 		std::cout << "Chi square value is " << Mychi2 << endl;
 		chi2_vec[i] = Mychi2;
 		chi2MC_vec[i] = frameMC_chi2->chiSquare();
+	
 
 		//chi2
 
@@ -745,11 +759,12 @@ if(varExp=="nMult"){
 		}
 	}
 
+
 	TFile* outf = new TFile(Form("%s",outputfile.Data()),"recreate");
 	outf->cd();
-	hMean->Write();
-	hPt->Write();
-	outf->Close();	
+	hMean->Write();		
+	hPt->Write();		
+	outf->Close();		
 
 	string Path;
 	if(tree == "ntphi"){ Path = "./filesbs/";}
@@ -798,25 +813,129 @@ if(varExp=="nMult"){
 
 	if(varExp=="Bpt"){name="$<p_T<$";} else if(varExp=="By"){name="$<y<$";} else if(varExp=="nMult"){name="$<nTrks<$";}
 	for(int i=0;i<m;i++){
-		std::ostringstream collabel;
-		std::ostringstream siglabel;
-		std::ostringstream genlabel;
-		std::ostringstream statlabel;
-		collabel<<_ptBins[i]<<name<<_ptBins[i+1];
-		siglabel<<_ptBins[i]<<name<<_ptBins[i+1];
-		genlabel<<_ptBins[i]<<name<<_ptBins[i+1];
-		statlabel<<" "<<_ptBins[i]<<name<<_ptBins[i+1];
-		std::string label1 = collabel.str();
+		std::ostringstream clabel;
+		clabel<<_ptBins[i]<<name<<_ptBins[i+1];
+		std::string label1 = clabel.str();
 		col_name_back.push_back(label1);
 		col_name_signal.push_back(label1);
 		col_name_general.push_back(label1);
 		col_name_general_stat.push_back(label1);
 	}
 	if(syst_study==1 && full==0){
+		gSystem->mkdir("./results/tables",true); 
 		latex_table(Path + "background_systematics_table_"+std::string (varExp.Data())+"_"+std::string (tree.Data()), _nBins+1,  (int)(1+background.size()),  col_name_back,labels_back,back_syst_rel_values, "Background PDF Systematic Errors");
 		latex_table(Path + "signal_systematics_table_"+std::string (varExp.Data())+"_"+std::string (tree.Data()), _nBins+1, (int)(1+signal.size()),    col_name_signal, labels_signal,sig_syst_rel_values, "Signal PDF Systematic Errors");
 		latex_table(Path + "general_systematics_table_"+std::string (varExp.Data())+"_"+std::string (tree.Data()),  _nBins+1, 4 , col_name_general, labels_general, general_syst, "Overall PDF Variation Systematic Errors");	
 		latex_table(Path + "Statistical_error_table_"+std::string (varExp.Data())+"_"+std::string (tree.Data()),  _nBins+1, 2 , col_name_general_stat, labels_general_stat, stat_error, "Statistical error");	
+		
+		std::vector<std::string> tabeltype ={"background_systematics_table_", "signal_systematics_table_", "general_systematics_table_", "Statistical_error_table_"};
+		std::vector<std::string> filetype ={"_check.aux", "_check.log", "_check.pdf"};
+		for (int i=0;i<(int)(tabeltype.size());i++){
+			for (int j=0;j<(int)(filetype.size());j++){
+				rename((tabeltype[i]+std::string (varExp.Data())+"_"+std::string (tree.Data())+filetype[j]).c_str(),(Path+tabeltype[i]+std::string (varExp.Data())+"_"+std::string (tree.Data())+filetype[j]).c_str());
+			}
+		}
+		
+		double zero[_nBins];
+		for (int i=0;i<_nBins;i++){zero[i]=0.;}
+
+		TCanvas* c_back= new TCanvas();
+		TLegend* legback=new TLegend(0.7,0.8,0.9,0.9);
+		TMultiGraph* m_back= new TMultiGraph();
+		const char* backlabel[4]={"Linear", "2nd Poly", "mass range", "jpsipi/JpsiK"};
+		double y_max_back=0;
+		for (int j=0;j<(int)(background.size());j++){
+			Double_t x[_nBins],y[_nBins];
+			for (int i=0;i<_nBins;i++){
+				x[i]=(_ptBins[i]+_ptBins[i+1])/2;
+				y[i]=	back_syst_rel_values[i][j];
+				if (y[i]>y_max_back){y_max_back=y[i];}
+		}
+			TGraph *g_back= new TGraphAsymmErrors (_nBins,x,y,zero,zero,zero,zero);
+			g_back->SetMarkerColor(j+1);
+			g_back->SetMarkerStyle(21);
+			m_back->Add(g_back);
+			legback->AddEntry(g_back,backlabel[j],"p");
+	}
+		m_back->GetXaxis()->SetTitle(varExp.Data());
+		m_back->GetYaxis()->SetTitle("Systematic Uncertainty(%)");
+		m_back->GetYaxis()->SetRangeUser(0, y_max_back*1.5);
+		m_back->Draw("A*");
+		legback->SetFillStyle(0);
+    	legback->SetTextSize(0);
+		legback->Draw();
+		c_back->SaveAs(Form("./results/tables/background_systematics_plot_%s_%s.png",tree.Data(),varExp.Data())); 
+
+		TCanvas* c_sig= new TCanvas();
+		TLegend* legsig=new TLegend(0.7,0.8,0.9,0.9);
+		TMultiGraph* m_sig= new TMultiGraph();
+		const char* siglabel[4]={"Triple Gaussian", "Fixed Mean", "CB+Gaussian","2 CB"};
+		double y_max_sig=0;
+		for (int j=0;j<(int)(signal.size());j++){
+			Double_t x[_nBins],y[_nBins];
+			for (int i=0;i<_nBins;i++){
+				x[i]=(_ptBins[i]+_ptBins[i+1])/2;
+				y[i]=	sig_syst_rel_values[i][j];
+				if (y[i]>y_max_sig){y_max_sig=y[i];}
+	}
+		TGraph *g_sig= new TGraphAsymmErrors (_nBins,x,y,zero,zero,zero,zero);
+		g_sig->SetMarkerColor(j+1);
+		g_sig->SetMarkerStyle(21);
+		m_sig->Add(g_sig);
+		legsig->AddEntry(g_sig,siglabel[j],"p");
+}
+	m_sig->GetXaxis()->SetTitle(varExp.Data());
+	m_sig->GetYaxis()->SetTitle("Systematic Uncertainty(%)");
+	m_sig->GetYaxis()->SetRangeUser(0, y_max_sig*1.5);
+	m_sig->Draw("A*");
+	legsig->SetFillStyle(0);
+  legsig->SetTextSize(0);
+	legsig->Draw();
+	c_sig->SaveAs(Form("./results/tables/signal_systematics_plot_%s_%s.png",tree.Data(),varExp.Data())); 
+
+	
+
+	TCanvas* c_gen= new TCanvas();
+	TLegend* legen=new TLegend(0.7,0.8,0.9,0.9);
+	TMultiGraph* m_gen= new TMultiGraph();
+	const char* genlabel[3]={"Background", "Signal", "Total"};
+	double y_max_gen=0;
+	for (int j=0;j<(int)(labels_general.size());j++){
+		Double_t x[_nBins],y[_nBins];
+		for (int i=0;i<_nBins;i++){
+			x[i]=(_ptBins[i]+_ptBins[i+1])/2;
+			y[i]=	general_syst[i][j];
+			if (y[i]>y_max_gen){y_max_gen=y[i];}
+	}
+		TGraph *g_gen= new TGraphAsymmErrors (_nBins,x,y,zero,zero,zero,zero);
+		g_gen->SetMarkerColor(j+1);
+		g_gen->SetMarkerStyle(21);
+		m_gen->Add(g_gen);
+		legen->AddEntry(g_gen,genlabel[j],"p");
+}
+	Double_t x[_nBins],y[_nBins];
+	for (int i=0;i<_nBins;i++){
+			x[i]=(_ptBins[i]+_ptBins[i+1])/2;
+			y[i]=	stat_error[i][0];
+	}
+		TGraph *g_gen= new TGraphAsymmErrors (_nBins,x,y,zero,zero,zero,zero);
+		g_gen->SetMarkerColor(9);
+		g_gen->SetMarkerStyle(21);
+		m_gen->Add(g_gen);
+		legen->AddEntry(g_gen,"Statistical","p");
+
+
+
+	m_gen->GetXaxis()->SetTitle(varExp.Data());
+	m_gen->GetYaxis()->SetTitle("Total Uncertainty(%)");
+	m_gen->GetYaxis()->SetRangeUser(0, y_max_gen*1.5);
+	m_gen->Draw("A*");
+	legen->SetFillStyle(0);
+  	legen->SetTextSize(0);
+	legen->Draw();
+	c_gen->SaveAs(Form("./results/tables/general_systematics_plot_%s_%s.png",tree.Data(),varExp.Data())); 
+	
+	
 	}
 
 // Differential plot part starts
@@ -877,7 +996,6 @@ if(varExp=="nMult"){
 
 	 TCanvas c_par;
 	 TMultiGraph* mg_par = new TMultiGraph();
-
 	 TGraphAsymmErrors* gr_scale = new TGraphAsymmErrors(_nBins,var_mean_av,scale_vec,hori_av_low,hori_av_high,scale_vec_err_low,scale_vec_err_high);
 	 gr_scale->SetLineColor(1); 
 	
@@ -889,8 +1007,8 @@ if(varExp=="nMult"){
 	 if(varExp == "Bpt"){
 		 mg_par->GetXaxis()->SetTitle("Transverse Momentum (p_{T})");
 		 mg_par->GetYaxis()->SetTitle("Mass resolution scale factor");
-		 if (tree == "ntKp"){ mg->GetXaxis()->SetLimits(0 ,80); }
-		 if (tree == "ntphi"){ mg->GetXaxis()->SetLimits(0 ,60); }
+		 if (tree == "ntKp"){ mg_par->GetXaxis()->SetLimits(0 ,80); }
+		 if (tree == "ntphi"){ mg_par->GetXaxis()->SetLimits(0 ,60); }
 	 }
 	 if(varExp == "nMult"){
 		 mg_par->GetXaxis()->SetTitle("Multiplicity (Mult)");
@@ -900,15 +1018,7 @@ if(varExp=="nMult"){
 	 mg_par->Add(gr_scale);
 	 mg_par->GetYaxis()->SetRangeUser(0,scale_max*1.4);
 	 mg_par->Draw("ap");
-/*	 
-     TLegend *leg_par = new TLegend(0.7,0.7,0.9,0.9);
-	 leg_par->AddEntry(gr_scale, "Scale", "e");
-	 //leg_d->AddEntry(grs, "Systematic Uncertainty", "e");
-	 leg_par->SetBorderSize(0);
-	 leg_par->SetFillStyle(0);
-	 leg_par->SetTextSize(0);
-	 leg_par->Draw();
-*/
+
 	 const char* pathc_par =Form("./results/Graphs/parameters_variation_%s_%s.png",tree.Data(),varExp.Data()); 
 	 c_par.SaveAs(pathc_par);
 //Parameters vs variables part ends
@@ -976,6 +1086,7 @@ TGraphAsymmErrors* gr_chi2 = new TGraphAsymmErrors(_nBins,var_mean_av,chi2_vec,h
 gr_chi2->SetLineColor(1); 
 TGraphAsymmErrors* grMC_chi2 = new TGraphAsymmErrors(_nBins,var_mean_av,chi2MC_vec,hori_av_low,hori_av_high,nullptr,nullptr);
 grMC_chi2->SetLineColor(2); 
+
 
 
 if(varExp == "By"){
@@ -1102,6 +1213,7 @@ gr_chi2_sig->SetLineColor(1);
 TGraphAsymmErrors* grMC_chi2_sig = new TGraphAsymmErrors(_nBins,var_mean_av,chi2MC_vec_sig[j],hori_av_low,hori_av_high,nullptr,nullptr);
 grMC_chi2_sig->SetLineColor(2); 
 
+
 if(varExp == "By"){
  mg_chi2_sig->GetXaxis()->SetTitle("Rapidity (y)");
  mg_chi2_sig->GetYaxis()->SetTitle("#chi^{2}/NDF");
@@ -1165,6 +1277,7 @@ TGraphAsymmErrors* gr_chi2_sigsum = new TGraphAsymmErrors(_nBins,var_mean_av,chi
 gr_chi2_sigsum->SetLineColor(j+2);
 mg_chi2_sigsum->Add(gr_chi2_sigsum);
 leg_chi2_sigsum->AddEntry(gr_chi2_sigsum, Form("%s",signal[j].c_str()), "e");
+
 	}
 
 if(varExp == "By"){
