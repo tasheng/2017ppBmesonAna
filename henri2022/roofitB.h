@@ -393,7 +393,7 @@ if(tree == "ntphi"){
 	//TString option = (pdf == "mass_range")? "L" : "LF";
     //RooCmdArg drawRange = (pdf == "mass_range")? Range(fitRange) : RooCmdArg();
     model->plotOn(frame,  Name(Form("erfc%d_%s",_count,pdf.Data())) , Components(*erfc), Precision(1e-6), DrawOption("L"), /*FillStyle(3005),*/ FillColor(kGreen+4), LineStyle(1), LineColor(kGreen+4), LineWidth(1));
-  	model->plotOn(frame, RooFit::Name("B->J/#psi #pi"),Components(*jpsipi), NormRange("bmass"), DrawOption("LF"), FillStyle(3002), FillColor(kPink+10), LineStyle(7), LineColor(kPink+10), LineWidth(1)); 
+  	model->plotOn(frame, RooFit::Name("B->J/#psi #pi"),Components(*jpsipi), NormRange("bmass"), DrawOption("LF"), FillStyle(3002), FillColor(kPink+10), LineStyle(1), LineColor(kPink+10), LineWidth(1)); 
 					}
 
 	model->plotOn(frame, Name(Form("bkg%d_%s",_count,pdf.Data())) ,  Components(bkg), Range(fitRange), Precision(1e-6), DrawOption("L"),LineStyle(7), LineColor(4), LineWidth(1));
@@ -500,7 +500,8 @@ if(tree == "ntphi"){
 	}
 	p1->cd();
 	TLegend *leg = new TLegend(0.62,0.55,0.89,0.75,NULL,"brNDC"); 
-	leg = new TLegend(0.70,0.65,0.89,0.89,NULL,"brNDC");
+	if (tree == "ntphi"){leg = new TLegend(0.70,0.65,0.89,0.89,NULL,"brNDC");}
+	else{leg = new TLegend(0.70,0.60,0.89,0.89,NULL,"brNDC");}
 	leg->SetBorderSize(0);
 	leg->SetTextSize(0.04);     
 	leg->SetTextFont(42);
