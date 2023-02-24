@@ -16,7 +16,10 @@ void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotN
 void read_samples(RooWorkspace& w, std::vector<TString>, TString fName, TString treeName, TString sample);
 
 // PDF VARIATION FOR SYST STUDIES
-int syst_study=1;
+int syst_study=0;
+
+// VALIDATION STUDIES
+int val=0;
 
 void roofitB(int doubly = 0, TString tree = "ntphi", int full = 0, int usePbPb = 0, int fitOnSaved = 0, TString inputdata = "", TString inputmc = "", TString varExp = "", TString trgselection = "",  TString cut = "", TString cutmcgen = "", int isMC = 0, Double_t luminosity = 1., int doweight = 1, TString outputfile = "", TString outplotf = "", TString npfit = "", int doDataCor = 0){ 
 
@@ -353,7 +356,7 @@ cout << endl << endl;
 	//BIN ANALYSIS START
 	for(int i=0;i<_nBins;i++){
 		_count++;
-		TCanvas* c= new TCanvas(Form("c%d",_count),"",600,550);
+		TCanvas* c= new TCanvas(Form("c%d",_count),"",600,600);
 		TCanvas* cMC= new TCanvas(Form("cMC%d",_count),"",600,600);
 		
 		RooDataSet* ds_cut ;
@@ -425,9 +428,15 @@ cout << endl << endl;
 		
 
 ////////// FITFITFITFITFITFITFITFITFITFITFITFIT
-
-	//	validate_fit(w_val, "", tree, varExp, full,centmin, centmax, _ptBins[i], _ptBins[i+1]);
+		
+		if (val==1){
+			gSystem->mkdir(Form("./%s/validation",outplotf.Data()),true); 
+			string Path_val=Form("./%s/validation",outplotf.Data());
+			validate_fit(w_val, "", tree, varExp, full, _ptBins[i], _ptBins[i+1],Path_val);
+		}
+		
 		//scan_significance(w_val, tree, varExp, full,centmin, centmax, _ptBins[i], _ptBins[i+1]);
+		
 		/*for(int q= 0; q < 100; q++){
 			validate_fit(w_val, tree, varExp, full,q);} ?? */
 		//datahist = frame->getHist("ds");
@@ -458,11 +467,6 @@ cout << endl << endl;
 		yield_vec_err_high[i]=yield_vec_err_high[i]/(_ptBins[i+1]-_ptBins[i]);
 		hori_av_low[i] = var_mean_av[i]-_ptBins[i];
 		hori_av_high[i] = _ptBins[i+1]-var_mean_av[i];
-		cout<<"AQUIIIIIIIIIIIIIIIIi"<<endl;
-		cout<<var_mean_av[i]<<endl;
-		cout<<hori_av_high[i]<<endl;
-		cout<<hori_av_low[i]<<endl;
-		cout<<"AQUIIIIIIIIIIIIIIIIi"<<endl;
 
 ////////////////////////////	
 //Resolution MC
@@ -483,7 +487,6 @@ cout << endl << endl;
 		resol_vec_err_high[i] = resol_err;
 //Resolution 
 
-		
 		//chi2
 
 		RooAbsPdf* model = (RooAbsPdf*)ws->pdf(Form("model%d_%s",_count,""));
@@ -492,13 +495,10 @@ cout << endl << endl;
 		dsMC_cut->plotOn(frameMC_chi2);
 		modelMC->plotOn(frameMC_chi2);
 		RooChi2Var chi2(Form("chi2%d",_count),"chi2",*model,*dh);
-		double Mychi2 = chi2.getVal()/(nbinsmasshisto - f->floatParsFinal().getSize()); //normalised chi square
-		
+		double Mychi2 = chi2.getVal()/(nbinsmasshisto - f->floatParsFinal().getSize()); //normalised chi square	
 		std::cout << "Chi square value is " << Mychi2 << endl;
 		chi2_vec[i] = Mychi2;
 		chi2MC_vec[i] = frameMC_chi2->chiSquare();
-	
-
 		//chi2
 
 		std::vector<double> aa;
@@ -538,13 +538,12 @@ cout << endl << endl;
 	if(varExp=="Bpt"){
       //for the paper run these
       if (drawLegend) {
-        tex_pt = new TLatex(0.65,0.4,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
-        tex_y = new TLatex(0.65,0.34,"p_{T} > 10 GeV/c : |y| < 2.4");
-        tex_y2 = new TLatex(0.65,0.28,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4");
-        tex_y1 = new TLatex(0.65,0.34,"1.5 < |y| < 2.4");
-        tex_y11 =new TLatex(0.65,0.34,"|y| < 2.4");
-        tex_nMult = new TLatex(0.21,0.62,"0 < nTrks < 100");
-		chi_square = new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2));
+        tex_pt = new TLatex(0.21,0.75,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
+        //tex_y = new TLatex(0.21,0.65,"p_{T} > 10 GeV/c : |y| < 2.4");
+        //tex_y2 = new TLatex(0.21,0.6,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4");
+        //tex_y1 = new TLatex(0.21,0.65,"1.5 < |y| < 2.4");
+        //tex_y11 =new TLatex(0.21,0.65,"|y| < 2.4");
+		chi_square = new TLatex(0.21,0.7,Form("#chi^{2} value : %.2f",Mychi2));
       } else {
         //for the AN run these
         tex_pt = new TLatex(0.65,0.8,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
@@ -589,36 +588,36 @@ if(varExp=="nMult"){
 	}
 		tex_pt->SetNDC();
 		tex_pt->SetTextFont(42);
-		tex_pt->SetTextSize(0.045);
+		tex_pt->SetTextSize(0.035);
 		tex_pt->SetLineWidth(2);
 		tex_pt->Draw();
 		tex_nMult->SetNDC();
 		tex_nMult->SetTextFont(42);
-		tex_nMult->SetTextSize(0.045);
+		tex_nMult->SetTextSize(0.035);
 		tex_nMult->SetLineWidth(2);
 		//tex_nMult->Draw();
 		tex_y->SetNDC();
 		tex_y->SetTextFont(42);
-		tex_y->SetTextSize(0.045);
+		tex_y->SetTextSize(0.035);
 		tex_y->SetLineWidth(2);
 		chi_square->SetNDC();
 		chi_square->SetTextFont(42);
-		chi_square->SetTextSize(0.045);
+		chi_square->SetTextSize(0.035);
 		chi_square->SetLineWidth(2);
 		chi_square->Draw();
 	
 	if (varExp=="Bpt"){
 		tex_y1->SetNDC();
 		tex_y1->SetTextFont(42);
-		tex_y1->SetTextSize(0.045);
+		tex_y1->SetTextSize(0.035);
 		tex_y1->SetLineWidth(2);
 		tex_y11->SetNDC();
 		tex_y11->SetTextFont(42);
-		tex_y11->SetTextSize(0.045);
+		tex_y11->SetTextSize(0.035);
 		tex_y11->SetLineWidth(2);
 		tex_y2->SetNDC();
 		tex_y2->SetTextFont(42);
-		tex_y2->SetTextSize(0.045);
+		tex_y2->SetTextSize(0.035);
 		tex_y2->SetLineWidth(2);
 
 		if(_ptBins[i] >= 10){tex_y11->Draw();}
@@ -633,11 +632,11 @@ if(varExp=="nMult"){
 	CMS_lumi(c,19011,0);
 	c->Update();
 	TLatex* texB = new TLatex(0.5,0.5,"");
-	if(tree=="ntphi"){ texB = new TLatex(0.21,0.82, "B^{0}_{s}");}
-	if(tree=="ntKp"){ texB = new TLatex(0.21,0.8, "B^{#pm}");}
+	if(tree=="ntphi"){ texB = new TLatex(0.21,0.85, "B^{0}_{s}");}
+	if(tree=="ntKp"){ texB = new TLatex(0.21,0.85, "B^{#pm}");}
 	texB->SetNDC();
 	texB->SetTextFont(62);
-	texB->SetTextSize(0.065);
+	texB->SetTextSize(0.05);
 	texB->SetLineWidth(2);
 	texB->Draw();
 
@@ -835,7 +834,7 @@ if(varExp=="nMult"){
 				rename((tabeltype[i]+std::string (varExp.Data())+"_"+std::string (tree.Data())+filetype[j]).c_str(),(Path+tabeltype[i]+std::string (varExp.Data())+"_"+std::string (tree.Data())+filetype[j]).c_str());
 			}
 		}
-		
+
 		double zero[_nBins];
 		for (int i=0;i<_nBins;i++){zero[i]=0.;}
 
