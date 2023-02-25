@@ -151,7 +151,6 @@ cout << endl << endl;
 	gStyle->SetPadLeftMargin(cLeftMargin);
 	gStyle->SetPadTopMargin(cTopMargin);
 	gStyle->SetPadBottomMargin(cBottomMargin);
-	cout << "cBottomMargin = " << cBottomMargin << endl;
 	gStyle->SetPadBottomMargin(0.45);
 	gStyle->SetTitleX(.0f);
 
@@ -320,10 +319,10 @@ cout << endl << endl;
 		RooRealVar n_jpsipi_ext("n_jpsipi_ext", "n_jpsipi_ext", 1000 , 0., (fullds_JPSI_shape_fix->sumEntries())*2);
 		RooExtendPdf jpsipi_ext("jpsipi_ext", "extended jpsipi", *jpsipi, n_jpsipi_ext);
 		// FIT
-		mass->setRange("bjpsipi", 5.22, 5.8);
+		mass->setRange("bjpsipi", 5.2, 5.9);
 		auto jpsipi_result = jpsipi_ext.fitTo(*fullds_JPSI_shape_fix, Range("bjpsipi"), Save(), Extended());
 		// FIT
-		plot_mcfit(*ws, &jpsipi_ext, fullds_JPSI_shape_fix, "./results/BP/InclusiveMC_JPsipi_fit.pdf", RooFit::Name("MCFit"), NormRange("bjpsipi"), LineColor(kRed), LineStyle(1), LineWidth(2));
+		plot_mcfit(*ws, &jpsipi_ext, fullds_JPSI_shape_fix, "./results/BP/InclusiveMC_JPsipi_fit.pdf", NormRange("bjpsipi"), DrawOption("LF"), FillStyle(3008), FillColor(kPink+10), LineStyle(1), LineColor(kPink+10), LineWidth(1)); 
 		ws->import(*jpsipi);
 		fix_parameters(*ws, "jpsipi" );
 		//[END] FIX SHAPE (J/Psi pi) 
@@ -335,7 +334,7 @@ cout << endl << endl;
 		mass->setRange("bmc", 5.18, 5.38);
 		auto signal_result = signal_ext.fitTo(*ds_sig, Range("bmc"), Save(), Extended());
 		// FIT
-		plot_mcfit(*ws, &signal_ext, ds_sig, "./results/BP/InclusiveMC_Signal_fit.pdf", RooFit::Name("MCFit"), Range("bmc"), LineColor(kRed),LineStyle(1), LineWidth(2));
+		plot_mcfit(*ws, &signal_ext, ds_sig, "./results/BP/InclusiveMC_Signal_fit.pdf",  Range("bmc"), LineColor(kRed),LineStyle(1), LineWidth(2));
 		ws->import(*signalnp);
 		fix_parameters(*ws, "signalnp");
 		//[END] FIT inclusiveMC SIGNAL 
@@ -356,8 +355,8 @@ cout << endl << endl;
 	//BIN ANALYSIS START
 	for(int i=0;i<_nBins;i++){
 		_count++;
-		TCanvas* c= new TCanvas(Form("c%d",_count),"",600,600);
-		TCanvas* cMC= new TCanvas(Form("cMC%d",_count),"",600,600);
+		TCanvas* c= new TCanvas(Form("c%d",_count),"",700,700);
+		TCanvas* cMC= new TCanvas(Form("cMC%d",_count),"",700,700);
 		
 		RooDataSet* ds_cut ;
 		if(doubly==0) {
@@ -368,12 +367,10 @@ cout << endl << endl;
 			else if(varExp == "By"){
 				ds_cut = new RooDataSet(Form("ds_cut%d", _count),"", ds, RooArgSet(*mass, *pt, *y, *trackSelection), Form("By>%f && By< %f", _ptBins[i], _ptBins[i+1]));
 				var_mean_av[i] = ds_cut->mean(*pt);}
-
 			else if(varExp == "nMult"){
 				ds_cut = new RooDataSet(Form("ds_cut%d", _count),"", ds, RooArgSet(*mass, *pt, *y, *trackSelection), Form("nMult>%f && nMult< %f", _ptBins[i], _ptBins[i+1]));
 				var_mean_av[i] = ds_cut->mean(*pt);}
   						}
-		
 		if(doubly==1)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y, *nMult), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto)); 
 		if(doubly==2)ds_cut = new RooDataSet(Form("ds_cut%d",_count),"",ds, RooArgSet(*mass, *pt, *y), Form("%s>=%f&&%s<=%f&&Bmass>%f&&Bmass<%f",varExp.Data(),_ptBins[i],varExp.Data(),_ptBins[i+1],minhisto, maxhisto)); 
 
@@ -426,7 +423,6 @@ cout << endl << endl;
 		cout << "Starting the fiting function" << endl;
 		RooFitResult* f = fit("", "", tree, c, cMC, ds_cut, dsMC_cut, dh, mass, frame, _ptBins[i], _ptBins[i+1], isMC, npfit, *ws);
 		
-
 ////////// FITFITFITFITFITFITFITFITFITFITFITFIT
 		
 		if (val==1){
@@ -436,12 +432,10 @@ cout << endl << endl;
 		}
 		
 		//scan_significance(w_val, tree, varExp, full,centmin, centmax, _ptBins[i], _ptBins[i+1]);
-		
 		/*for(int q= 0; q < 100; q++){
 			validate_fit(w_val, tree, varExp, full,q);} ?? */
 		//datahist = frame->getHist("ds");
 		//TGraphAsymmErrors* datagraph = static_cast<TGraphAsymmErrors*>(datahist);
-
 
 		RooRealVar* fitYield = static_cast<RooRealVar*>(f->floatParsFinal().at(f->floatParsFinal().index(Form("nsig%d_%s",_count,""))));
 		modelcurve = frame->getCurve(Form("model%d_%s",_count,""));   
@@ -488,7 +482,6 @@ cout << endl << endl;
 //Resolution 
 
 		//chi2
-
 		RooAbsPdf* model = (RooAbsPdf*)ws->pdf(Form("model%d_%s",_count,""));
 		RooAbsPdf* modelMC = (RooAbsPdf*)ws->pdf(Form("modelMC%d_%s",_count,""));
 		RooPlot* frameMC_chi2 = mass->frame(Title(Form("frameMC_chi2%d_%s",_count,"")), Bins(nbinsmasshisto));
@@ -534,6 +527,9 @@ cout << endl << endl;
 		TLatex* chi_square = new TLatex(0.5,0.5,"");
 		TLatex* chi_back = new TLatex(0.5,0.5,"");
 		TLatex* chi_sig = new TLatex(0.5,0.5,"");
+		TLatex* yield_val = new TLatex(0.5,0.5,"");
+		int yieldI = round(yield);
+		int yieldErrI = round(yieldErr);
 		
 	if(varExp=="Bpt"){
       //for the paper run these
@@ -543,7 +539,8 @@ cout << endl << endl;
         //tex_y2 = new TLatex(0.21,0.6,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4");
         //tex_y1 = new TLatex(0.21,0.65,"1.5 < |y| < 2.4");
         //tex_y11 =new TLatex(0.21,0.65,"|y| < 2.4");
-		chi_square = new TLatex(0.21,0.7,Form("#chi^{2} value : %.2f",Mychi2));
+		yield_val = new TLatex(0.21,0.7,Form("Y_{S} = %d #pm %d",yieldI, yieldErrI));
+		chi_square = new TLatex(0.21,0.65,Form("#chi^{2} value : %.2f",Mychi2));
       } else {
         //for the AN run these
         tex_pt = new TLatex(0.65,0.8,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
@@ -552,7 +549,7 @@ cout << endl << endl;
         tex_y1 = new TLatex(0.65,0.74,"1.5 < |y| < 2.4");
         tex_y11 = new TLatex(0.65,0.74,"|y| < 2.4");
         tex_nMult = new TLatex(0.21,0.62,"0 < nTrks < 100");
-		chi_square=new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2));
+		chi_square=new TLatex(0.21,0.7,Form("#chi^{2} value : %.2f",Mychi2));
       }
 		}
 
@@ -595,7 +592,6 @@ if(varExp=="nMult"){
 		tex_nMult->SetTextFont(42);
 		tex_nMult->SetTextSize(0.035);
 		tex_nMult->SetLineWidth(2);
-		//tex_nMult->Draw();
 		tex_y->SetNDC();
 		tex_y->SetTextFont(42);
 		tex_y->SetTextSize(0.035);
@@ -605,6 +601,11 @@ if(varExp=="nMult"){
 		chi_square->SetTextSize(0.035);
 		chi_square->SetLineWidth(2);
 		chi_square->Draw();
+		yield_val->SetNDC();
+		yield_val->SetTextFont(42);
+		yield_val->SetTextSize(0.035);
+		yield_val->SetLineWidth(2);
+		yield_val->Draw();
 	
 	if (varExp=="Bpt"){
 		tex_y1->SetNDC();
@@ -636,7 +637,7 @@ if(varExp=="nMult"){
 	if(tree=="ntKp"){ texB = new TLatex(0.21,0.85, "B^{#pm}");}
 	texB->SetNDC();
 	texB->SetTextFont(62);
-	texB->SetTextSize(0.05);
+	texB->SetTextSize(0.04);
 	texB->SetLineWidth(2);
 	texB->Draw();
 
@@ -1379,10 +1380,10 @@ c_chi2_backsum.SaveAs(pathc_chi2_backsum);
 
 template<typename... Targs>
 void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotName, Targs... options) {
-  
-  TCanvas can_mc;
-  can_mc.cd();
-  TPad *p1 = new TPad("p1","p1",0.05,0.05,0.9,0.9);
+
+  TCanvas* can_mc= new TCanvas("can_mc","",600,600);
+  can_mc->cd();
+  TPad *p1 = new TPad("p1","p1",0.,0.2,1.,0.99);
   p1->SetBorderMode(1); 
   p1->SetFrameBorderMode(0); 
   p1->SetBorderSize(2);
@@ -1391,15 +1392,36 @@ void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotN
   p1->cd();
 
   RooRealVar Bmass = *(w.var("Bmass"));
-  Bmass.setRange("bmass", 5.0, 6.0);
   RooPlot* massframe = Bmass.frame(Title(" "));
-  ds->plotOn(massframe, MarkerSize(0.8));
-  model->plotOn(massframe, options...);
-  model->paramOn(massframe, Layout(0.55, 1, 0.9), "", Format("NEU", AutoPrecision(1)) ) ;
-  massframe->GetXaxis()->SetRangeUser(5.15,5.45);
-  if (plotName == "./results/BP/InclusiveMC_JPsipi_fit.pdf") {massframe->GetXaxis()->SetRangeUser(5.1,5.9);}
-  massframe->Draw();
-  can_mc.SaveAs(plotName);
+  	massframe->GetYaxis()->SetTitle(TString::Format("Events / (%g MeV/c^{2})",(Bmass.getMax()-Bmass.getMin())/100*1000));
+	massframe->GetXaxis()->SetTitle("m_{J/#psi #pi^{#pm}} (GeV/c^{2})");
+	massframe->GetXaxis()->CenterTitle();
+	massframe->GetYaxis()->SetTitleOffset(1.5);
+	massframe->GetXaxis()->SetTitleOffset(1.2);
+	massframe->GetYaxis()->SetTitleSize(0.035);
+	massframe->GetYaxis()->SetTitleFont(42);
+	massframe->GetXaxis()->SetLabelFont(42);
+	massframe->GetYaxis()->SetLabelFont(42);
+	massframe->GetXaxis()->SetLabelSize(0.035);
+	massframe->GetYaxis()->SetLabelSize(0.035);	
+	massframe->GetXaxis()->SetRangeUser(5.15,5.45);
+    if (plotName == "./results/BP/InclusiveMC_JPsipi_fit.pdf") {massframe->GetXaxis()->SetRangeUser(5,6);}
+	ds->plotOn(massframe, Name("dsjpp") , MarkerSize(0.5), MarkerStyle(8), LineColor(1), LineWidth(1));
+  	model->plotOn(massframe, RooFit::Name("MCFit"), options...);
+  	model->paramOn(massframe, Layout(0.62, 0.89, 0.75), "", Format("NEU", AutoPrecision(1)) ) ;
+	massframe->getAttText()->SetTextSize(0.025);
+	massframe->getAttFill()->SetFillStyle(0);
+	massframe->getAttLine()->SetLineWidth(0);
+	massframe->Draw();
+	TLegend *leg_jpp = new TLegend(0.75,0.8,0.89,0.89,NULL,"brNDC");
+	leg_jpp->SetBorderSize(0);
+	leg_jpp->SetTextSize(0.025);     
+	leg_jpp->SetTextFont(42);
+	leg_jpp->SetFillStyle(0);
+	leg_jpp->AddEntry(massframe->findObject("dsjpp"), " MC","p");
+	leg_jpp->AddEntry(massframe->findObject("MCFit")," Peaking Bkg. PDF","f");
+	leg_jpp->Draw();
+  can_mc->SaveAs(plotName);
 }
 
 void read_samples(RooWorkspace& w, std::vector<TString> label, TString fName, TString treeName, TString sample){
