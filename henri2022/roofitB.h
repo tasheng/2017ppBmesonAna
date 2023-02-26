@@ -76,7 +76,7 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	frameMC->SetStats(0);
 	frameMC->GetXaxis()->SetNdivisions(-50205);
 
-	TPad *pMC1 = new TPad("pMC1","pMC1",0.,0.215,1.,0.99);
+	TPad *pMC1 = new TPad("pMC1","pMC1",0.,0.215,1.,1.);
 	// TPad *p1 = new TPad("p1","p1",0.05,0.05,0.99,0.99);
 	pMC1->SetBorderMode(1); 
 	pMC1->SetFrameBorderMode(0); 
@@ -84,14 +84,13 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	pMC1->SetBottomMargin(0.10);
 	pMC1->Draw(); 
 
-	TPad *pMC2 = new TPad("pMC2","pMC2",0.,0.02,1.,0.24);// 0.26 
+	TPad *pMC2 = new TPad("pMC2","pMC2",0.,0.02,1.,0.24);
 	pMC2->SetTopMargin(0.);    
 	pMC2->SetBorderMode(0);
 	pMC2->SetBorderSize(2); 
 	pMC2->SetFrameBorderMode(0); 
 	pMC2->SetTicks(1,1); 
-	pMC2->Draw();
-
+	//pMC2->Draw();
 
 	// give better initial values to the Bmesons mass
 	double init_mean = BS_MASS;
@@ -154,7 +153,13 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	frameMC->getAttText()->SetTextSize(0.025);
 	frameMC->getAttFill()->SetFillStyle(0);
 	frameMC->getAttLine()->SetLineWidth(0);
-	frameMC->SetXTitle("");
+    if(tree=="ntKp")frameMC->SetXTitle("m_{J/#psiK^{#pm}} (GeV/c^{2})");
+	if(tree=="ntphi")frameMC->SetXTitle("m_{J/#psiK^{+}K^{-}} (GeV/c^{2})");
+	frameMC->GetXaxis()->SetTitleOffset(1.2);
+	frameMC->GetXaxis()->SetTitleSize(0.035);
+	frameMC->GetXaxis()->SetTitleFont(42);
+	frameMC->GetXaxis()->CenterTitle();
+	frameMC->GetXaxis()->SetLabelSize(0.035);
 	frameMC->GetXaxis()->SetRangeUser(init_mean-subt, init_mean+subt);
 	frameMC->Draw();
 	cMC->RedrawAxis();
@@ -212,7 +217,7 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	pull_plotMC->GetXaxis()->SetLabelSize(0.1);
 	pull_plotMC->GetXaxis()->SetTickLength(0.16);
 	pull_plotMC->GetXaxis()->SetNdivisions(-50205);
-	pull_plotMC->Draw();
+	//pull_plotMC->Draw();
 
 //PULL MC
 //PLOT MC FIT
@@ -250,14 +255,14 @@ if(npfit != "1" && variation=="" && pdf==""){
 
 	c->cd();
 	RooPlot* frame = mass->frame("");
-	TPad *p1 = new TPad("p1","p1",0.,0.215,1.,0.99);
+	TPad *p1 = new TPad("p1","p1",0.,0.215,1.,1.);
 	p1->SetBorderMode(1); 
 	p1->SetFrameBorderMode(0); 
 	p1->SetBorderSize(2);
 	p1->SetBottomMargin(0.10);
 	p1->Draw(); 
 
-	TPad *p2 = new TPad("p2","p2",0.,0.02,1.,0.24); 
+	TPad *p2 = new TPad("p2","p2",0.,0.,1.,0.24); 
 	p2->SetTopMargin(0.);    
 	p2->SetBorderMode(0);
 	p2->SetBorderSize(2); 

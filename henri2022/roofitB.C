@@ -16,7 +16,7 @@ void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotN
 void read_samples(RooWorkspace& w, std::vector<TString>, TString fName, TString treeName, TString sample);
 
 // PDF VARIATION FOR SYST STUDIES
-int syst_study=0;
+int syst_study=1;
 
 // VALIDATION STUDIES
 int val=0;
@@ -1381,9 +1381,9 @@ c_chi2_backsum.SaveAs(pathc_chi2_backsum);
 template<typename... Targs>
 void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotName, Targs... options) {
 
-  TCanvas* can_mc= new TCanvas("can_mc","",600,600);
+  TCanvas* can_mc= new TCanvas("can_mc","",700,700);
   can_mc->cd();
-  TPad *p1 = new TPad("p1","p1",0.,0.2,1.,0.99);
+  TPad *p1 = new TPad("p1","p1",0.,0.215,1.,1);
   p1->SetBorderMode(1); 
   p1->SetFrameBorderMode(0); 
   p1->SetBorderSize(2);
