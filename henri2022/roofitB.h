@@ -379,17 +379,14 @@ if(tree == "ntphi"){
 
   p1->cd();
   ds->plotOn(frame, Name(Form("ds_cut%d", _count)), Binning(nbinsmasshisto), MarkerSize(0.5), MarkerStyle(8), MarkerColor(1), LineColor(1), LineWidth(1)); 
-  
-  if(npfit != "1")	{
-	//TString option = (pdf == "mass_range")? "L" : "LF";
-    //RooCmdArg drawRange = (pdf == "mass_range")? Range(fitRange) : RooCmdArg();
-    model->plotOn(frame, RooFit::Name(Form("erfc%d_%s",_count,"")) , Components(Form("erfc%d_%s",_count,"")),  NormRange(fitRange), FillColor(kGreen+3), FillStyle(3012), LineColor(kGreen+3), LineStyle(1), LineWidth(1), DrawOption("LF"));
-  	model->plotOn(frame, RooFit::Name("B->J/#psi #pi"), Components(*jpsipi), NormRange(fitRange), DrawOption("LF"), FillStyle(3008), FillColor(kPink+10), LineStyle(1), LineColor(kPink+10), LineWidth(1)); 
-					}
-	model->plotOn(frame, Name(Form("bkg%d_%s",_count,pdf.Data())) ,  Components(bkg), Range(fitRange), Precision(1e-6), DrawOption("L"),LineStyle(7), LineColor(4), LineWidth(1));
-	model->plotOn(frame, Name(Form("model%d_%s", _count, pdf.Data())), Range(fitRange), Precision(1e-6), DrawOption("L"), LineColor(2), LineWidth(1));
-	if(pdf!="1gauss") {model->plotOn(frame, Name(Form("sig%d_%s", _count, pdf.Data())),  Components(*sig), Range(fitRange), Precision(1e-6), DrawOption("LF"), FillStyle(3002), FillColor(kOrange-3), LineStyle(7), LineColor(kOrange-3), LineWidth(1));} 
-	else {model->plotOn(frame, Name(Form("sig%d", _count)),  Components(sig1), NormRange(fitRange), Precision(1e-6), DrawOption("LF"), FillStyle(3002), FillColor(kOrange-3), LineStyle(7), LineColor(kOrange-3), LineWidth(1));}
+  model->plotOn(frame, Name(Form("bkg%d_%s",_count,pdf.Data())) ,  Components(bkg), Range(fitRange), Precision(1e-6),  DrawOption("L"), LineStyle(7), LineColor(4), LineWidth(1));
+  model->plotOn(frame, Name(Form("model%d_%s", _count, pdf.Data())), Range(fitRange), Precision(1e-6), DrawOption("L"), LineColor(2), LineWidth(1));
+
+    if(npfit != "1"){
+    	model->plotOn(frame, RooFit::Name(Form("erfc%d_%s",_count,"")) , Components(*erfc), Range(fitRange),  NormRange(fitRange), FillColor(kGreen+3), FillStyle(3012), LineColor(kGreen+3), LineStyle(1), LineWidth(1), DrawOption("L"));
+  		model->plotOn(frame, RooFit::Name("B->J/#psi #pi"), Components(*jpsipi), NormRange(fitRange), DrawOption("LF"), FillStyle(3008), FillColor(kPink+10), LineStyle(1), LineColor(kPink+10), LineWidth(1)); 
+		}
+ 	model->plotOn(frame, Name(Form("sig%d_%s", _count, pdf.Data())),  Components(*sig), Range(fitRange), Precision(1e-6), DrawOption("LF"), FillStyle(3002), FillColor(kOrange-3), LineStyle(7), LineColor(kOrange-3), LineWidth(1)); 
 
 	if(drawLegend){model->paramOn(frame,Layout(1, 1, 1), Format("NEU",AutoPrecision(3)));}
 	else{model->paramOn(frame,Layout(0.6, 0.98, 0.68), Format("NEU",AutoPrecision(2)));}
@@ -496,7 +493,8 @@ if(tree == "ntphi"){
 	leg->AddEntry(frame->findObject(Form("bkg%d_%s",_count,pdf.Data()))," Comb. Bkg.","l");
 	if(npfit != "1"){
 		leg -> AddEntry(frame->findObject("B->J/#psi #pi")," B #rightarrow J/#psi #pi^{#pm}","f");
-		leg -> AddEntry(frame->findObject(Form("erfc%d_%s",_count,pdf.Data()))," B #rightarrow J/#psi X","f");}
+		leg -> AddEntry(frame->findObject(Form("erfc%d_%s",_count,pdf.Data()))," B #rightarrow J/#psi X","f");
+	}
   	if (drawLegend) {leg -> Draw();}  
 
 	nsig.setVal(0.);
@@ -604,7 +602,7 @@ void fit_jpsinp(RooWorkspace& w, TString pdf, int pti, int ptf, bool includeSign
 	RooProduct* n_jpsipi = new RooProduct(Form("n_jpsipi_by_signal%d_%s",_count,pdf.Data()), "number of jpsis pi with fixed ratio to n_signal", RooArgList(nbin_signal, *jpsipi_to_signal_ratio));
 	
 	// Unfix the signal with to better describe each pT bin peak
-  	sigma1_np->setConstant(false);
+  	//sigma1_np->setConstant(false);
 	// BUILD TOTAL PDF
 	RooAddPdf* model_inclusive = new RooAddPdf(Form("model_inclusive%d_%s",_count,pdf.Data()), "NP with B+", RooArgList(*signalnp, *jpsipi, *erfc, *COMB_jpsi), RooArgList(nbin_signal, *n_jpsipi, n_erfc, n_cont));
     // FITFITFIT JUST TO CHECK 
@@ -642,7 +640,7 @@ void plot_jpsifit(RooWorkspace& w, TString pdf, RooAbsPdf* model, RooDataSet* ds
 	massframe->GetXaxis()->SetRangeUser(5.,5.6);
   ds->plotOn(massframe, RooFit::Name("NP"), MarkerSize(0.5),MarkerStyle(8),LineColor(1),LineWidth(1));
   model->plotOn(massframe, RooFit::Name("NP Fit"), NormRange("bmass"),LineColor(kRed), LineStyle(1), LineWidth(1));
-  model->plotOn(massframe, RooFit::Name("peaking"),Components(Form("erfc%d_%s",_count,pdf.Data())), NormRange("bmass"), FillColor(kGreen+3), FillStyle(3012), LineColor(kGreen+3), LineStyle(1), LineWidth(1), DrawOption("LF"));
+  model->plotOn(massframe, RooFit::Name("par"),Components(Form("erfc%d_%s",_count,pdf.Data())), NormRange("bmass"), FillColor(kGreen+3), FillStyle(3012), LineColor(kGreen+3), LineStyle(1), LineWidth(1), DrawOption("LF"));
   model->plotOn(massframe, RooFit::Name("COMB_jpsi"),Components(Form("COMB_jpsi%d_%s",_count,pdf.Data())), NormRange("bmass"),LineColor(kBlue), LineWidth(1), LineStyle(kDashed));
   if (with_sig) {
     model->plotOn(massframe, RooFit::Name("signal"),Components("signalnp"), NormRange("bmass"), LineColor(kOrange-3), LineStyle(1), LineWidth(1), FillStyle(3002),FillColor(kOrange-3), VLines(), DrawOption("LF"));
@@ -662,13 +660,13 @@ void plot_jpsifit(RooWorkspace& w, TString pdf, RooAbsPdf* model, RooDataSet* ds
 	leg->SetTextFont(42);
 	leg->SetFillStyle(0);
   leg->AddEntry(massframe->findObject("NP"), " MC", "pl");
-  leg->AddEntry(massframe->findObject("peaking"), " Part. Rec. Bkg.", "f");
+  leg->AddEntry(massframe->findObject("par"), " Part. Rec. Bkg.", "f");
   leg->AddEntry(massframe->findObject("COMB_jpsi"), " Comb. Bkg.", "l");
-  leg->AddEntry(massframe->findObject("NP Fit"),"Part. + Comb Bkg.","l");
+  leg->AddEntry(massframe->findObject("NP Fit")," Part. + Comb Bkg.","l");
   // compare yields with gen particles
   if (with_sig) {
-    leg->AddEntry(massframe->findObject("signal"), "signal", "f");
-    leg->AddEntry(massframe->findObject("B->J/#psi #pi"), "B->J/#psi #pi", "f");
+    leg->AddEntry(massframe->findObject("signal"), " Signal", "f");
+    leg->AddEntry(massframe->findObject("B->J/#psi #pi"), " B->J/#psi #pi", "f");
   				}
   leg->Draw();
   can_np->SaveAs(plotName);

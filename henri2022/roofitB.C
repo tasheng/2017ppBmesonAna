@@ -630,8 +630,8 @@ if(varExp=="nMult"){
 	} 
 	else{tex_y->Draw();}
 
-	CMS_lumi(c,19011,0);
-	c->Update();
+	//CMS_lumi(c,19011,0);
+	//c->Update();
 	TLatex* texB = new TLatex(0.5,0.5,"");
 	if(tree=="ntphi"){ texB = new TLatex(0.21,0.85, "B^{0}_{s}");}
 	if(tree=="ntKp"){ texB = new TLatex(0.21,0.85, "B^{#pm}");}
@@ -695,8 +695,8 @@ if(varExp=="nMult"){
 							tex_y2->Draw();}
 						else{tex_y1->Draw();}
 					}else{tex_y->Draw();}
-					CMS_lumi(c,19011,0);
-					c->Update();
+					//CMS_lumi(c,19011,0);
+					//c->Update();
 					c->SaveAs(Form("%s/%s_%s_%s_%d_%d_%s_cutY%d_", outplotf.Data(), _isMC.Data(), _isPbPb.Data(), varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],background[j].c_str(), doubly)+tree+".pdf");
 				
 					modelcurve_back = frame->getCurve(Form("model%d_%s",_count,background[j].c_str()));
@@ -734,8 +734,8 @@ if(varExp=="nMult"){
 							tex_y2->Draw();}
 					else{tex_y1->Draw();}
 				} else{tex_y->Draw();}
-				CMS_lumi(c,19011,0);
-				c->Update();
+				//CMS_lumi(c,19011,0);
+				//c->Update();
 
 				cMC->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),varExp.Data(), (int)_ptBins[i], (int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");
 				c->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");
