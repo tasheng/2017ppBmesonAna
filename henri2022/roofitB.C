@@ -17,7 +17,7 @@ void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotN
 void read_samples(RooWorkspace& w, std::vector<TString>, TString fName, TString treeName, TString sample);
 
 // PDF VARIATION FOR SYST STUDIES
-int syst_study=0;
+int syst_study=1;
 
 // VALIDATION STUDIES
 int val=0;
@@ -304,9 +304,10 @@ cout << endl << endl;
 		// PREPARE DATA SETS
 		std::vector<TString> jpsi_vars = {"By", "Bpt", "Bgen","BDT_pt_5_7", "BDT_pt_7_10", "BDT_pt_10_15","BDT_pt_15_20", "BDT_pt_20_50"};
 		//read_samples(*ws, jpsi_vars, "/data3/hlegoinha/data/jpsinp_inclusive.root", "ntnp", "jpsinp");
-		// read_samples(*ws, jpsi_vars, "/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/jpsinp_inclusive.root", "ntnp", "jpsinp");
+		 read_samples(*ws, jpsi_vars, "/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/jpsinp_inclusive.root", "ntnp", "jpsinp");
 		// read_samples(*ws, jpsi_vars, "~/dat/presel/filter/jpsinp_inclusive.root", "ntnp", "jpsinp");
-		read_samples(*ws, jpsi_vars, jpsiFile, "ntKp", "jpsinp");
+		//read_samples(*ws, jpsi_vars, jpsiFile, "ntKp", "jpsinp");
+		
 		RooDataSet* full_data_MC = (RooDataSet*) ws->data("jpsinp");
 		full_data_MC = (RooDataSet*)full_data_MC->reduce("(BDT_pt_5_7 > 0.08 && Bpt >= 5 && Bpt < 7) || (BDT_pt_7_10 > 0.07 && Bpt >= 7 && Bpt < 10) || (BDT_pt_10_15 > 0.0 && Bpt >= 10 && Bpt < 15) || (BDT_pt_15_20 > 0.02 && Bpt >= 15 && Bpt < 20) || (BDT_pt_20_50 > 0.04 && Bpt >= 20 && Bpt < 50) || (Bpt >= 20 && Bpt < 50) ");
 		full_data_MC = (RooDataSet*)full_data_MC->reduce("(Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10)");
@@ -506,7 +507,7 @@ cout << endl << endl;
 		if(fitOnSaved == 0){
 			TH1D* htest = new TH1D(Form("htest%d",_count),"",nbinsmasshisto,minhisto,maxhisto);
 			TString sideband = "(abs(Bmass-5.367)>0.2&&abs(Bmass-5.367)<0.3";
-			std::cout<<"yield bkg sideband: "<<htest->GetEntries()<<std::endl;
+			std::cout << "yield bkg sideband: " << htest->GetEntries() << std::endl;
 		}
 		if(varExp!="nMult"){
 			hPt->SetBinContent(i+1,yield/(_ptBins[i+1]-_ptBins[i]));
@@ -521,6 +522,7 @@ cout << endl << endl;
 			hMean->SetBinContent(i+1,fitMean->getVal());
 			hMean->SetBinError(i+1,fitMean->getError());  
 		}
+
 	////////////////////////////
 
 		TLatex* tex_pt = new TLatex(0.5,0.5,"");
@@ -533,18 +535,18 @@ cout << endl << endl;
 		TLatex* chi_back = new TLatex(0.5,0.5,"");
 		TLatex* chi_sig = new TLatex(0.5,0.5,"");
 		TLatex* yield_val = new TLatex(0.5,0.5,"");
-		int yieldI = round(yield);
-		int yieldErrI = round(yieldErr);
-		
+		int yieldI = round(yield) ;
+		int yieldErrI = round(yieldErr) ;
+ 
 	if(varExp=="Bpt"){
       //for the paper run these
       if (drawLegend) {
-        tex_pt = new TLatex(0.21,0.75,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
+        tex_pt = new TLatex(0.21,0.75,Form("%d < p_{T} < %d GeV/c", (int)_ptBins[i], (int)_ptBins[i+1]));
         //tex_y = new TLatex(0.21,0.65,"p_{T} > 10 GeV/c : |y| < 2.4");
         //tex_y2 = new TLatex(0.21,0.6,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4");
         //tex_y1 = new TLatex(0.21,0.65,"1.5 < |y| < 2.4");
         //tex_y11 =new TLatex(0.21,0.65,"|y| < 2.4");
-		yield_val = new TLatex(0.21,0.7,Form("Y_{S} = %d #pm %d",yieldI, yieldErrI));
+		yield_val  = new TLatex(0.21,0.7,Form("Y_{S} = %d #pm %d",yieldI, yieldErrI));
 		chi_square = new TLatex(0.21,0.65,Form("#chi^{2}/ndf = %.2f ",Mychi2));
       } else {
         //for the AN run these
@@ -684,13 +686,19 @@ if(varExp=="nMult"){
 					double Mychi2_back = chi2_back.getVal()/(nbinsmasshisto - f_back->floatParsFinal().getSize()); //normalised chi square
 					chi2_vec_back[j][i] = Mychi2_back;
 					chi2MC_vec_back[j][i] = frameMC_back->chiSquare();
-
 					texB->Draw();
 					tex_pt->Draw();
-					chi_back =new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2_back));
+					RooRealVar* fitYield_b_sys = static_cast<RooRealVar*>(f_back->floatParsFinal().at(f_back->floatParsFinal().index(Form("nsig%d_%s",_count, background[j].c_str()))));
+					yield_val  = new TLatex(0.21,0.7,Form("Y_{S} = %d #pm %d",int(round(fitYield_b_sys->getVal())), int(round(fitYield_b_sys->getError()))));
+					yield_val->SetNDC();
+					yield_val->SetTextFont(42);
+					yield_val->SetTextSize(0.035);
+					yield_val->SetLineWidth(2);
+					yield_val->Draw();
+					chi_back = new TLatex(0.21,0.65,Form("#chi^{2}/ndf = %.2f ",Mychi2_back));
 					chi_back->SetNDC();
 					chi_back->SetTextFont(42);
-					chi_back->SetTextSize(0.045);
+					chi_back->SetTextSize(0.035);
 					chi_back->SetLineWidth(2);
 					chi_back->Draw();
 					if (varExp=="Bpt"){
@@ -703,14 +711,12 @@ if(varExp=="nMult"){
 					//CMS_lumi(c,19011,0);
 					//c->Update();
 					c->SaveAs(Form("%s/%s_%s_%s_%d_%d_%s_cutY%d_", outplotf.Data(), _isMC.Data(), _isPbPb.Data(), varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],background[j].c_str(), doubly)+tree+".pdf");
-				
 					modelcurve_back = frame->getCurve(Form("model%d_%s",_count,background[j].c_str()));
 					RooRealVar* fitYield_back = static_cast<RooRealVar*>(f_back->floatParsFinal().at(f_back->floatParsFinal().index(Form("nsig%d_%s",_count,background[j].c_str()))));
 					back_variation.push_back(fitYield_back->getVal());
 					back_err.push_back(abs(((yield-fitYield_back->getVal())/yield)*100));
 					if(abs(((yield-fitYield_back->getVal())/yield)*100)>max_back) max_back=abs(((yield-fitYield_back->getVal())/yield)*100);
 				}
-
 			general_err.push_back(max_back);
 
 			for(int j=0; j<signal.size(); j++){
@@ -726,10 +732,17 @@ if(varExp=="nMult"){
 				chi2MC_vec_sig[j][i] = frameMC_sig->chiSquare();
 				texB->Draw();
 				tex_pt->Draw();
-				chi_sig=new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2_sig));
+				RooRealVar* fitYield_b_sig = static_cast<RooRealVar*>(f_signal->floatParsFinal().at(f_signal->floatParsFinal().index(Form("nsig%d_%s",_count, signal[j].c_str()))));
+				yield_val  = new TLatex(0.21,0.7,Form("Y_{S} = %d #pm %d", int(round(fitYield_b_sig->getVal())), int(round(fitYield_b_sig->getError()))));
+				yield_val->SetNDC();
+				yield_val->SetTextFont(42);
+				yield_val->SetTextSize(0.035);
+				yield_val->SetLineWidth(2);
+				yield_val->Draw();
+				chi_sig=new TLatex(0.21, 0.65, Form("#chi^{2}/ndf = %.2f ", Mychi2_sig));
 				chi_sig->SetNDC();
 				chi_sig->SetTextFont(42);
-				chi_sig->SetTextSize(0.045);
+				chi_sig->SetTextSize(0.035);
 				chi_sig->SetLineWidth(2);
 				chi_sig->Draw();
 				if (varExp=="Bpt"){
@@ -741,7 +754,6 @@ if(varExp=="nMult"){
 				} else{tex_y->Draw();}
 				//CMS_lumi(c,19011,0);
 				//c->Update();
-
 				cMC->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),varExp.Data(), (int)_ptBins[i], (int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");
 				c->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");
 				modelcurve_signal = frame->getCurve(Form("model%d_%s",_count,signal[j].c_str()));
