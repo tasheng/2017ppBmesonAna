@@ -159,7 +159,8 @@ void BPComparison(){
 
 	TH1D * TnPSyst = (TH1D *) fError.Get("TnPSyst");
 	TH1D * BptSyst = (TH1D *) fError.Get("BptSyst");
-	TH1D * BDTSyst = (TH1D *) fError.Get("BDTSyst");
+	TH1D * MCDataSyst = (TH1D *) fError.Get("MCDataSyst");
+  if (!MCDataSyst) MCDataSyst = (TH1D *) fError.Get("BDTSyst");
 
   TString pdfErrorFile = "../../../bp_pdf.root";
   TFile fPdfError(pdfErrorFile);
@@ -187,7 +188,7 @@ void BPComparison(){
 
   // Get systematics from input files
   for (auto ibin = 0; ibin < NBins; ++ibin) {
-    BPMCDataSyst[ibin] = BDTSyst->GetBinContent(ibin + 1);
+    BPMCDataSyst[ibin] = MCDataSyst->GetBinContent(ibin + 1);
     BPPtShapeSyst[ibin] = BptSyst->GetBinContent(ibin + 1);
     BPTnPSystDown[ibin] = TnPSyst->GetBinContent(ibin + 1);
     // TnP systematics are symmetric in the binned pT case
