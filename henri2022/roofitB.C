@@ -321,7 +321,7 @@ cout << endl << endl;
 		mass->setRange("bjpsipi", 5.2, 5.9);
 		auto jpsipi_result = jpsipi_ext.fitTo(*fullds_JPSI_shape_fix, Range("bjpsipi"), Save(), Extended());
 		// FIT
-		plot_mcfit(*ws, &jpsipi_ext, fullds_JPSI_shape_fix, "./results/BP/InclusiveMC_JPsipi_fit.pdf", NormRange("bjpsipi"), DrawOption("LF"), FillStyle(3008), FillColor(kPink+10), LineStyle(1), LineColor(kPink+10), LineWidth(1)); 
+		plot_mcfit(*ws, &jpsipi_ext, fullds_JPSI_shape_fix, "./results/BP/InclusiveMC_JPsipi_fit.pdf", NormRange("bjpsipi"), DrawOption("LF"), FillStyle(3008), FillColor(kMagenta), LineStyle(1), LineColor(kMagenta), LineWidth(1)); 
 		ws->import(*jpsipi);
 		fix_parameters(*ws, "jpsipi" );
 		//[END] FIX SHAPE (J/Psi pi) 
