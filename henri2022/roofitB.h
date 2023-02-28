@@ -385,8 +385,8 @@ if(tree == "ntphi"){
   model->plotOn(frame, Name(Form("sig%d_%s", _count, pdf.Data())),  Components(*sig), Range(fitRange), Precision(1e-6), DrawOption("LF"), FillStyle(3002), FillColor(kOrange-3), LineStyle(7), LineColor(kOrange-3), LineWidth(1)); 
 
     if(npfit != "1"){
-    	model->plotOn(frame, RooFit::Name(Form("erfc%d_%s",_count,"")) , Components(*erfc), Range(fitRange),  NormRange(fitRange), LineColor(kGreen+3), LineStyle(9), LineWidth(2), DrawOption("L"));
-	model->plotOn(frame, RooFit::Name("B->J/#psi #pi"), Components(*jpsipi), NormRange(fitRange), DrawOption("LF"), FillColor(kPink+10), LineStyle(1), LineColor(kPink+10), LineWidth(1)); 
+    model->plotOn(frame, RooFit::Name(Form("erfc%d_%s",_count,"")) , Components(*erfc), Range(fitRange),  NormRange(fitRange), LineColor(kGreen+3), LineStyle(9), LineWidth(2), DrawOption("L"));
+	model->plotOn(frame, RooFit::Name("B->J/#psi #pi"), Components(*jpsipi), NormRange(fitRange), DrawOption("LF"), FillColor(kMagenta), LineStyle(1), LineColor(kMagenta), LineWidth(1)); 
 			}
 	model->plotOn(frame, Name(Form("bkg%d_%s",_count,pdf.Data())) ,  Components(bkg), Range(fitRange), Precision(1e-6),  DrawOption("L"), LineStyle(7), LineColor(4), LineWidth(1));
 
@@ -647,7 +647,7 @@ void plot_jpsifit(RooWorkspace& w, TString pdf, RooAbsPdf* model, RooDataSet* ds
   model->plotOn(massframe, RooFit::Name("COMB_jpsi"),Components(Form("COMB_jpsi%d_%s",_count,pdf.Data())), NormRange("bmass"),LineColor(kBlue), LineWidth(1), LineStyle(kDashed));
   if (with_sig) {
     model->plotOn(massframe, RooFit::Name("signal"),Components("signalnp"), NormRange("bmass"), LineColor(kOrange-3), LineStyle(1), LineWidth(1), FillStyle(3002),FillColor(kOrange-3), VLines(), DrawOption("LF"));
-    model->plotOn(massframe, RooFit::Name("B->J/#psi #pi"),Components("jpsipi"), NormRange("bmass"),DrawOption("LF"), FillStyle(3008), FillColor(kPink+10), LineStyle(1), LineColor(kPink+10), LineWidth(1)); 
+    model->plotOn(massframe, RooFit::Name("B->J/#psi #pi"),Components("jpsipi"), NormRange("bmass"),DrawOption("LF"), FillColor(kMagenta), LineStyle(1), LineColor(kMagenta), LineWidth(1)); 
   }
     model->paramOn(massframe,  Layout(0.6, 0.95, 0.65),Format("NEU", AutoPrecision(1)));
   	massframe->getAttText()->SetTextSize(0.025);
@@ -915,7 +915,7 @@ void validate_fit(RooWorkspace* w, TString pdf, TString tree, TString variable, 
 		h1[i]->GetFunction("gaus")->SetLineWidth(1);
 		h1[i]->GetFunction("gaus")->SetFillStyle(3019);
 		h1[i]->GetFunction("gaus")->SetFillColor(kCyan+2);
-		h1[i]->GetXaxis()->SetTitle(Form("%s Pull",XName[i].Data()));
+		h1[i]->GetXaxis()->SetTitle(Form("%s",XName[i].Data()));
 		h1[i]->GetYaxis()->SetTitle("Toy MCs");
 		h1[i]->GetXaxis()->CenterTitle();
 		h1[i]->GetYaxis()->CenterTitle();
