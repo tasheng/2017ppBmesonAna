@@ -55,6 +55,8 @@ RooWorkspace* outputw = new RooWorkspace("w");
 
 RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanvas* cMC, RooDataSet* ds, RooDataSet* dsMC, RooDataHist* dh, RooRealVar* mass, RooPlot* &outframe, int ptmin, int ptmax, int isMC, TString npfit, RooWorkspace& w)
 {
+
+	if (ptmin == 50 & pmax == 60){nbinsmasshisto = 50} //to much fine binned for the case of 50-60 Bp
 	cout<<"total data: "<<ds->numEntries()<<endl;
 	TH1* h = dh->createHistogram("Bmass");
 	h->Sumw2(kFALSE);
