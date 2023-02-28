@@ -22,7 +22,7 @@ int syst_study=0;
 // VALIDATION STUDIES
 int val=0;
 
-void roofitB(int doubly = 0, TString tree = "ntphi", int full = 0, int usePbPb = 0, int fitOnSaved = 0, TString inputdata = "", TString inputmc = "", TString varExp = "", TString trgselection = "",  TString cut = "", TString cutmcgen = "", int isMC = 0, Double_t luminosity = 1., int doweight = 1, TString outputfile = "", TString outplotf = "", TString npfit = "", int doDataCor = 0){ 
+  void roofitB(int doubly = 0, TString tree = "ntphi", int full = 0, int usePbPb = 0, int fitOnSaved = 0, TString inputdata = "", TString inputmc = "", TString varExp = "", TString trgselection = "",  TString cut = "", TString cutmcgen = "", int isMC = 0, Double_t luminosity = 1., int doweight = 1, TString outputfile = "", TString outplotf = "", TString npfit = "", int doDataCor = 0, TString scale_file = "", TString jpsiFile = ""){
 
 	//Create the Folders
 	gSystem->mkdir("filesbp",true); 
@@ -304,7 +304,9 @@ cout << endl << endl;
 		// PREPARE DATA SETS
 		std::vector<TString> jpsi_vars = {"By", "Bpt", "Bgen","BDT_pt_5_7", "BDT_pt_7_10", "BDT_pt_10_15","BDT_pt_15_20", "BDT_pt_20_50"};
 		//read_samples(*ws, jpsi_vars, "/data3/hlegoinha/data/jpsinp_inclusive.root", "ntnp", "jpsinp");
-		read_samples(*ws, jpsi_vars, "/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/jpsinp_inclusive.root", "ntnp", "jpsinp");
+		// read_samples(*ws, jpsi_vars, "/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/jpsinp_inclusive.root", "ntnp", "jpsinp");
+		// read_samples(*ws, jpsi_vars, "~/dat/presel/filter/jpsinp_inclusive.root", "ntnp", "jpsinp");
+		read_samples(*ws, jpsi_vars, jpsiFile, "ntKp", "jpsinp");
 		RooDataSet* full_data_MC = (RooDataSet*) ws->data("jpsinp");
 		full_data_MC = (RooDataSet*)full_data_MC->reduce("(BDT_pt_5_7 > 0.08 && Bpt >= 5 && Bpt < 7) || (BDT_pt_7_10 > 0.07 && Bpt >= 7 && Bpt < 10) || (BDT_pt_10_15 > 0.0 && Bpt >= 10 && Bpt < 15) || (BDT_pt_15_20 > 0.02 && Bpt >= 15 && Bpt < 20) || (BDT_pt_20_50 > 0.04 && Bpt >= 20 && Bpt < 50) || (Bpt >= 20 && Bpt < 50) ");
 		full_data_MC = (RooDataSet*)full_data_MC->reduce("(Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10)");

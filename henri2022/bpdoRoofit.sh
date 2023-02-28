@@ -4,10 +4,12 @@ DOANALYSISPbPb_ROOFIT_BINNED_PT_BP_TRK=0
 DOANALYSISPbPb_ROOFIT_BINNED_Y_BP=0
 DOANALYSISPbPb_ROOFIT_BINNED_MULTI_BP=0
 
-INPUTMCPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPMC.root"
-INPUTDATAPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPData.root"
-#INPUTMCPbPbCANDWISE_BP="../../CutSkim/BPMC.root"
-#INPUTDATAPbPbCANDWISE_BP="../../CutSkim/BPData.root"
+# INPUTMCPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPMC.root"
+# INPUTDATAPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPData.root"
+# INPUTMCPbPbCANDWISE_BP="../CutSkim/BPMC.root"
+# INPUTDATAPbPbCANDWISE_BP="../CutSkim/BPData.root"
+INPUTMCPbPbCANDWISE_BP="~/dat/presel/BPMC_nom.root"
+INPUTDATAPbPbCANDWISE_BP="~/dat/presel/BPData_nom.root"
 
 #LUMIPbPb=13.1983052423 #paper 20170227
 LUMIPbPb=56.564165324
@@ -31,6 +33,7 @@ OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_FULL="ROOTfiles/yields_Bp_full.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_Y="ROOTfiles/yields_Bp_binned_y.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT="ROOTfiles/yields_Bp_binned_pt.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT_trk="ROOTfiles/yields_Bp_binned_pt_trk.root"
+INPUTJPSI="~/dat/presel/jpsinp_nom.root"
 
 #NPROOFIT_PbPb="yes"  #must be !=1 in order to fir the mc file
 NPROOFIT_PbPb="467.13*TMath::Erf((Bmass-5.14)/-0.03)+467.13+63.57*TMath::Gaus(Bmass,5.06,0.0846)/(sqrt(2*3.14159)*0.0846)+21.5*TMath::Gaus(Bmass,5.36,0.0581)/(sqrt(2*3.14159)*0.0581)"
@@ -43,7 +46,7 @@ rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
 fi
 
 if [ $DOANALYSISPbPb_ROOFIT_BINNED_PT_BP  -eq 1  ]; then
-root -b  -q 'roofitB.C+('0','\"ntKp\"','0','1','0','\"$INPUTDATAPbPbCANDWISE_BP\"','\"$INPUTMCPbPbCANDWISE_BP\"','\"Bpt\"','\"$TRGPbPb\"','\"$CUTPbPb\"','\"$SELGENPbPb\"','$ISMCPbPb','1','$ISDOWEIGHTPbPb','\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT\"','\"results/BP/Bpt\"','\"$NPROOFIT_PbPb\"','0')'
+root -b  -q 'roofitB.C('0','\"ntKp\"','0','1','0','\"$INPUTDATAPbPbCANDWISE_BP\"','\"$INPUTMCPbPbCANDWISE_BP\"','\"Bpt\"','\"$TRGPbPb\"','\"$CUTPbPb\"','\"$SELGENPbPb\"','$ISMCPbPb','1','$ISDOWEIGHTPbPb','\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT\"','\"results/BP/Bpt\"','\"$NPROOFIT_PbPb\"','0','\"\"','\"$INPUTJPSI\"')'
 
 rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
 fi
@@ -57,7 +60,7 @@ if [ $DOANALYSISPbPb_ROOFIT_BINNED_PT_BP_TRK -eq 1  ]; then
 '$ISMCPbPb','1','$ISDOWEIGHTPbPb', \
 '\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT_trk\"', \
 '\"results/BP/trk_tight_roofit\"','\"$NPROOFIT_PbPb\"', \
-'0')' |& tee binned_pt_trk.log
+'0','\"\"','\"$INPUTJPSI\"')' |& tee binned_pt_trk.log
 
     rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
 fi

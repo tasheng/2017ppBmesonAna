@@ -576,7 +576,7 @@ void fit_jpsinp(RooWorkspace& w, TString pdf, int pti, int ptf, bool includeSign
   	// Apply y selections and pT bins
   	d_s = (RooDataSet*) d_s->reduce(Form("(Bpt>%d && Bpt < %d)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))",pti , ptf) );
 	// Get rid of B+ at gen level
-	RooDataSet* ds_cont = (RooDataSet*) d_s->reduce("Bgen != 23333 && Bgen != 23335");
+	RooDataSet* ds_cont = (RooDataSet*) d_s->reduce("Bgen != 23333 && Bgen != 23335 && Bgen > 5000");
 
 	// Crteate the necessary folders and define paths
   	gSystem->mkdir(Form("./results/BP/%i_%i", pti, ptf),true);
