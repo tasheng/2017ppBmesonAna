@@ -2028,7 +2028,7 @@ void  MCEff(int DoTnP, int Rescale){
 		c->SetLogz();
 
 		invEff2DTnPSystUp->GetYaxis()->SetTitle("B |y|");
-		invEff2DTnPSystUp->GetXaxis()->SetTitle("B_{s} p_{T} (GeV/c)");
+		invEff2DTnPSystUp->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
 		invEff2DTnPSystUp->GetXaxis()->CenterTitle();
 		invEff2DTnPSystUp->GetYaxis()->CenterTitle();
 		invEff2DTnPSystUp->GetYaxis()->SetTitleOffset(1.2);
@@ -2041,7 +2041,7 @@ void  MCEff(int DoTnP, int Rescale){
 
 
 		invEff2DTnPSystDown->GetYaxis()->SetTitle("B |y|");
-		invEff2DTnPSystDown->GetXaxis()->SetTitle("B_{s} p_{T} (GeV/c)");
+		invEff2DTnPSystDown->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
 		invEff2DTnPSystDown->GetXaxis()->CenterTitle();
 		invEff2DTnPSystDown->GetYaxis()->CenterTitle();
 		invEff2DTnPSystDown->GetYaxis()->SetTitleOffset(1.2);

@@ -20,7 +20,7 @@ glist = []
 # for fin in listdir(rapdir):
 #     fin = join(rapdir, fin)
 for i in range(len(ylim) - 1):
-    fstr = f'fonll_pp_B_5p03TeV_y-{ylim[i]}-{ylim[i+1]}.dat'
+    fstr = 'fonll_pp_B_5p03TeV_y-{low}-{upp}.dat'.format(low=ylim[i], upp=ylim[i+1])
     fin = rapdir + fstr
     colnames = ['pt', 'cross']
     df = pd.read_csv(fin, names=colnames, delimiter='\s+')
@@ -29,7 +29,7 @@ for i in range(len(ylim) - 1):
     x = df['pt'].to_numpy(dtype=np.float64)
     y = df['cross'].to_numpy(dtype=np.float64)
     g = r.TGraph(len(x), x, y)
-    g.SetName(f'gaeSigmaBplus{i}')
+    g.SetName('gaeSigmaBplus{i}'.format(i=i))
     g.Write()
     glist.append(g)
 fout.Close()

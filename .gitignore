@@ -17,3 +17,12 @@
 *_C.d
 *_C.so
 *ACLiC*
+
+# soft links
+Skimmed/
+SkimmedSamples/
+UnskimmedSamples/
+
+# generated root files
+BP/**/*.root
+Bs/**/*.root

@@ -20,6 +20,13 @@ maketnp () {
 
 # new bpt reweighting uses FONLL and doesn't depend on acceptance
 # function >> MCEff.C
+bptshape () {
+    pushd NewBptStudies
+    root -q -b -l ReweightBpt.C'(0)' &
+    root -q -b -l ReweightBpt.C'(1)' &
+    python3 ReweightY.py &
+    wait
+}
 
 yield () {
     ## yield extraction
@@ -27,6 +34,16 @@ yield () {
     # roofitB.C contains 2 By cuts
     source bpdoRoofit.sh &
     source bsdoRoofit.sh &
+    wait
+    popd
+}
+
+yield () {
+    ## yield extraction
+    pushd henri2022
+    # roofitB.C contains 2 By cuts
+    bash bpdoRoofit.sh &
+    bash bsdoRoofit.sh &
     wait
     popd
 }
@@ -131,7 +148,10 @@ paperPlots () {
 }
 # maketnp
 
-yield
+# bptshape
+
+# yield
+# wait
 
 sync_with_main
 
