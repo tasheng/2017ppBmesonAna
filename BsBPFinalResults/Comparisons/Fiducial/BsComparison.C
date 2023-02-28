@@ -130,7 +130,7 @@ void BsComparison(){
 	}
 
   std::vector<double> scaledPt = {7, 10};
-  std::vector<double> factor = scaleFactor("../../../CutSkim/BsMC.root", "ntphi", scaledPt);
+  std::vector<double> factor = scaleFactor("~/dat/presel/BsMC_nom.root", "ntphi", scaledPt);
   for (auto i = 0; i < factor.size(); ++i) {
     cout << "applying scaling factor: " << factor[i] << "\n";
     BsXsecPPY2DScaled[i] *= factor[i];
