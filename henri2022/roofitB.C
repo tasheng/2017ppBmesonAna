@@ -16,7 +16,7 @@ void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotN
 void read_samples(RooWorkspace& w, std::vector<TString>, TString fName, TString treeName, TString sample);
 
 // PDF VARIATION FOR SYST STUDIES
-int syst_study=1;
+int syst_study=0;
 
 // VALIDATION STUDIES
 int val=0;
@@ -217,7 +217,6 @@ cout << endl << endl;
 	TString _isMC = "data";
 	if(isMC) _isMC = "mcAsData";
 	TString _isPbPb = "pp";
-
 
 	dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
 	ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new,RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
@@ -428,12 +427,12 @@ cout << endl << endl;
 		if (val==1){
 			gSystem->mkdir(Form("./%s/validation",outplotf.Data()),true); 
 			string Path_val=Form("./%s/validation",outplotf.Data());
-			validate_fit(w_val, "", tree, varExp, full, _ptBins[i], _ptBins[i+1],Path_val);
+			validate_fit(ws, "", tree, varExp, full, _ptBins[i], _ptBins[i+1],Path_val);
 		}
 		
-		//scan_significance(w_val, tree, varExp, full,centmin, centmax, _ptBins[i], _ptBins[i+1]);
+		//scan_significance(*ws, tree, varExp, full,centmin, centmax, _ptBins[i], _ptBins[i+1]);
 		/*for(int q= 0; q < 100; q++){
-			validate_fit(w_val, tree, varExp, full,q);} ?? */
+			validate_fit(*ws, tree, varExp, full,q);} ?? */
 		//datahist = frame->getHist("ds");
 		//TGraphAsymmErrors* datagraph = static_cast<TGraphAsymmErrors*>(datahist);
 
@@ -489,7 +488,7 @@ cout << endl << endl;
 		modelMC->plotOn(frameMC_chi2);
 		RooChi2Var chi2(Form("chi2%d",_count),"chi2",*model,*dh);
 		double Mychi2 = chi2.getVal()/(nbinsmasshisto - f->floatParsFinal().getSize()); //normalised chi square	
-		std::cout << "Chi square value is " << Mychi2 << endl;
+		std::cout << "normalised Chi square value is " << Mychi2 << endl;
 		chi2_vec[i] = Mychi2;
 		chi2MC_vec[i] = frameMC_chi2->chiSquare();
 		//chi2
@@ -540,7 +539,7 @@ cout << endl << endl;
         //tex_y1 = new TLatex(0.21,0.65,"1.5 < |y| < 2.4");
         //tex_y11 =new TLatex(0.21,0.65,"|y| < 2.4");
 		yield_val = new TLatex(0.21,0.7,Form("Y_{S} = %d #pm %d",yieldI, yieldErrI));
-		chi_square = new TLatex(0.21,0.65,Form("#chi^{2} value : %.2f",Mychi2));
+		chi_square = new TLatex(0.21,0.65,Form("#chi^{2} value : %.2f /ndf",Mychi2));
       } else {
         //for the AN run these
         tex_pt = new TLatex(0.65,0.8,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
