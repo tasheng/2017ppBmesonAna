@@ -20,7 +20,7 @@ void read_samples(RooWorkspace& w, std::vector<TString>, TString fName, TString 
 int syst_study=0;
 
 // VALIDATION STUDIES
-int val=0;
+int val=1;
 
 void roofitB(int doubly = 0, TString tree = "ntphi", int full = 0, int usePbPb = 0, int fitOnSaved = 0, TString inputdata = "", TString inputmc = "", TString varExp = "", TString trgselection = "",  TString cut = "", TString cutmcgen = "", int isMC = 0, Double_t luminosity = 1., int doweight = 1, TString outputfile = "", TString outplotf = "", TString npfit = "", int doDataCor = 0){ 
 
@@ -429,11 +429,7 @@ cout << endl << endl;
 
 ////////// FITFITFITFITFITFITFITFITFITFITFITFIT
 		
-		if (val==1){
-			gSystem->mkdir(Form("./%s/validation",outplotf.Data()),true); 
-			string Path_val=Form("./%s/validation",outplotf.Data());
-			validate_fit(ws, "", tree, varExp, full, _ptBins[i], _ptBins[i+1],Path_val);
-		}
+		
 		
 		//scan_significance(w_val, tree, varExp, full,centmin, centmax, _ptBins[i], _ptBins[i+1]);
 		
@@ -784,6 +780,12 @@ if(varExp=="nMult"){
 			general_syst.push_back(general_err);
 			yield_vec_systerr_low[i] = general_err[2] / 100 * yield_vec[i];
 			yield_vec_systerr_high[i] = general_err[2] / 100 * yield_vec[i];
+		}
+		
+		if (val==1){
+			gSystem->mkdir(Form("./%s/validation",outplotf.Data()),true); 
+			string Path_val=Form("./%s/validation",outplotf.Data());
+			validate_fit(ws, "", tree, varExp, full, _ptBins[i], _ptBins[i+1],Path_val);
 		}
 	}
 

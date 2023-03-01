@@ -871,48 +871,14 @@ void validate_fit(RooWorkspace* w, TString pdf, TString tree, TString variable, 
 
 
 	TCanvas* c_pull = new TCanvas("pulls", "pulls", 700, 700);
-	gPad->SetLeftMargin(0.15);
-	gStyle->SetStatX(0.95);		//Stat box x position (top right hand corner)	
-	gStyle->SetStatY(0.9); 		//Stat box y position 	
-	gStyle->SetStatW(0.1);	 		//Stat box width as fraction of pad size	0.05	
-	gStyle->SetStatFont(62);  		//Stat box font
-	gStyle->SetStatFontSize(0);
-	gStyle->SetOptFit(0111);
-	gStyle->SetStatBorderSize(0);
-	gStyle->SetStatColor(0);
-	gStyle->SetStatStyle(0);		//Stat box fill style hollow
 	
+	
+
 	TCanvas* c_params = new TCanvas("params", "params", 700, 700);
-	gPad->SetLeftMargin(0.15);
-	gStyle->SetStatX(0.95);		//Stat box x position (top right hand corner)	
-	gStyle->SetStatY(0.9); 		//Stat box y position 	
-	gStyle->SetStatW(0.1);	 		//Stat box width as fraction of pad size	0.05	
-	gStyle->SetStatFont(62);  		//Stat box font
-	gStyle->SetStatFontSize(0);
-	gStyle->SetOptFit(0111);
-	gStyle->SetStatBorderSize(0);
-	gStyle->SetStatColor(0);
-	gStyle->SetStatStyle(0);		//Stat box fill style hollow
 	
-	/*TCanvas* c_params = new TCanvas("params", "params", 900, 800);
-
-	  for(int i = 0; i < params_size; ++i){
-	  c_params->cd();
-	  h2[i]->SetTitle("");
-	  h2[i]->Draw();
-	  c_params->Update();
-	  if(particle == 0){h2[i]->Fit("gaus","","",900,1200);}
-	  else if(particle == 1){h2[i]->Fit("gaus","","",60, 120);}
-	  h2[i]->GetFunction("gaus")->SetLineColor(4);
-	  h2[i]->GetFunction("gaus")->SetLineWidth(5);
-	//h2[i]->GetXaxis()->SetTitle();
-	h2[i]->GetYaxis()->SetTitle("Toy MCs");
-	h2[i]->Draw("same");
-	}*/
-
-
-
+	
 	TCanvas* c_errors = new TCanvas("errors", "errors", 700, 700);
+	
 	gPad->SetLeftMargin(0.15);
 	gStyle->SetStatX(0.95);		//Stat box x position (top right hand corner)	
 	gStyle->SetStatY(0.9); 		//Stat box y position 	
