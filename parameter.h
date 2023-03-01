@@ -1,6 +1,5 @@
 #include <vector>
 #include <array>
-#include <map>
 
 // PbPb published binning
 /* const std::vector<double> ptbinsvec = { */
@@ -12,31 +11,40 @@
 // const std::array<double, nptBins + 1> ptbinsvec = {
 // 	7, 10, 15, 20, 50
 // };
-const unsigned nptBins = 7;
-const std::array<double, nptBins + 1> ptbinsvec = {
-  5, 7, 10, 15, 20, 30, 50, 60
-};
+//
 
 
-enum Tracking{
-  loose = 0,
-  standard = 1,
-  tight = 2,
-};
+//const unsigned nptBins = 1;
+//const std::array<double, nptBins + 1> ptbinsvec = {7, 10};
 
-std::map<Tracking, double> ptErr{
-  {Tracking::standard, 0.1},
-  {Tracking::tight, 0.05},
-  {Tracking::loose, 0.15}
-};
+const unsigned nptBins = 4;
+const std::array<double, nptBins + 1> ptbinsvec = { 7, 10, 15, 20, 50};
 
-std::map<Tracking, double> chi2Nlayer{
-  {Tracking::standard, 0.18},
-  {Tracking::tight, 0.15},
-  {Tracking::loose, 0.18}
-};
 
-const double epsilon = 1e-7;
+const unsigned nptBinsBP = 7;
+const std::array<double, nptBinsBP + 1> ptbinsvecBP = { 5, 7, 10, 15, 20, 30, 50, 60};
+
+//const unsigned nptBinsBP = 1;
+//const std::array<double, nptBinsBP + 1> ptbinsvecBP = {7,10 };
+
+const unsigned nyBins_both = 8;
+const std::array<double, nyBins_both + 1> ybinsvec = {-2.4,-1.5,-1.0,-0.5,0.0 ,0.5, 1.0, 1.5, 2.4};
+
+//const unsigned nyBins_both = 1;
+//const std::array<double, nyBins_both + 1> ybinsvec = {1.0,1.5};
+
+const unsigned nyBins_both_full = 1;
+const std::array<double, nyBins_both_full + 1> ybinsvec_full = {-2.4, 2.4};
+
+const unsigned nmBins_both = 7;
+const std::array<double, nmBins_both + 1> nmbinsvec = { 0,20,30,40,50,60,70,100};
+
+//const unsigned nmBins_both = 1;
+//const std::array<double, nmBins_both + 1> nmbinsvec = {30,40};
+
+const unsigned nmBins_both_full = 1;
+const std::array<double, nmBins_both_full + 1> nmbinsvec_full = {0,100};
+
 
 // 7 bins
 /* float BPXsecPbPbY[NBins] = {4.82132e+06/11.1,311668,270167,64384.4,208537/11.1,28700.6/11.1,7000.73/11.1}; */
