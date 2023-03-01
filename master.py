@@ -76,7 +76,7 @@ def get_pdf_syst(inFileList, outfile, hname, nbins):
     fout.Close()
     return
 
-get_pdf_syst(bp_pdf_list, "bp_pdf.root", "bp_error", 7)
+get_pdf_syst(bp_pdf_list, "bp_pdf.root", "bp_error", 4)
 get_pdf_syst(bs_pdf_list, "bs_pdf.root", "bs_error", 4)
 
 def make_line(item, array, suf = '', form = '{:.2f}'):

@@ -32,8 +32,8 @@ yield () {
     ## yield extraction
     pushd henri2022
     # roofitB.C contains 2 By cuts
-    source bpdoRoofit.sh &
-    source bsdoRoofit.sh &
+    bash bpdoRoofit.sh &
+    bash bsdoRoofit.sh &
     wait
     popd
 }
@@ -150,7 +150,7 @@ paperPlots () {
 
 # bptshape
 
-# yield
+yield
 # wait
 
 sync_with_main
