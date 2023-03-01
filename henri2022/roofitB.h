@@ -585,7 +585,7 @@ void fit_jpsinp(RooWorkspace& w, int nbin_hist, TString pdf, int pti, int ptf, b
   	// Apply y selections and pT bins
   	d_s = (RooDataSet*) d_s->reduce(Form("(Bpt>%d && Bpt < %d)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))",pti , ptf) );
 	// Get rid of B+ at gen level
-	RooDataSet* ds_cont = (RooDataSet*) d_s->reduce("Bgen != 23333 && Bgen != 23335");
+	RooDataSet* ds_cont = (RooDataSet*) d_s->reduce("Bgen != 23333 && Bgen != 23335 && Bgen > 5000");
 
 	// Crteate the necessary folders and define paths
   	gSystem->mkdir(Form("./results/BP/%i_%i", pti, ptf),true);
@@ -841,7 +841,7 @@ void validate_fit(RooWorkspace* w, TString pdf, TString tree, TString variable, 
 
 	RooMCStudy* mcstudy = new RooMCStudy(*model, Bmass,  Extended(), FitOptions(Save(kTRUE), PrintEvalErrors(0)));
 	
-	mcstudy->generateAndFit(50);
+	mcstudy->generateAndFit(5000);
 
 	cout << "DONE Generate and Fit " << endl;
 
@@ -878,7 +878,7 @@ void validate_fit(RooWorkspace* w, TString pdf, TString tree, TString variable, 
 	
 	
 	TCanvas* c_errors = new TCanvas("errors", "errors", 700, 700);
-	
+
 	gPad->SetLeftMargin(0.15);
 	gStyle->SetStatX(0.95);		//Stat box x position (top right hand corner)	
 	gStyle->SetStatY(0.9); 		//Stat box y position 	
