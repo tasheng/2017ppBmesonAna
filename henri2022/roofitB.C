@@ -20,7 +20,7 @@ void read_samples(RooWorkspace& w, std::vector<TString>, TString fName, TString 
 int syst_study=0;
 
 // VALIDATION STUDIES
-int val=1;
+int val=0;
 
 void roofitB(int doubly = 0, TString tree = "ntphi", int full = 0, int usePbPb = 0, int fitOnSaved = 0, TString inputdata = "", TString inputmc = "", TString varExp = "", TString trgselection = "",  TString cut = "", TString cutmcgen = "", int isMC = 0, Double_t luminosity = 1., int doweight = 1, TString outputfile = "", TString outplotf = "", TString npfit = "", int doDataCor = 0){ 
 
@@ -547,7 +547,7 @@ cout << endl << endl;
 	if(varExp=="Bpt"){
       //for the paper run these
       if (drawLegend) {
-        tex_pt = new TLatex(0.21,0.65,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
+        tex_pt = new TLatex(0.21,0.75,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
         tex_y = new TLatex(0.21,0.6,"p_{T} > 10 GeV/c : |y| < 2.4");
         tex_y2 = new TLatex(0.21,0.55,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4");
         tex_y1 = new TLatex(0.21,0.6,"1.5 < |y| < 2.4");
@@ -917,7 +917,7 @@ if(varExp=="nMult"){
 	m_sig->GetYaxis()->SetRangeUser(0, y_max_sig*1.5);
 	m_sig->Draw("A*");
 	legsig->SetFillStyle(0);
-  legsig->SetTextSize(0);
+  	legsig->SetTextSize(0);
 	legsig->Draw();
 	c_sig->SaveAs(Form("./results/tables/signal_systematics_plot_%s_%s.png",tree.Data(),varExp.Data())); 
 
