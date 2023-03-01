@@ -4,12 +4,11 @@ DOANALYSISPbPb_ROOFIT_BINNED_PT_BP_TRK=0
 DOANALYSISPbPb_ROOFIT_BINNED_Y_BP=0
 DOANALYSISPbPb_ROOFIT_BINNED_MULTI_BP=0
 
-# INPUTMCPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPMC.root"
-# INPUTDATAPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPData.root"
-# INPUTMCPbPbCANDWISE_BP="../CutSkim/BPMC.root"
-# INPUTDATAPbPbCANDWISE_BP="../CutSkim/BPData.root"
-INPUTMCPbPbCANDWISE_BP="~/dat/presel/BPMC_nom.root"
-INPUTDATAPbPbCANDWISE_BP="~/dat/presel/BPData_nom.root"
+INPUTMCPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPMC.root"
+INPUTDATAPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPData.root"
+#INPUTMCPbPbCANDWISE_BP="../../CutSkim/BPMC.root"
+#INPUTDATAPbPbCANDWISE_BP="../../CutSkim/BPData.root"
+INPUTJPSI="~/dat/presel/jpsinp_nom.root"
 
 #LUMIPbPb=13.1983052423 #paper 20170227
 LUMIPbPb=56.564165324
@@ -33,7 +32,7 @@ OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_FULL="ROOTfiles/yields_Bp_full.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_Y="ROOTfiles/yields_Bp_binned_y.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT="ROOTfiles/yields_Bp_binned_pt.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT_trk="ROOTfiles/yields_Bp_binned_pt_trk.root"
-INPUTJPSI="~/dat/presel/jpsinp_nom.root"
+
 
 #NPROOFIT_PbPb="yes"  #must be !=1 in order to fir the mc file
 NPROOFIT_PbPb="467.13*TMath::Erf((Bmass-5.14)/-0.03)+467.13+63.57*TMath::Gaus(Bmass,5.06,0.0846)/(sqrt(2*3.14159)*0.0846)+21.5*TMath::Gaus(Bmass,5.36,0.0581)/(sqrt(2*3.14159)*0.0581)"
