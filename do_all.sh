@@ -15,7 +15,7 @@ bptshape () {
     pushd NewBptStudies
     root -q -b -l ReweightBpt.C'(0)' &
     root -q -b -l ReweightBpt.C'(1)' &
-    python3 ReweightY.py &
+    python ReweightY.py &
     wait
 }
 
