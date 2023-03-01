@@ -313,6 +313,9 @@ void plotPt(bool bSavePlots       = 1,
 
 		LHCb7TeVRef->SetName("LHCb7TeVRef");
 
+
+
+
 		//==================
 		// // **************** marker setup
 		// Bs
@@ -505,7 +508,7 @@ void plotPt(bool bSavePlots       = 1,
 		if(whichPlot==1) f4->GetYaxis()->SetRangeUser(0.0,4.0);
 		if(whichPlot==0) f4->GetYaxis()->SetRangeUser(100.0,2000000); //1.8 -> 0.9
 		
-		f4->GetYaxis()->SetRangeUser(0.0, 3.0); 
+		f4->GetYaxis()->SetRangeUser(0.0, 2.0);
 		f4->SetLineColor(0);
 		//f4->GetXaxis()->SetNdivisions(-6);
 
@@ -531,7 +534,56 @@ void plotPt(bool bSavePlots       = 1,
 		pgBpl_syst_high->SetLineColor(kGreen-9);
 		pgBpl_syst_low->SetLineColor(kGreen-9);
 
+    // D0 comparison
+    TFile fd0("dataSource/HEPData-ins1616207-v1-Table_1.root");
+    auto d0Raa = fd0.Get<TH1F>("Table 1/Hist1D_y1");
+    auto d0RaaStat = fd0.Get<TH1F>("Table 1/Hist1D_y1_e1");
+    auto d0RaaSyst = fd0.Get<TH1F>("Table 1/Hist1D_y1_e2");
+    auto d0RaaGraph = fd0.Get<TGraphAsymmErrors>("Table 1/Graph1D_y1");
 
+    TFile fch("dataSource/HEPData-ins1496050-v2-Table_15.root");
+    auto chRaa = fch.Get<TH1F>("Table 15/Hist1D_y1");
+    auto chRaaStat = fch.Get<TH1F>("Table 15/Hist1D_y1_e1");
+    auto chRaaSyst = fch.Get<TH1F>("Table 15/Hist1D_y1_e2");
+    auto chRaaGraph = fch.Get<TGraphAsymmErrors>("Table 15/Graph1D_y1");
+
+    auto gd0 = (TGraphAsymmErrors*) pgBpl_high->Clone();
+    auto gd0Syst = (TGraphAsymmErrors*) pgBpl_syst_high->Clone();
+    unsigned ngd0 = d0Raa->GetNbinsX();
+    gd0->Set(ngd0);
+    gd0Syst->Set(ngd0);
+    for (auto i = 0; i < ngd0; ++i) {
+      gd0->SetPoint(i, d0RaaGraph->GetPointX(i), d0RaaGraph->GetPointY(i));
+      gd0Syst->SetPoint(i, d0RaaGraph->GetPointX(i), d0RaaGraph->GetPointY(i));
+      gd0->SetPointError(i, d0RaaGraph->GetErrorX(i), d0RaaGraph->GetErrorX(i),
+                         d0RaaStat->GetBinContent(i + 1), d0RaaStat->GetBinContent(i + 1));
+      gd0Syst->SetPointError(i, d0RaaGraph->GetErrorX(i), d0RaaGraph->GetErrorX(i),
+                             d0RaaSyst->GetBinContent(i + 1), d0RaaSyst->GetBinContent(i + 1));
+    }
+
+		gd0Syst->SetFillColorAlpha(kRed-9,0.5);
+		gd0Syst->SetLineColor(kRed-9);
+		gd0->SetLineColor(kRed+2);
+		gd0->SetMarkerColor(kRed+2);
+
+    auto gch = (TGraphAsymmErrors*) pgBpl_high->Clone();
+    auto gchSyst = (TGraphAsymmErrors*) pgBpl_syst_high->Clone();
+    unsigned ngch = chRaa->GetNbinsX();
+    gch->Set(ngch);
+    gchSyst->Set(ngch);
+    for (auto i = 0; i < ngch; ++i) {
+      gch->SetPoint(i, chRaaGraph->GetPointX(i), chRaaGraph->GetPointY(i));
+      gchSyst->SetPoint(i, chRaaGraph->GetPointX(i), chRaaGraph->GetPointY(i));
+      gch->SetPointError(i, chRaaGraph->GetErrorX(i), chRaaGraph->GetErrorX(i),
+                         chRaaStat->GetBinContent(i + 1), chRaaStat->GetBinContent(i + 1));
+      gchSyst->SetPointError(i, chRaaGraph->GetErrorX(i), chRaaGraph->GetErrorX(i),
+                             chRaaSyst->GetBinContent(i + 1), chRaaSyst->GetBinContent(i + 1));
+    }
+
+		gchSyst->SetFillColorAlpha(kYellow-9,0.5);
+		gchSyst->SetLineColor(kYellow-9);
+		gch->SetLineColor(kYellow+2);
+		gch->SetMarkerColor(kYellow+2);
 
 		if(whichPlot==0)// x-section
 		{
@@ -562,6 +614,12 @@ void plotPt(bool bSavePlots       = 1,
 
 			pgBpl_high->Draw("P");
 			pgBpl_lowWhite->Draw("P");
+
+      // D0 comparison
+      gd0Syst->Draw("5");
+      gd0->Draw("P");
+      gchSyst->Draw("5");
+      gch->Draw("P");
 	
 			TLine * Unity = new TLine(5,1,60,1);
 			Unity->SetLineWidth(2);
@@ -657,9 +715,20 @@ void plotPt(bool bSavePlots       = 1,
 		//	lat->DrawLatex(legXsec_xLowStart+ShiftX,legXsec_y,"#bf{B_{s}^{0}}");
 		//	lat->DrawLatex(legXsec_xLowStart+ ShiftX + 0.080,legXsec_y,"#bf{B^{+}}");
 
+      double xsep = 0.085;
 
+			lat->SetTextSize(0.04);
+			lat->DrawLatex(legXsec_xLowStart+ShiftX+0.02 + 0.009,legXsec_y + 0.13,
+                     "0-90%");
+			lat->DrawLatex(legXsec_xLowStart+ShiftX + xsep * 2 + 0.009,legXsec_y + 0.13,
+                     "0-100%");
+
+			lat->SetTextSize(0.048 * 1.15);  //Enlarge Labels
 			lat->DrawLatex(legXsec_xLowStart+ShiftX+0.02 + 0.009,legXsec_y + 0.07,"#bf{B_{s}^{0}}"); //Enlarge Label
-			lat->DrawLatex(legXsec_xLowStart+ ShiftX + 0.125 + 0.003,legXsec_y+ 0.07,"#bf{B^{+}}");  //Enlarge Label
+			lat->DrawLatex(legXsec_xLowStart+ ShiftX + xsep * 1 + 0.02, legXsec_y+ 0.07,"#bf{B^{+}}");  //Enlarge Label
+
+			lat->DrawLatex(legXsec_xLowStart+ ShiftX + xsep * 2 + 0.003, legXsec_y+ 0.07,"#bf{D^{0}}");  //Enlarge Label
+			lat->DrawLatex(legXsec_xLowStart+ ShiftX + xsep * 3 + 0.003, legXsec_y+ 0.07,"#bf{h^{+}}");  //Enlarge Label
 
 
 		//	lat->DrawLatex(legXsec_xLowStart+ShiftX+0.02 - 0.01,legXsec_y + 0.08,"#bf{Rebinned}"); //Enlarge Label + Shift up
@@ -685,12 +754,13 @@ void plotPt(bool bSavePlots       = 1,
 
 			lat->DrawLatex(legXsec_xLowStart-0.18-0.02,legXsec_y+0.062-ShiftY + 0.08,"1.5 < |y| < 2.4"); //Enlarge Label + Shift up
 			lat->DrawLatex(legXsec_xLowStart-0.13-0.02,legXsec_y+0.017-ShiftY + 0.08,"|y| < 2.4 "); //Enlarge Label + Shift up
+			lat->DrawLatex(legXsec_xLowStart-0.13-0.02,legXsec_y-0.028-ShiftY + 0.08,"|y(#eta)| < 1 "); //Enlarge Label + Shift up
 
 
 
 
 //			TLegend *legXSec = new TLegend(legXsec_xLowStart + ShiftX + 0.04,legXsec_y-ShiftY,legXsec_xLowEnd+ShiftX-0.10+0.06,legXsec_y+0.15-ShiftY,"                    ","brNDC");
-			TLegend *legXSec = new TLegend(legXsec_xLowStart + ShiftX + 0.04,legXsec_y-ShiftY + 0.08,legXsec_xLowEnd+ShiftX-0.10+0.06,legXsec_y+0.15-ShiftY + 0.08,"                    ","brNDC");
+			TLegend *legXSec = new TLegend(legXsec_xLowStart + ShiftX + 0.04,legXsec_y-ShiftY + 0.04,legXsec_xLowEnd+ShiftX-0.10+0.06,legXsec_y+0.15-ShiftY + 0.08,"                    ","brNDC");
 		
 			legXSec->SetBorderSize(0);
 
@@ -704,16 +774,26 @@ void plotPt(bool bSavePlots       = 1,
 			legXSec->SetFillColor(19);
 			legXSec->SetFillStyle(0);
 			legXSec->SetTextFont(42);
-			legXSec->SetNColumns(2);
+			legXSec->SetNColumns(4);
 			legXSec->SetColumnSeparation(0.0);
 			//legXSec->AddEntry(pgBs_low,"1.5 < |y| < 2.4","p");
 			legXSec->AddEntry(pgBs_low," ","p");
 			legXSec->SetTextFont(42);
 			legXSec->AddEntry(pgBpl_low," ","p");
 			//legXSec->AddEntry(pgBs_high,"|y| < 2.4","p");
+			legXSec->AddEntry(gd0," ","");
+			legXSec->AddEntry(gch," ","");
+      // row 2
 			legXSec->AddEntry(pgBs_high," ","p");
 			legXSec->SetTextFont(42);
 			legXSec->AddEntry(pgBpl_high," ","p");
+			legXSec->AddEntry(gd0," ","");
+			legXSec->AddEntry(gch," ","");
+      // row 3
+			legXSec->AddEntry(gd0," ","");
+			legXSec->AddEntry(gch," ","");
+			legXSec->AddEntry(gd0," ","p");
+			legXSec->AddEntry(gch," ","p");
 				
 
 

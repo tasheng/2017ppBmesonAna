@@ -95,7 +95,7 @@ double ltxSetTextSize4 = 0.042; //Enlarge Label
 
 
 // xsec specific
-double legXsec_xLowStart= 0.65;
+double legXsec_xLowStart= 0.55;
 double legXsec_y= 0.75;
 double legXsec_xLowEnd = 0.92;
 
