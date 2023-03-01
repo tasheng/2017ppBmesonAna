@@ -440,7 +440,8 @@ if(tree == "ntphi"){
 	pull_plot->GetYaxis()->SetLabelOffset(0.01);
 	pull_plot->GetYaxis()->SetLabelSize(0.1);
 	pull_plot->GetYaxis()->SetNdivisions(305);
-	pull_plot->GetXaxis()->SetTitleSize(0.20);
+	pull_plot->GetYaxis()->SetTitleOffset(0.4);
+	pull_plot->GetXaxis()->SetTitleSize(0.16);
 	pull_plot->GetXaxis()->SetTitleOffset(1.0);
 	pull_plot->GetXaxis()->CenterTitle();
 	pull_plot->GetXaxis()->SetLabelFont(42);

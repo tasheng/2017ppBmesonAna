@@ -554,7 +554,7 @@ cout << endl << endl;
         tex_y11 =new TLatex(0.21,0.6,"|y| < 2.4");
         tex_nMult = new TLatex(0.21,0.67,"0 < nTrks < 100");
 		yield_val = new TLatex(0.21,0.7,Form("Y_{S} = %d #pm %d",yieldI, yieldErrI));
-		chi_square = new TLatex(0.21,0.65,Form("#chi^{2}/ndf = %.2f/ndf",Mychi2));
+		chi_square = new TLatex(0.21,0.65,Form("#chi^{2}/ndf = %.2f",Mychi2));
       } else {
         //for the AN run these
         tex_pt = new TLatex(0.65,0.8,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
@@ -599,40 +599,40 @@ if(varExp=="nMult"){
 	}
 		tex_pt->SetNDC();
 		tex_pt->SetTextFont(42);
-		tex_pt->SetTextSize(0.035);
+		tex_pt->SetTextSize(0.025);
 		tex_pt->SetLineWidth(2);
 		tex_pt->Draw();
 		tex_nMult->SetNDC();
 		tex_nMult->SetTextFont(42);
-		tex_nMult->SetTextSize(0.035);
+		tex_nMult->SetTextSize(0.025);
 		tex_nMult->SetLineWidth(2);
 		tex_y->SetNDC();
 		tex_y->SetTextFont(42);
-		tex_y->SetTextSize(0.035);
+		tex_y->SetTextSize(0.025);
 		tex_y->SetLineWidth(2);
 		chi_square->SetNDC();
 		chi_square->SetTextFont(42);
-		chi_square->SetTextSize(0.035);
+		chi_square->SetTextSize(0.025);
 		chi_square->SetLineWidth(2);
 		chi_square->Draw();
 		yield_val->SetNDC();
 		yield_val->SetTextFont(42);
-		yield_val->SetTextSize(0.035);
+		yield_val->SetTextSize(0.025);
 		yield_val->SetLineWidth(2);
 		yield_val->Draw();
 
 	if (varExp=="Bpt"){
 		tex_y1->SetNDC();
 		tex_y1->SetTextFont(42);
-		tex_y1->SetTextSize(0.035);
+		tex_y1->SetTextSize(0.025);
 		tex_y1->SetLineWidth(2);
 		tex_y11->SetNDC();
 		tex_y11->SetTextFont(42);
-		tex_y11->SetTextSize(0.035);
+		tex_y11->SetTextSize(0.025);
 		tex_y11->SetLineWidth(2);
 		tex_y2->SetNDC();
 		tex_y2->SetTextFont(42);
-		tex_y2->SetTextSize(0.035);
+		tex_y2->SetTextSize(0.025);
 		tex_y2->SetLineWidth(2);
 
 		if(_ptBins[i] >= 10){tex_y11->Draw();}
@@ -644,8 +644,8 @@ if(varExp=="nMult"){
 	} 
 	else{tex_y->Draw();}
 
-	CMS_lumi(c,19011,0);
-	c->Update();
+	//CMS_lumi(c,19011,0);
+	//c->Update();
 	TLatex* texB = new TLatex(0.5,0.5,"");
 	if(tree=="ntphi"){ texB = new TLatex(0.21,0.85, "B^{0}_{s}");}
 	if(tree=="ntKp"){ texB = new TLatex(0.21,0.85, "B^{#pm}");}
@@ -657,7 +657,7 @@ if(varExp=="nMult"){
 
 		/*TLatex *lat = new TLatex();
 		lat->SetNDC();
-		lat->SetTextSize(0.035);
+		lat->SetTextSize(0.025);
 		lat->DrawLatex(0.64,0.85,Form("S = %.1f", yield));
 		lat->DrawLatex(0.64,0.80,Form("S_err = %.1f", yieldErr));		
 		lat->DrawLatex(0.64,0.75,Form("B = %.1f", bkgd));
@@ -700,13 +700,13 @@ if(varExp=="nMult"){
 					yield_val  = new TLatex(0.21,0.7,Form("Y_{S} = %d #pm %d",int(round(fitYield_b_sys->getVal())), int(round(fitYield_b_sys->getError()))));
 					yield_val->SetNDC();
 					yield_val->SetTextFont(42);
-					yield_val->SetTextSize(0.035);
+					yield_val->SetTextSize(0.025);
 					yield_val->SetLineWidth(2);
 					yield_val->Draw();
 					chi_back = new TLatex(0.21,0.65,Form("#chi^{2}/ndf = %.2f ",Mychi2_back));
 					chi_back->SetNDC();
 					chi_back->SetTextFont(42);
-					chi_back->SetTextSize(0.035);
+					chi_back->SetTextSize(0.025);
 					chi_back->SetLineWidth(2);
 					chi_back->Draw();
 					if (varExp=="Bpt"){
@@ -716,8 +716,8 @@ if(varExp=="nMult"){
 							tex_y2->Draw();}
 						else{tex_y1->Draw();}
 					}else{tex_y->Draw();}
-					CMS_lumi(c,19011,0);
-					c->Update();
+					//CMS_lumi(c,19011,0);
+					//c->Update();
 					c->SaveAs(Form("%s/%s_%s_%s_%d_%d_%s_cutY%d_", outplotf.Data(), _isMC.Data(), _isPbPb.Data(), varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],background[j].c_str(), doubly)+tree+".pdf");
 				
 					modelcurve_back = frame->getCurve(Form("model%d_%s",_count,background[j].c_str()));
@@ -746,13 +746,13 @@ if(varExp=="nMult"){
 				yield_val  = new TLatex(0.21,0.7,Form("Y_{S} = %d #pm %d", int(round(fitYield_b_sig->getVal())), int(round(fitYield_b_sig->getError()))));
 				yield_val->SetNDC();
 				yield_val->SetTextFont(42);
-				yield_val->SetTextSize(0.035);
+				yield_val->SetTextSize(0.025);
 				yield_val->SetLineWidth(2);
 				yield_val->Draw();
 				chi_sig=new TLatex(0.21, 0.65, Form("#chi^{2}/ndf = %.2f ", Mychi2_sig));
 				chi_sig->SetNDC();
 				chi_sig->SetTextFont(42);
-				chi_sig->SetTextSize(0.035);
+				chi_sig->SetTextSize(0.025);
 				chi_sig->SetLineWidth(2);
 				chi_sig->Draw();
 				if (varExp=="Bpt"){
@@ -762,8 +762,8 @@ if(varExp=="nMult"){
 							tex_y2->Draw();}
 					else{tex_y1->Draw();}
 				} else{tex_y->Draw();}
-				CMS_lumi(c,19011,0);
-				c->Update();
+				//CMS_lumi(c,19011,0);
+				//c->Update();
 
 				cMC->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),varExp.Data(), (int)_ptBins[i], (int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");
 				c->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");
