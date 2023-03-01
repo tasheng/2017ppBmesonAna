@@ -29,6 +29,8 @@ def make_table(meson, errf, pdff, tracking_error, outFile):
     TnPSyst = fError.Get("TnPSyst");
     BptSyst = fError.Get("BptSyst");
     MCDataSyst = fError.Get("MCDataSyst");
+    BDTSyst = fError.Get("BDTSyst");
+    PreSyst = fError.Get("PreSelectionSyst");
     nBins = TnPSyst.GetNbinsX()
 
     pdfSyst = fPdfError.Get(meson + "_error");
@@ -36,21 +38,28 @@ def make_table(meson, errf, pdff, tracking_error, outFile):
 
     tnp = np.array([TnPSyst.GetBinContent(i) for i in range(1, nBins + 1)])
     bpt = np.array([BptSyst.GetBinContent(i) for i in range(1, nBins + 1)])
-    bdt = np.array([MCDataSyst.GetBinContent(i) for i in range(1, nBins + 1)])
+    mcdata = np.array([MCDataSyst.GetBinContent(i) for i in range(1, nBins + 1)])
     tracking = np.full(nBins, tracking_error)
     pdf = np.array(pdfSyst.GetY())
     trk_sel = np.array(trkSyst.GetY())
 
-    total = np.sqrt(np.sum([e**2 for e in [bpt, tnp, bdt, tracking, trk_sel, pdf]], axis=0))
+    total = np.sqrt(np.sum([e**2 for e in [bpt, tnp, mcdata, tracking, trk_sel, pdf]], axis=0))
+
+    bdt = np.array([BDTSyst.GetBinContent(i) for i in range(1, nBins + 1)])
+    pre = np.array([PreSyst.GetBinContent(i) for i in range(1, nBins + 1)])
 
     with open(outFile, "w") as f:
         f.write(get_line("Hadron tracking efficiency", tracking))
         f.write(get_line("Track selection", trk_sel))
-        f.write(get_line("Data-MC discrepancy", bdt))
+        f.write(get_line("Data-MC discrepancy", mcdata))
         f.write(get_line(r"\pt shape", bpt))
         f.write(get_line("PDF variation", pdf))
         f.write(get_line("TnP systematics", tnp))
         f.write(get_line("Sum", total))
+        f.write('\n\n')
+        f.write(get_line("BDT syst.", bdt))
+        f.write(get_line("Pre-selection syst.", pre))
+        f.write(get_line("Data--MC syst.", mcdata))
 
 make_table("bp", BPerrorFile, BPpdfErrorFile, pp_tracking_error, BPoutFile)
 make_table("bs", BserrorFile, BspdfErrorFile, 2 * pp_tracking_error, BsoutFile)
