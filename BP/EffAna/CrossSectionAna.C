@@ -43,7 +43,7 @@ void CrossSectionAna(int DoTnP){
 
 	TString FileName;
 
-	FileName = "../../CutSkim/BPData.root";
+  FileName = "/data3/tasheng/presel/BPData_nom.root";
 	TFile * fin = new TFile(FileName.Data());
 	fin->cd();
 

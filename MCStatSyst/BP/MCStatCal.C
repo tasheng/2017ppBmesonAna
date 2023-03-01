@@ -48,8 +48,7 @@ void MCStatCal(){
   TString FileName;
 
 	// FileName = "../../SkimmedSamples/BPData.root";
-	// FileName = "../../CutSkim/BPData_trkpt5.root";
-	FileName = "../../CutSkim/BPData.root";
+	FileName = "~/dat/presel/BPData_nom.root";
 	TFile * fin = new TFile(FileName.Data());
 	fin->cd();
 

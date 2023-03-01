@@ -126,6 +126,8 @@ bsStat() {
 comp () {
     # get pdf variation errors
     python master.py
+    # Get pre-selection error
+    python comppre.py
     # comparison plot again
     pushd BsBPFinalResults/Comparisons/Fiducial/
     # << BP/EffAna/FinalFiles/BPPPCorrYieldPT.root

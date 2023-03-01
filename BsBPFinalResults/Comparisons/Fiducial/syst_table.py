@@ -28,7 +28,7 @@ def make_table(meson, errf, pdff, tracking_error, outFile):
 
     TnPSyst = fError.Get("TnPSyst");
     BptSyst = fError.Get("BptSyst");
-    BDTSyst = fError.Get("BDTSyst");
+    MCDataSyst = fError.Get("MCDataSyst");
     nBins = TnPSyst.GetNbinsX()
 
     pdfSyst = fPdfError.Get(meson + "_error");
@@ -36,7 +36,7 @@ def make_table(meson, errf, pdff, tracking_error, outFile):
 
     tnp = np.array([TnPSyst.GetBinContent(i) for i in range(1, nBins + 1)])
     bpt = np.array([BptSyst.GetBinContent(i) for i in range(1, nBins + 1)])
-    bdt = np.array([BDTSyst.GetBinContent(i) for i in range(1, nBins + 1)])
+    bdt = np.array([MCDataSyst.GetBinContent(i) for i in range(1, nBins + 1)])
     tracking = np.full(nBins, tracking_error)
     pdf = np.array(pdfSyst.GetY())
     trk_sel = np.array(trkSyst.GetY())
