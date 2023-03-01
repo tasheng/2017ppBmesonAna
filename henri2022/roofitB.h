@@ -30,9 +30,9 @@
 #include "RooMCStudy.h"
 #include <RooMinuit.h>
 
-void plot_jpsifit(RooWorkspace& w, TString pdf, RooAbsPdf* model, RooDataSet* ds, TString plotName,  bool with_sig);
+void plot_jpsifit(RooWorkspace& w, int nbin_hist, TString pdf, RooAbsPdf* model, RooDataSet* ds, TString plotName,  bool with_sig);
 void fix_parameters(RooWorkspace& w, TString pdfName, bool release=false);
-void fit_jpsinp (RooWorkspace& w, TString pdf, int pti, int ptf, bool includeSignal=true);
+void fit_jpsinp (RooWorkspace& w, int nbin_hist, TString pdf, int pti, int ptf, bool includeSignal=true);
 
 // draw legend and suppress parameters
 const bool drawLegend = true;
@@ -57,6 +57,8 @@ RooWorkspace* outputw = new RooWorkspace("w");
 
 RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanvas* cMC, RooDataSet* ds, RooDataSet* dsMC, RooDataHist* dh, RooRealVar* mass, RooPlot* &outframe, int ptmin, int ptmax, int isMC, TString npfit, RooWorkspace& w)
 {
+	
+	if (ptmin == 50 & ptmax == 60){nbinsmasshisto = 50} //to much fine binned for the case of 50-60 Bp
 	cout<<"total data: "<<ds->numEntries()<<endl;
 	TH1* h = dh->createHistogram("Bmass");
 	h->Sumw2(kFALSE);
@@ -252,7 +254,7 @@ if(npfit != "1" && variation=="" && pdf==""){
 	w.import(*m_jpsinp_cont);
 	// DEFINE MODEL to fit the non prompt background
 	
-	fit_jpsinp(w, pdf, ptmin, ptmax);}
+	fit_jpsinp(w,  nbinsmasshisto, pdf, ptmin, ptmax);}
 // FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp
 
 	//FIT THE DATA FIT THE DATA FIT THE DATA
@@ -569,7 +571,7 @@ if(tree == "ntphi"){
 
 } // END OF MAIN FITTING FUNCTION
 
-void fit_jpsinp(RooWorkspace& w, TString pdf, int pti, int ptf, bool includeSignal) {
+void fit_jpsinp(RooWorkspace& w, int nbin_hist, TString pdf, int pti, int ptf, bool includeSignal) {
 
 	RooDataSet* d_s = (RooDataSet*) w.data("jpsinp");
 	if(pti>= 5 && ptf<=7){	     d_s = (RooDataSet*) d_s->reduce("BDT_pt_5_7 > 0.08");}
@@ -593,7 +595,7 @@ void fit_jpsinp(RooWorkspace& w, TString pdf, int pti, int ptf, bool includeSign
 	RooAbsPdf* m_jpsinp_cont = w.pdf(Form("m_jpsinp_cont%d_%s",_count, pdf.Data()));
 	// FIT
 	auto cont_result = m_jpsinp_cont->fitTo(*ds_cont, Save());
-	plot_jpsifit(w, pdf, m_jpsinp_cont, ds_cont, jpsi_fit_plot, false);
+	plot_jpsifit(w, nbin_hist, pdf, m_jpsinp_cont, ds_cont, jpsi_fit_plot, false);
 	fix_parameters(w, Form("m_jpsinp_cont%d_%s",_count,pdf.Data()));
 	//[END] FIX SHAPE (NP background) 
 
@@ -617,11 +619,11 @@ void fit_jpsinp(RooWorkspace& w, TString pdf, int pti, int ptf, bool includeSign
     // FITFITFIT JUST TO CHECK 
     model_inclusive->fitTo(*d_s, Save(), Extended(), NumCPU(4));
 	// Plot
-    plot_jpsifit(w, pdf, model_inclusive, d_s, jpsi_plot_with_sig, true);
+    plot_jpsifit(w, nbin_hist, pdf, model_inclusive, d_s, jpsi_plot_with_sig, true);
 	// TEST THE FIT TEST THE FIT
 }
 
-void plot_jpsifit(RooWorkspace& w, TString pdf, RooAbsPdf* model, RooDataSet* ds, TString plotName, bool with_sig) {
+void plot_jpsifit(RooWorkspace& w, int nbin_hist, TString pdf, RooAbsPdf* model, RooDataSet* ds, TString plotName, bool with_sig) {
   
   TCanvas* can_np= new TCanvas("can_mc","",600,600);
   can_np->cd();
@@ -648,7 +650,7 @@ void plot_jpsifit(RooWorkspace& w, TString pdf, RooAbsPdf* model, RooDataSet* ds
   massframe->GetXaxis()->SetLabelSize(0.035);
   massframe->GetYaxis()->SetLabelSize(0.035);	
   massframe->GetXaxis()->SetRangeUser(5.,5.6);
-  ds->plotOn(massframe, RooFit::Name("NP"), MarkerSize(0.5),MarkerStyle(8),LineColor(1),LineWidth(1));
+  ds->plotOn(massframe, RooFit::Name("NP"),Binning(nbin_hist), MarkerSize(0.5),MarkerStyle(8),LineColor(1),LineWidth(1));
   model->plotOn(massframe, RooFit::Name("NP Fit"), NormRange("bmass"),LineColor(kRed), LineStyle(1), LineWidth(1));
   model->plotOn(massframe, RooFit::Name("par"),Components(Form("erfc%d_%s",_count,pdf.Data())), NormRange("bmass"), LineColor(kGreen+3), LineStyle(9), LineWidth(2), DrawOption("L"));
   model->plotOn(massframe, RooFit::Name("COMB_jpsi"),Components(Form("COMB_jpsi%d_%s",_count,pdf.Data())), NormRange("bmass"),LineColor(kBlue), LineWidth(1), LineStyle(kDashed));

@@ -1,5 +1,6 @@
 #include "roofitB.h"
 #include "CMS_lumi.C"
+#include <TMath.h>
 #include "parameter.h"                             
 #include "parametersNew.h"
 #include "TSystem.h"
@@ -496,8 +497,10 @@ cout << endl << endl;
 		modelMC->plotOn(frameMC_chi2);
 		RooChi2Var chi2(Form("chi2%d",_count),"chi2",*model,*dh);
 		double Mychi2 = chi2.getVal()/(nbinsmasshisto - f->floatParsFinal().getSize()); //normalised chi square
-		
-		std::cout << "normalised Chi square value is " << Mychi2 << endl;
+		Double_t XI_PROB ;
+		XI_PROB = TMath::Prob(chi2.getVal(), (nbinsmasshisto - f->floatParsFinal().getSize()) ); // P(chi2)
+		std::cout << "normalised Chi square value is (number of free param. " << f->floatParsFinal().getSize() << " ): " << Mychi2 << endl;
+		std::cout << "Probability of Chi square value is " << XI_PROB << endl;
 		chi2_vec[i] = Mychi2;
 		chi2MC_vec[i] = frameMC_chi2->chiSquare();
 	
@@ -551,7 +554,7 @@ cout << endl << endl;
         tex_y11 =new TLatex(0.21,0.6,"|y| < 2.4");
         tex_nMult = new TLatex(0.21,0.67,"0 < nTrks < 100");
 		yield_val = new TLatex(0.21,0.7,Form("Y_{S} = %d #pm %d",yieldI, yieldErrI));
-		chi_square = new TLatex(0.21,0.65,Form("#chi^{2} value : %.2f/ndf",Mychi2));
+		chi_square = new TLatex(0.21,0.65,Form("#chi^{2}/ndf = %.2f/ndf",Mychi2));
       } else {
         //for the AN run these
         tex_pt = new TLatex(0.65,0.8,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
@@ -560,7 +563,7 @@ cout << endl << endl;
         tex_y1 = new TLatex(0.65,0.74,"1.5 < |y| < 2.4");
         tex_y11 = new TLatex(0.65,0.74,"|y| < 2.4");
         tex_nMult = new TLatex(0.21,0.62,"0 < nTrks < 100");
-		chi_square=new TLatex(0.21,0.7,Form("#chi^{2} value : %.2f",Mychi2));
+		chi_square=new TLatex(0.21,0.7,Form("#chi^{2}/ndf = %.2f",Mychi2));
       }
 		}
 
@@ -570,13 +573,13 @@ if(varExp=="By"){
         tex_pt = new TLatex(0.55,0.4,"0 < p_{T} < 100 GeV/c");
         tex_y = new TLatex(0.55,0.34,Form("%d < y < %d ",(int)_ptBins[i],(int)_ptBins[i+1]));
         tex_nMult = new TLatex(0.21,0.62,"0 < nTrks < 100");
-		chi_square=new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2));
+		chi_square=new TLatex(0.21,0.62,Form("#chi^{2}/ndf = %.2f",Mychi2));
       } else {
         //fr the AN run these
         tex_pt = new TLatex(0.55,0.8,"0 < p_{T} < 100 GeV/c");
         tex_y = new TLatex(0.55,0.74,Form("%d < y < %d ",(int)_ptBins[i],(int)_ptBins[i+1]));
         tex_nMult = new TLatex(0.21,0.62,"0 < nTrks < 100");
-		chi_square=new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2));
+		chi_square=new TLatex(0.21,0.62,Form("#chi^{2}/ndf = %.2f",Mychi2));
       }
 		}
 if(varExp=="nMult"){ 
@@ -585,13 +588,13 @@ if(varExp=="nMult"){
       	tex_nMult = new TLatex(0.21,0.62,Form("%d < nTrks < %d",(int)_ptBins[i],(int)_ptBins[i+1]));
         tex_pt = new TLatex(0.55,0.4,"0 < p_{T} < 100 GeV/c");
         tex_y = new TLatex(0.55,0.34,"|y| < 2.4");
-		chi_square=new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2));
+		chi_square=new TLatex(0.21,0.62,Form("#chi^{2}/ndf = %.2f",Mychi2));
       } else {
         //fr the AN run these
         tex_nMult = new TLatex(0.21,0.62,Form("%d < nTrks < %d",(int)_ptBins[i],(int)_ptBins[i+1]));
         tex_pt = new TLatex(0.55,0.8,"0 < p_{T} < 100 GeV/c");
         tex_y = new TLatex(0.55,0.74,"|y| < 2.4");
-		chi_square=new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2));
+		chi_square=new TLatex(0.21,0.62,Form("#chi^{2}/ndf = %.2f",Mychi2));
       }
 	}
 		tex_pt->SetNDC();
@@ -693,10 +696,17 @@ if(varExp=="nMult"){
 
 					texB->Draw();
 					tex_pt->Draw();
-					chi_back =new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2_back));
+					RooRealVar* fitYield_b_sys = static_cast<RooRealVar*>(f_back->floatParsFinal().at(f_back->floatParsFinal().index(Form("nsig%d_%s",_count, background[j].c_str()))));
+					yield_val  = new TLatex(0.21,0.7,Form("Y_{S} = %d #pm %d",int(round(fitYield_b_sys->getVal())), int(round(fitYield_b_sys->getError()))));
+					yield_val->SetNDC();
+					yield_val->SetTextFont(42);
+					yield_val->SetTextSize(0.035);
+					yield_val->SetLineWidth(2);
+					yield_val->Draw();
+					chi_back = new TLatex(0.21,0.65,Form("#chi^{2}/ndf = %.2f ",Mychi2_back));
 					chi_back->SetNDC();
 					chi_back->SetTextFont(42);
-					chi_back->SetTextSize(0.045);
+					chi_back->SetTextSize(0.035);
 					chi_back->SetLineWidth(2);
 					chi_back->Draw();
 					if (varExp=="Bpt"){
@@ -732,10 +742,17 @@ if(varExp=="nMult"){
 				chi2MC_vec_sig[j][i] = frameMC_sig->chiSquare();
 				texB->Draw();
 				tex_pt->Draw();
-				chi_sig=new TLatex(0.21,0.62,Form("#chi^{2} value : %.2f",Mychi2_sig));
+				RooRealVar* fitYield_b_sig = static_cast<RooRealVar*>(f_signal->floatParsFinal().at(f_signal->floatParsFinal().index(Form("nsig%d_%s",_count, signal[j].c_str()))));
+				yield_val  = new TLatex(0.21,0.7,Form("Y_{S} = %d #pm %d", int(round(fitYield_b_sig->getVal())), int(round(fitYield_b_sig->getError()))));
+				yield_val->SetNDC();
+				yield_val->SetTextFont(42);
+				yield_val->SetTextSize(0.035);
+				yield_val->SetLineWidth(2);
+				yield_val->Draw();
+				chi_sig=new TLatex(0.21, 0.65, Form("#chi^{2}/ndf = %.2f ", Mychi2_sig));
 				chi_sig->SetNDC();
 				chi_sig->SetTextFont(42);
-				chi_sig->SetTextSize(0.045);
+				chi_sig->SetTextSize(0.035);
 				chi_sig->SetLineWidth(2);
 				chi_sig->Draw();
 				if (varExp=="Bpt"){
