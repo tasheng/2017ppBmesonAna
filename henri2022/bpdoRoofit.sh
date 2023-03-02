@@ -8,8 +8,11 @@ DOANALYSISPbPb_ROOFIT_BINNED_MULTI_BP=0
 #INPUTDATAPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPData.root"
 INPUTMCPbPbCANDWISE_BP="/data3/tasheng/presel/BPMC_presel.root"
 INPUTDATAPbPbCANDWISE_BP="/data3/tasheng/presel/BPData_presel.root"
+#INPUTMCPbPbCANDWISE_BP="/lstore/cms/henrique/dados/BPMC_presel.root"
+#INPUTDATAPbPbCANDWISE_BP="/lstore/cms/henrique/dados/BPData_presel.root"
 
 INPUTJPSI="/data3/tasheng/presel/jpsinp_nom.root"
+#INPUTJPSI="/lstore/cms/henrique/dados/jpsinp_nom.root"
 #INPUTJPSI="~/dat/presel/jpsinp_nom.root"
 
 #LUMIPbPb=13.1983052423 #paper 20170227

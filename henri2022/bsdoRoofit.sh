@@ -8,6 +8,8 @@ DOANALYSISPbPb_ROOFIT_BINNED_Y_BS=0
 #INPUTMCPbPbCANDWISE_BS="~/data/BsMC.root"
 INPUTMCPbPbCANDWISE_BS="/data3/tasheng/presel/BsMC_presel.root"
 INPUTDATAPbPbCANDWISE_BS="/data3/tasheng/presel/BsData_presel.root"
+#INPUTMCPbPbCANDWISE_BS="/lstore/cms/henrique/dados/BsMC_presel.root"
+#INPUTDATAPbPbCANDWISE_BS="/lstore/cms/henrique/dados/BsData_presel.root"
 
 LABEL=""
 
