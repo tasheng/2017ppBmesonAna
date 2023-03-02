@@ -44,7 +44,7 @@ NPROOFIT_PbPb="467.13*TMath::Erf((Bmass-5.14)/-0.03)+467.13+63.57*TMath::Gaus(Bm
 
 
 if [ $DOANALYSISPbPb_ROOFIT_FULL_BP  -eq 1  ]; then
-root -b  -q 'roofitB.C+('0','\"ntKp\"','1','1','0','\"$INPUTDATAPbPbCANDWISE_BP\"','\"$INPUTMCPbPbCANDWISE_BP\"','\"Bpt\"','\"$TRGPbPb\"','\"$CUTPbPb\"','\"$SELGENPbPb\"','$ISMCPbPb','1','$ISDOWEIGHTPbPb','\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_FULL\"','\"results/BP\"','\"$NPROOFIT_PbPb\"','0')'
+root -b  -q 'roofitB.C('0','\"ntKp\"','1','1','0','\"$INPUTDATAPbPbCANDWISE_BP\"','\"$INPUTMCPbPbCANDWISE_BP\"','\"Bpt\"','\"$TRGPbPb\"','\"$CUTPbPb\"','\"$SELGENPbPb\"','$ISMCPbPb','1','$ISDOWEIGHTPbPb','\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_FULL\"','\"results/BP\"','\"$NPROOFIT_PbPb\"','0','\"\"','\"$INPUTJPSI\"')'
 
 rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
 fi
