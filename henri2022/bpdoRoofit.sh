@@ -6,8 +6,8 @@ DOANALYSISPbPb_ROOFIT_BINNED_MULTI_BP=0
 
 #INPUTMCPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPMC.root"
 #INPUTDATAPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPData.root"
-INPUTMCPbPbCANDWISE_BP="../../CutSkim/BPMC.root"
-INPUTDATAPbPbCANDWISE_BP="../../CutSkim/BPData.root"
+INPUTMCPbPbCANDWISE_BP="/data3/tasheng/presel/BPMC_presel.root"
+INPUTDATAPbPbCANDWISE_BP="/data3/tasheng/presel/BP_presel.root"
 
 INPUTJPSI="/data3/tasheng/presel/jpsinp_nom.root"
 #INPUTJPSI="~/dat/presel/jpsinp_nom.root"

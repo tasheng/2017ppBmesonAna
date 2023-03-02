@@ -11,9 +11,6 @@
 #include "TGraphErrors.h"
 #include<stdio.h>
 
-
-template<typename... Targs>
-void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotName,  Targs... options);
 void read_samples(RooWorkspace& w, std::vector<TString>, TString fName, TString treeName, TString sample);
 
 // PDF VARIATION FOR SYST STUDIES
@@ -219,7 +216,6 @@ cout << endl << endl;
 	if(isMC) _isMC = "mcAsData";
 	TString _isPbPb = "pp";
 
-
 	dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
 	ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new,RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
 
@@ -229,7 +225,7 @@ cout << endl << endl;
 	else if (tree == "ntphi"){background = {"1st", "2nd", "mass_range"};}
 	std::vector<std::string> signal = {"3gauss", "fixed", "gauss_cb"};
 	//MODELS for syst studies
-	
+
 	std::vector<std::vector<double>> background_syst;
 	std::vector<std::vector<double>> signal_syst;
 	std::vector<std::vector<double>> general_syst;
@@ -265,26 +261,9 @@ cout << endl << endl;
 	// FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp
 	//Fit the J/psi pi MC sample
    	//The shapes of J/psi pi peak is determined
-	//The relative yield between signal and J/psi pi is fixed
 	if(npfit != "1"){
 
 		//PDF MODELS PDF MODELS PDF MODELS
-		//inclusive MC signal Model
-		RooRealVar* meannp = 0;
-		RooRealVar* sigma1np = 0;
-		RooProduct* sigma2np;
-		RooRealVar* ratio_sigma12np = 0;
-		RooRealVar* cofs_b_np = 0;
-		meannp = new RooRealVar("meannp","meannp",5.281,5.24,5.32);
-		sigma1np = new RooRealVar("sigma1np","sigma1np",0.02,0.01,0.03);
-		ratio_sigma12np = new RooRealVar("ratio_sigma12np","ratio_sigma12np", 2.4, 0.1, 5);
-		sigma2np = new RooProduct("sigma2np", "sigma2np", RooArgList(*sigma1np, *ratio_sigma12np));
-		cofs_b_np = new RooRealVar("cofs_b_np", "cofs_b_np", 0.5, 0., 1.);
-		RooGaussian* signal1_b_np = new RooGaussian("signal1_b_np","signal_gauss1_b_np",*mass,*meannp,*sigma1np);
-		RooGaussian* signal2_b_np = new RooGaussian("signal2_b_np","signal_gauss2_b_np",*mass,*meannp,*sigma2np); 
-		RooAddPdf* signalnp = new RooAddPdf("signalnp", "signalnp", RooArgList(*signal1_b_np,*signal2_b_np),*cofs_b_np);
-		//inclusive MC signal Model
-
 		//inclusive MC jpsipi Model
 		RooRealVar* m_jpsipi_fraction2 = 0;
 		RooRealVar* m_jpsipi_mean1 = 0;
@@ -304,16 +283,14 @@ cout << endl << endl;
 
 		// PREPARE DATA SETS
 		std::vector<TString> jpsi_vars = {"By", "Bpt", "Bgen","BDT_pt_5_7", "BDT_pt_7_10", "BDT_pt_10_15","BDT_pt_15_20", "BDT_pt_20_50"};
-		read_samples(*ws, jpsi_vars, jpsiFile, "ntKp", "jpsinp");
-		
+		read_samples(*ws, jpsi_vars, jpsiFile.Data(), "ntKp", "jpsinp");
 		RooDataSet* full_data_MC = (RooDataSet*) ws->data("jpsinp");
 		full_data_MC = (RooDataSet*)full_data_MC->reduce("(BDT_pt_5_7 > 0.08 && Bpt >= 5 && Bpt < 7) || (BDT_pt_7_10 > 0.07 && Bpt >= 7 && Bpt < 10) || (BDT_pt_10_15 > 0.0 && Bpt >= 10 && Bpt < 15) || (BDT_pt_15_20 > 0.02 && Bpt >= 15 && Bpt < 20) || (BDT_pt_20_50 > 0.04 && Bpt >= 20 && Bpt < 50) || (Bpt >= 20 && Bpt < 50) ");
 		full_data_MC = (RooDataSet*)full_data_MC->reduce("(Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10)");
 		
-		// FORM INCLUSIVE SIGNAL AND PEAKING Background BINS
-		RooDataSet* ds_sig = (RooDataSet*) full_data_MC->reduce("Bgen == 23333");
+		// FORM PEAKING Background BINS
 		RooDataSet* fullds_JPSI_shape_fix = (RooDataSet*)full_data_MC->reduce("Bgen == 23335");
-		// FORM INCLUSIVE SIGNAL AND PEAKING Background BINS
+		// FORM PEAKING Background BINS
 		// PREPARE DATA SETS
 
 		//[START] FIX SHAPE (J/Psi pi) 
@@ -323,32 +300,11 @@ cout << endl << endl;
 		mass->setRange("bjpsipi", 5.2, 5.9);
 		auto jpsipi_result = jpsipi_ext.fitTo(*fullds_JPSI_shape_fix, Range("bjpsipi"), Save(), Extended());
 		// FIT
-		plot_mcfit(*ws, &jpsipi_ext, fullds_JPSI_shape_fix, "./results/BP/InclusiveMC_JPsipi_fit.pdf", NormRange("bjpsipi"), DrawOption("LF"), FillStyle(3008), FillColor(kMagenta+10), LineStyle(1), LineColor(kMagenta+10), LineWidth(1)); 
+		plot_mcfit(*ws, &jpsipi_ext, fullds_JPSI_shape_fix, "./results/BP/InclusiveMC_JPsipi_fit.pdf", NormRange("bjpsipi"), DrawOption("LF"), FillStyle(3008), FillColor(kMagenta+1), LineStyle(1), LineColor(kMagenta+1), LineWidth(1)); 
 		ws->import(*jpsipi);
 		fix_parameters(*ws, "jpsipi" );
 		//[END] FIX SHAPE (J/Psi pi) 
 
-		//[START] FIT inclusiveMC SIGNAL 
-  		RooRealVar n_signal_np("n_signal_np", "n_signal_np", 1000, 0., 150000); 
-		RooExtendPdf signal_ext("signal_ext", "extended signal pdf", *signalnp, n_signal_np);
-		// FIT
-		mass->setRange("bmc", 5.18, 5.38);
-		auto signal_result = signal_ext.fitTo(*ds_sig, Range("bmc"), Save(), Extended());
-		// FIT
-		plot_mcfit(*ws, &signal_ext, ds_sig, "./results/BP/InclusiveMC_Signal_fit.pdf",  Range("bmc"), LineColor(kRed),LineStyle(1), LineWidth(2));		ws->import(*signalnp);
-		fix_parameters(*ws, "signalnp");
-		//[END] FIT inclusiveMC SIGNAL 
-
-		// Fix the ratio of jpsipi to signal
-		RooRealVar jpsipi_to_signal_ratio("jpsipi_to_signal_ratio", "jpsipi_to_signal_ratio",0.05, 0, 1);
-		jpsipi_to_signal_ratio.setVal(0.0384);   		// from PDG 										
-		//jpsipi_to_signal_ratio.setVal(n_jpsipi_ext.getVal() / n_signal_np.getVal());              // from the inclusive bin analysis
-		//double jpsipi_to_signal_ratio_UNC = sqrt(pow( n_jpsipi_ext.getVal() / n_signal_np.getVal() ,2) )*sqrt( pow(n_jpsipi_ext.getError()/n_jpsipi_ext.getVal() ,2) + pow(n_signal_np.getError()/ n_signal_np.getVal() ,2));  		
-		//cout << "jpsipi_to_signal_ratio_unc" << jpsipi_to_signal_ratio.getVal()<<" +/- " << jpsipi_to_signal_ratio_UNC <<  endl;
-
-  		jpsipi_to_signal_ratio.setConstant();
-		ws->import(jpsipi_to_signal_ratio);
-		// Fix the ratio of jpsipi to signal
 						}
 	// FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp
 
@@ -1407,53 +1363,6 @@ c_chi2_backsum.SaveAs(pathc_chi2_backsum);
 }	
 //chi2 plot part ends
 
-}
-
-
-template<typename... Targs>
-void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotName, Targs... options) {
-  
-  TCanvas* can_mc= new TCanvas("can_mc","",700,700);
-  can_mc->cd();
-  TPad *p1 = new TPad("p1","p1",0.,0.215,1.,1);
-  p1->SetBorderMode(1); 
-  p1->SetFrameBorderMode(0); 
-  p1->SetBorderSize(2);
-  p1->SetBottomMargin(0.10);
-  p1->Draw(); 
-  p1->cd();
-
-  RooRealVar Bmass = *(w.var("Bmass"));
-  RooPlot* massframe = Bmass.frame(Title(" "));
-  massframe->GetYaxis()->SetTitle(TString::Format("Events / (%g MeV/c^{2})",(Bmass.getMax()-Bmass.getMin())/100*1000));
-  massframe->GetXaxis()->SetTitle("m_{J/#psi #pi^{#pm}} (GeV/c^{2})");
-  massframe->GetXaxis()->CenterTitle();
-  massframe->GetYaxis()->SetTitleOffset(1.5);
-  massframe->GetXaxis()->SetTitleOffset(1.2);
-  massframe->GetYaxis()->SetTitleSize(0.035);
-  massframe->GetYaxis()->SetTitleFont(42);
-  massframe->GetXaxis()->SetLabelFont(42);
-  massframe->GetYaxis()->SetLabelFont(42);
-  massframe->GetXaxis()->SetLabelSize(0.035);
-  massframe->GetYaxis()->SetLabelSize(0.035);	
-  massframe->GetXaxis()->SetRangeUser(5.15,5.45);
-  if (plotName == "./results/BP/InclusiveMC_JPsipi_fit.pdf") {massframe->GetXaxis()->SetRangeUser(5,6);}
-  ds->plotOn(massframe, Name("dsjpp") , MarkerSize(0.5), MarkerStyle(8), LineColor(1), LineWidth(1));
-  model->plotOn(massframe, RooFit::Name("MCFit"), options...);
-  model->paramOn(massframe, Layout(0.62, 0.89, 0.75), "", Format("NEU", AutoPrecision(1)) ) ;
-  massframe->getAttText()->SetTextSize(0.025);
-  massframe->getAttFill()->SetFillStyle(0);
-  massframe->getAttLine()->SetLineWidth(0);
-  massframe->Draw();
-  TLegend *leg_jpp = new TLegend(0.75,0.8,0.89,0.89,NULL,"brNDC");
-  leg_jpp->SetBorderSize(0);
-  leg_jpp->SetTextSize(0.025);     
-  leg_jpp->SetTextFont(42);
-  leg_jpp->SetFillStyle(0);
-  leg_jpp->AddEntry(massframe->findObject("dsjpp"), " MC","p");
-  leg_jpp->AddEntry(massframe->findObject("MCFit")," Peaking Bkg. PDF","f");
-  leg_jpp->Draw();
-  can_mc->SaveAs(plotName);
 }
 
 void read_samples(RooWorkspace& w, std::vector<TString> label, TString fName, TString treeName, TString sample){
