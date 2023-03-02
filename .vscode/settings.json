@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "roofitB.C": "cpp"
+        "roofitB.C": "cpp",
+        "TnPWeight.C": "cpp"
     }
 }
