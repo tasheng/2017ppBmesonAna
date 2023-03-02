@@ -13,19 +13,13 @@ maketnp () {
 # function >> MCEff.C
 bptshape () {
     pushd NewBptStudies
+    python ReweightY.py &
+    wait
     root -q -b -l ReweightBpt.C'(0)' &
     root -q -b -l ReweightBpt.C'(1)' &
-    python ReweightY.py &
     wait
 }
 
-bpYield () {
-    ## yield extraction
-    pushd BP/RawYieldFits
-    # roofitB.C contains 2 By cuts
-    source doRoofit.sh
-    popd
-}
 
 yield () {
     ## yield extraction
@@ -54,12 +48,6 @@ bpEff () {
 }
 
 
-bsYield () {
-    cd Bs/RawYieldFits
-    # roofitB.C contains 2 By cuts
-    source doRoofit.sh
-    cd ../..
-}
 
 bsEff () {
     pushd Bs/EffAna
@@ -146,21 +134,21 @@ paperPlots () {
 }
 # maketnp
 
-# bptshape
+ bptshape
 
-# yield
-# wait
+ yield
+ wait
 
-bpEff &
-bsEff &
-wait
+#bpEff &
+#bsEff &
+#wait
 
-nominal
-syst
+#nominal
+#syst
 
 # bpStat&
 # bsStat&
 # wait
 
-comp
-paperPlots
+#comp
+#paperPlots

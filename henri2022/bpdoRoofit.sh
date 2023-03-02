@@ -4,11 +4,13 @@ DOANALYSISPbPb_ROOFIT_BINNED_PT_BP_TRK=0
 DOANALYSISPbPb_ROOFIT_BINNED_Y_BP=0
 DOANALYSISPbPb_ROOFIT_BINNED_MULTI_BP=0
 
-INPUTMCPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPMC.root"
-INPUTDATAPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPData.root"
-#INPUTMCPbPbCANDWISE_BP="../../CutSkim/BPMC.root"
-#INPUTDATAPbPbCANDWISE_BP="../../CutSkim/BPData.root"
-INPUTJPSI="~/dat/presel/jpsinp_nom.root"
+#INPUTMCPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPMC.root"
+#INPUTDATAPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPData.root"
+INPUTMCPbPbCANDWISE_BP="../../CutSkim/BPMC.root"
+INPUTDATAPbPbCANDWISE_BP="../../CutSkim/BPData.root"
+
+INPUTJPSI="/data3/tasheng/presel/jpsinp_nom.root"
+#INPUTJPSI="~/dat/presel/jpsinp_nom.root"
 
 #LUMIPbPb=13.1983052423 #paper 20170227
 LUMIPbPb=56.564165324
