@@ -6,10 +6,10 @@ DOANALYSISPbPb_ROOFIT_BINNED_Y_BS=0
 
 #INPUTDATAPbPbCANDWISE_BS="~/data/BsData.root"
 #INPUTMCPbPbCANDWISE_BS="~/data/BsMC.root"
-INPUTMCPbPbCANDWISE_BS="/data3/tasheng/presel/BsMC_presel.root"
-INPUTDATAPbPbCANDWISE_BS="/data3/tasheng/presel/BsData_presel.root"
-#INPUTMCPbPbCANDWISE_BS="/lstore/cms/henrique/dados/BsMC_presel.root"
-#INPUTDATAPbPbCANDWISE_BS="/lstore/cms/henrique/dados/BsData_presel.root"
+INPUTMCPbPbCANDWISE_BS="/data3/tasheng/presel/BsMC_nom.root"
+INPUTDATAPbPbCANDWISE_BS="/data3/tasheng/presel/BsData_nom.root"
+#INPUTMCPbPbCANDWISE_BS="/lstore/cms/henrique/dados/BsMC_nom.root"
+#INPUTDATAPbPbCANDWISE_BS="/lstore/cms/henrique/dados/BsData_nom.root"
 
 LABEL=""
 
