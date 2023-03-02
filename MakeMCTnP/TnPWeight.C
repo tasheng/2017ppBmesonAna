@@ -48,15 +48,6 @@ void TnPWeight(int Opt){
 		outfile = "BsTnPInfo.root";
 	}
 
-	gSystem->mkdir( "Syst" , true);
-	gSystem->mkdir( "NewEff2DMaps" , true);
-	gSystem->mkdir( "1DEffPlots" , true);
-	gSystem->mkdir( "TnPHis" , true);
-	gSystem->mkdir( "MuonInfoPlots" , true);
-	gSystem->mkdir( "Eff2DMapTnP" , true);
-	gSystem->mkdir( "Plot1DEfficiency/Pt" , true);
-	gSystem->mkdir( "Plot1DEfficiency/Mult" , true);
-
 	float Bmu1pt[NCand];
 	float Bmu2pt[NCand];
 	float Bmu1eta[NCand];

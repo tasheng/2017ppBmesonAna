@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "roofitB.C": "cpp",
-        "TnPWeight.C": "cpp"
+        "TnPWeight.C": "cpp",
+        "MCEff.C": "cpp"
     }
 }
