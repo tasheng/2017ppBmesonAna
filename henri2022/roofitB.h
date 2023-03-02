@@ -775,13 +775,8 @@ void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotN
 
 /* Fix or release the parameters for a given PDF */
 void fix_parameters(RooWorkspace& w, TString pdfName, bool release) {
-	cout << "here?" << endl;
   RooAbsPdf* pdf = w.pdf(pdfName);
-  	cout << "here?" << endl;
-
   RooAbsData* ds = w.data("jpsinp");
-  	cout << "here?" << endl;
-
   RooArgSet* par_set = pdf->getParameters(*ds);
   auto itr = par_set->createIterator();
   bool toFix = ! release;

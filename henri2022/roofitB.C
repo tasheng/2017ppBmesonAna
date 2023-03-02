@@ -717,7 +717,7 @@ if(varExp=="nMult"){
 				//CMS_lumi(c,19011,0);
 				//c->Update();
 
-				cMC->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),varExp.Data(), (int)_ptBins[i], (int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");
+				if (signal[j].Data() != "fixed") {cMC->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),varExp.Data(), (int)_ptBins[i], (int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");}
 				c->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");
 				modelcurve_signal = frame->getCurve(Form("model%d_%s",_count,signal[j].c_str()));
 				RooRealVar* fitYield_signal = static_cast<RooRealVar*>(f_signal->floatParsFinal().at(f_signal->floatParsFinal().index(Form("nsig%d_%s",_count,signal[j].c_str()))));
@@ -880,8 +880,6 @@ if(varExp=="nMult"){
   	legsig->SetTextSize(0);
 	legsig->Draw();
 	c_sig->SaveAs(Form("./results/tables/signal_systematics_plot_%s_%s.png",tree.Data(),varExp.Data())); 
-
-	
 
 	TCanvas* c_gen= new TCanvas();
 	TLegend* legen=new TLegend(0.7,0.8,0.9,0.9);
