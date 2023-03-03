@@ -33,11 +33,10 @@ yield () {
 }
 
 bpEff () {
-    ## eff correction (2d map)
     pushd BP/EffAna
-    # about 1hr
     echo "Takes BPw.root as input"
     ls -l BDTWeights/BPw.root
+        # about 2hr
     root -b -l -q MCEff.C'(1,0)' > eff.log # >> bpsyst2d.root
     wait
     root -b -l -q CrossSectionAna.C'(1)'
@@ -47,12 +46,11 @@ bpEff () {
     popd
 }
 
-
 bsEff () {
     pushd Bs/EffAna
-    # about 1hr
     echo "Takes Bsw.root as input"
     ls -l BDTWeights/Bsw.root
+        # about 1hr
     root -b -l -q MCEff.C'(1,0)' > eff.log
     wait
     root -b -l -q CrossSectionAna.C'(1)'
@@ -137,18 +135,25 @@ paperPlots () {
 
 
 #UNCOMMENT ACORDINGLY
+#(Run by THIS ORDER!)
 
-# bptshape
+ bptshape
 
-# yield
-# wait
+ yield
+ wait
 
-#bpEff &
-#bsEff &
-#wait
+bpEff &
+bsEff &
+wait
 
-#nominal
 #syst
+#nominal
+
+
+
+
+
+
 
 # bpStat&
 # bsStat&

@@ -31,7 +31,6 @@ void PlotEffSyst2D(int Opt){
 	TString infile;
   TString outFile;
 
-
 	if(Opt == 0) {
     infile =  "OutFiles/BPSyst2D.root";
     outFile =  "OutFiles/BPError2D.root";
@@ -42,12 +41,9 @@ void PlotEffSyst2D(int Opt){
 
 
 	TString BmesonName;
-
-
-
 	if(Opt == 0) BmesonName =  "BP";
 	if(Opt == 1) BmesonName =  "Bs";
-
+	gSystem->mkdir(Form("SystPlots/%s/Pt",BmesonName.Data()), true)
 
 	TFile * fin = new TFile(infile.Data());
 	fin->cd();
@@ -70,21 +66,14 @@ void PlotEffSyst2D(int Opt){
 	Eff1DHis->SetMarkerSize(1);
 	Eff1DHis->SetMarkerColor(kBlack);
 	Eff1DHis->SetLineColor(kBlack);
-
-
 	Eff1DHisTnPUp->SetMarkerStyle(20);
 	Eff1DHisTnPUp->SetMarkerSize(1);
 	Eff1DHisTnPUp->SetMarkerColor(kRed);
 	Eff1DHisTnPUp->SetLineColor(kRed);
-
-
 	Eff1DHisTnPDown->SetMarkerStyle(20);
 	Eff1DHisTnPDown->SetMarkerSize(1);
 	Eff1DHisTnPDown->SetMarkerColor(kBlue);
 	Eff1DHisTnPDown->SetLineColor(kBlue);
-
-
-
 	Eff1DHisTnPUp->Draw("ep");
 	Eff1DHis->Draw("epSAME");
 	Eff1DHisTnPDown->Draw("epSAME");
@@ -103,12 +92,10 @@ void PlotEffSyst2D(int Opt){
 	cSyst->SaveAs(Form("SystPlots/%s/Pt/TnPSystComp.png",BmesonName.Data()));
 
 
-
 	Eff1DHisBDT->SetMarkerStyle(20);
 	Eff1DHisBDT->SetMarkerSize(1);
 	Eff1DHisBDT->SetMarkerColor(kRed);
 	Eff1DHisBDT->SetLineColor(kRed);
-
 	Eff1DHis->Draw("ep");
 	Eff1DHisBDT->Draw("epSAME");
 
@@ -130,7 +117,6 @@ void PlotEffSyst2D(int Opt){
 	Eff1DHisBpt->SetMarkerSize(1);
 	Eff1DHisBpt->SetMarkerColor(kRed);
 	Eff1DHisBpt->SetLineColor(kRed);
-
 	Eff1DHis->Draw("ep");
 	Eff1DHisBpt->Draw("epSAME");
 
@@ -152,16 +138,13 @@ void PlotEffSyst2D(int Opt){
 	TH1D * TnPSyst = (TH1D *) Eff1DHisTnPUp->Clone("TnPSyst");
 	TnPSyst->GetYaxis()->SetTitle("TnP Systematic Uncertainties (%)");
 	TnPSyst->GetYaxis()->SetTitleOffset(1.3);
-
 	TnPSyst->SetLineColor(kBlack);
 	TnPSyst->SetMarkerColor(kBlack);	
 	TnPSyst->Reset();
 
-
 	TH1D * BptSyst = (TH1D *) Eff1DHisBpt->Clone("BptSyst");
 	BptSyst->GetYaxis()->SetTitle("B-meson p_{T} Shape Systematic Uncertainties (%)");
 	BptSyst->GetYaxis()->SetTitleOffset(1.3);
-
 	BptSyst->SetLineColor(kBlack);
 	BptSyst->SetMarkerColor(kBlack);	
 	BptSyst->Reset();
@@ -169,7 +152,6 @@ void PlotEffSyst2D(int Opt){
 	TH1D * BDTSyst = (TH1D *) Eff1DHisBDT->Clone("BDTSyst");
 	BDTSyst->GetYaxis()->SetTitle("MC/Data Discrepancy Systematic Uncertainties (%)");
 	BDTSyst->GetYaxis()->SetTitleOffset(1.3);
-
 	BDTSyst->SetLineColor(kBlack);
 	BDTSyst->SetMarkerColor(kBlack);	
 	BDTSyst->Reset();
@@ -177,85 +159,44 @@ void PlotEffSyst2D(int Opt){
 	c->cd();
 
 
-
-	
-
 	float SystValue;
 	float SystValueError;
 
 	for(int i = 0; i < Eff1DHisTnPUp->GetNbinsX(); i++){
 
 		SystValue = abs(Eff1DHisTnPUp->GetBinContent(i+1) -  Eff1DHis->GetBinContent(i+1) )/Eff1DHis->GetBinContent(i+1) * 100;
-
-
-
-
 		cout << "TnP Syst: " << SystValue << endl;
-
 		TnPSyst->SetBinContent(i+1,SystValue);
 		TnPSyst->SetBinError(i+1,0.001);
-
-
-
 	}
-
-
-
 
 	for(int i = 0; i < Eff1DHisTnPUp->GetNbinsX(); i++){
 
 		SystValue = abs(Eff1DHisBpt->GetBinContent(i+1) -  Eff1DHis->GetBinContent(i+1) )/Eff1DHis->GetBinContent(i+1) * 100;
-
 		BptSyst->SetBinContent(i+1,SystValue);
 		BptSyst->SetBinError(i+1,0.001);
-
 		cout << "Bpt Syst: " << SystValue << endl;
 
-
-
 	}
-
-
-
 
 	for(int i = 0; i < Eff1DHisTnPUp->GetNbinsX(); i++){
 
 		SystValue = abs(Eff1DHisBDT->GetBinContent(i+1) -  Eff1DHis->GetBinContent(i+1) )/Eff1DHis->GetBinContent(i+1) * 100;
-
 		BDTSyst->SetBinContent(i+1,SystValue);
 		BDTSyst->SetBinError(i+1,0.001);
-
 		cout << "BDT Syst: " << SystValue << endl;
-    cout << SystValue << "\n";
-
-
-
+    	cout << SystValue << "\n";
 
 	}
 
 
 
-
-
-
-
-
-
-
-
 	TnPSyst->Draw("ep");
-
 	c->SaveAs(Form("SystPlots/%s/Pt/TnPSystRatio.png",BmesonName.Data()));
-
 	BptSyst->Draw("ep");
-
 	c->SaveAs(Form("SystPlots/%s/Pt/BptSysRatio.png",BmesonName.Data()));
-
 	BDTSyst->Draw("ep");
-
 	c->SaveAs(Form("SystPlots/%s/Pt/MCDataSystRatio.png",BmesonName.Data()));
-
-
 
   TnPSyst->Write();
   BptSyst->Write();

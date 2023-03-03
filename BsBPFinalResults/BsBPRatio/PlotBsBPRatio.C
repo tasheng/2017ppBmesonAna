@@ -72,18 +72,12 @@ void PlotBsBPRatio(int Opt){
 	//B+ PP//
 
 	const int NBins = 10;
-
 	float BPXsecPPY[NBins];
 	float BPXsecPPX[NBins] = {7.5,20,27.5,32.5,37.5,45,57.5,72.5,90,115};
-
 	float BPXSecPPYErrUp[NBins];
 	float BPXSecPPYErrDown[NBins];
-
-
 	float BPXSecPPYErrUpPercent[NBins];
 	float BPXSecPPYErrDownPercent[NBins];
-
-
 	float BPXSecPPXErrUp[NBins] = {7.5,5,2.5,2.5,2.5,5,7.5,7.5,10,15};
 	float BPXSecPPXErrDown[NBins] = {7.5,5,2.5,2.5,2.5,5,7.5,7.5,10,15};
 
@@ -159,15 +153,10 @@ void PlotBsBPRatio(int Opt){
 
 	float BsXsecPPY[NBins];
 	float BsXsecPPX[NBins] = {7.5,20,27.5,32.5,37.5,45,57.5,72.5,90,115};
-
 	float BsXSecPPYErrUp[NBins];
 	float BsXSecPPYErrDown[NBins];
-
-
 	float BsXSecPPYErrUpPercent[NBins];
 	float BsXSecPPYErrDownPercent[NBins];
-
-
 	float BsXSecPPXErrUp[NBins] = {7.5,5,2.5,2.5,2.5,5,7.5,7.5,10,15};
 	float BsXSecPPXErrDown[NBins] = {7.5,5,2.5,2.5,2.5,5,7.5,7.5,10,15};
 

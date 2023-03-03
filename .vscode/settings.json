@@ -8,6 +8,7 @@
         "BPRAA.C": "cpp",
         "BsRAA.C": "cpp",
         "CalEffSystBP.C": "cpp",
-        "CalEffSystBs.C": "cpp"
+        "CalEffSystBs.C": "cpp",
+        "PlotEffSyst2D.C": "cpp"
     }
 }

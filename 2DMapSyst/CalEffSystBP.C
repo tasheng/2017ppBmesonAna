@@ -35,9 +35,7 @@ void CalEffSystBP(){
 //	gStyle->SetOptTitle(0);
 	gStyle->SetOptStat(0);
 
-
 	TString FileName;
-
 	// FileName = "../SkimmedSamples/BPData.root";
 	// FileName = "../CutSkim/BPData_trkpt5.root";
 	// FileName = "../CutSkim/BPData.root";
@@ -255,17 +253,11 @@ void CalEffSystBP(){
 		ptbinsvec.push_back(50);
 		ptbinsvec.push_back(100);
 
-
-
 	}
-
-
 
 	for(int i = 0; i < NBins + 1; i++){
 		ptBins[i] =  ptbinsvec[i];
 	}
-
-
 
 	for(int i = 0; i < NBins; i++){
 		Counts[i] = 0;
@@ -364,7 +356,6 @@ void CalEffSystBP(){
 	double tnpabssystdown;
 
 	TFile * finSyst2D = new TFile("../BP/EffAna/NewEff2DMaps/BPSyst2D.root");
-	
 	TH2D * invEff2D = (TH2D *) finSyst2D->Get("invEff2D");
 	TH2D * invEff2DTnPSystUp = (TH2D *) finSyst2D->Get("invEff2DTnPSystUp");
 	TH2D * invEff2DTnPSystDown = (TH2D *) finSyst2D->Get("invEff2DTnPSystDown");
@@ -547,8 +538,7 @@ void CalEffSystBP(){
 
 	}
 	
-
-
+	gSystem->mkdir("OutFiles", true);
 	TFile * fout = new TFile("OutFiles/BPSyst2D.root","RECREATE");
 	fout->cd();
 

@@ -45,13 +45,8 @@ void BsRAA(){
 	gStyle->SetOptStat(0);
 
 	TCanvas * c = new TCanvas("c","c",600,600);
-
 	c->cd();
-
 	c->SetLeftMargin(0.16);
-
-
-
 
 	TString InfileBs = "../../Bs/EffAna/FinalFiles/BsPPCorrYieldPT.root";
 	//TString InfileBs = "BsPPCorrYieldPT.root";
@@ -63,33 +58,25 @@ void BsRAA(){
 	BsCross->SetMarkerSize(1);
 	BsCross->SetMarkerColor(1);
 	BsCross->SetLineColor(1);
-
 	BsCross->Draw("ep");
 
 	//B+ PbPb//
 	
 	const int NBins = 4;
-
 	float BsXsecPPY[NBins];
 	float BsXsecPPX[NBins] = {8.5,12.5,17.5,35};
-
 	float BsXSecPPYErrUp[NBins];
 	float BsXSecPPYErrDown[NBins];
 	float BsXSecPPYErrUpPercent[NBins];
 	float BsXSecPPYErrDownPercent[NBins];
 
-
 	for(int i = 0; i < NBins; i++){
-
 		BsXsecPPY[i] = BsCross->GetBinContent(i+1);
 		BsXSecPPYErrUp[i] = BsCross->GetBinError(i+1);
 		BsXSecPPYErrDown[i] = BsCross->GetBinError(i+1);
 		BsXSecPPYErrUpPercent[i] = BsXSecPPYErrUp[i]/BsXsecPPY[i];
 		BsXSecPPYErrDownPercent[i] = BsXSecPPYErrDown[i]/BsXsecPPY[i];
-		
 	}
-
-
 
 	float BsXSecPPXErrUp[NBins] = {1.5,2.5,2.5,15};
 	float BsXSecPPXErrDown[NBins] = {1.5,2.5,2.5,15};
@@ -103,22 +90,14 @@ void BsRAA(){
 	float BsXSecPbPbYErrDown[NBins];
 
 	for(int i = 0; i < NBins; i++){
-
 		BsXSecPbPbYErrUp[i] = BsXSecPbPbYErrUpPercent[i] * BsXsecPbPbY[i];
 		BsXSecPbPbYErrDown[i] = BsXSecPbPbYErrDownPercent[i] * BsXsecPbPbY[i];
-
 	}
-
-
 
 	//Syst//
 
-
-
 	float BsXSecPPYSystUp[NBins];
 	float BsXSecPPYSystDown[NBins];
-
-
 
   TString errorFile = "../../2DMapSyst/OutFiles/BsError2D.root";
   TFile fError(errorFile);
