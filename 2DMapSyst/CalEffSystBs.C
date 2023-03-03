@@ -13,12 +13,8 @@
 #include <iostream>
 #include <fstream>
 //#include "tnp_weight_lowptPbPb.h"
-
-
-
 //#include "his.h"
 using namespace std;
-
 using std::cout;
 using std::endl;
 
@@ -28,7 +24,6 @@ void CalEffSystBs(){
 	//const int NBins = 6;
 
 	int TnP = 1;
-
 
 //	double BRchain = 6.02061e-5;
 	double BRchain = 3.1189e-5;
@@ -485,7 +480,7 @@ void CalEffSystBs(){
 		Eff2DBptHis->SetBinError(i+1, NewEffErr[i]);
 	}
 	
-	gSystem->mkdir("OutFiles",true)
+	gSystem->mkdir("OutFiles", true);
 	TFile * fout = new TFile("OutFiles/BsSyst2D.root","RECREATE");
 	fout->cd();
 

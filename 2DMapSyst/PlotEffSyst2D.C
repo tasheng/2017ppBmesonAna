@@ -43,7 +43,7 @@ void PlotEffSyst2D(int Opt){
 	TString BmesonName;
 	if(Opt == 0) BmesonName =  "BP";
 	if(Opt == 1) BmesonName =  "Bs";
-	gSystem->mkdir(Form("SystPlots/%s/Pt",BmesonName.Data()), true)
+	gSystem->mkdir(Form("SystPlots/%s/Pt",BmesonName.Data()), true);
 
 	TFile * fin = new TFile(infile.Data());
 	fin->cd();

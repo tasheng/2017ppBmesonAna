@@ -14,11 +14,8 @@
 #include <fstream>
 //#include "tnp_weight_lowptPbPb.h"
 
-
-
 //#include "his.h"
 using namespace std;
-
 using std::cout;
 using std::endl;
 
