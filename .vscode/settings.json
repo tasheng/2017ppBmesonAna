@@ -3,6 +3,11 @@
         "roofitB.C": "cpp",
         "TnPWeight.C": "cpp",
         "MCEff.C": "cpp",
-        "CrossSectionAna.C": "cpp"
+        "CrossSectionAna.C": "cpp",
+        "PlotBsBPRatio.C": "cpp",
+        "BPRAA.C": "cpp",
+        "BsRAA.C": "cpp",
+        "CalEffSystBP.C": "cpp",
+        "CalEffSystBs.C": "cpp"
     }
 }

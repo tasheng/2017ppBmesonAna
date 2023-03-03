@@ -31,7 +31,7 @@ using std::endl;
 
 void PlotBsBPRatio(int Opt){
 
-
+	gSystem->mkdir("Plots/2DMap", true);
 
 	TLatex* tex = new TLatex();
 

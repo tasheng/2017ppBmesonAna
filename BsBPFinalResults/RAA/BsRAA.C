@@ -56,7 +56,6 @@ void BsRAA(){
 	TString InfileBs = "../../Bs/EffAna/FinalFiles/BsPPCorrYieldPT.root";
 	//TString InfileBs = "BsPPCorrYieldPT.root";
 
-
 	TFile * FileBs = new TFile(InfileBs.Data());
 
 	TH1D * BsCross = (TH1D *) FileBs->Get("hPtSigma");
@@ -65,11 +64,7 @@ void BsRAA(){
 	BsCross->SetMarkerColor(1);
 	BsCross->SetLineColor(1);
 
-
-
 	BsCross->Draw("ep");
-
-
 
 	//B+ PbPb//
 	
@@ -80,8 +75,6 @@ void BsRAA(){
 
 	float BsXSecPPYErrUp[NBins];
 	float BsXSecPPYErrDown[NBins];
-
-
 	float BsXSecPPYErrUpPercent[NBins];
 	float BsXSecPPYErrDownPercent[NBins];
 
@@ -100,20 +93,12 @@ void BsRAA(){
 
 	float BsXSecPPXErrUp[NBins] = {1.5,2.5,2.5,15};
 	float BsXSecPPXErrDown[NBins] = {1.5,2.5,2.5,15};
-	
-
-
 	float BsXsecPbPbY[NBins] = {160432,75523.7,25354.5,2272.18};
 	float BsXsecPbPbX[NBins] = {8.75,12.6,17.4,27.3};
-
-
 	float BsXSecPbPbXErrUp[NBins] = {1.25,2.4,2.4,22.7};
 	float BsXSecPbPbXErrDown[NBins] = {1.25,2.6,2.6,7.3};
-
 	float BsXSecPbPbYErrUpPercent[NBins] = {0.513,0.224,0.216,0.216};
 	float BsXSecPbPbYErrDownPercent[NBins] = {0.483,0.256,0.207,0.163};
-
-
 	float BsXSecPbPbYErrUp[NBins];
 	float BsXSecPbPbYErrDown[NBins];
 

@@ -42,7 +42,7 @@ void CalEffSystBs(){
 	// FileName = "../SkimmedSamples/BsData.root";
 	// FileName = "../CutSkim/BsData_trkpt5.root";
 	// FileName = "../CutSkim/BsData.root";
-	FileName = "~/dat/presel/BsData_nom.root";
+	FileName = "/data3/tasheng/presel/BsData_nom.root";
 	TFile * fin = new TFile(FileName.Data());
 	fin->cd();
 
