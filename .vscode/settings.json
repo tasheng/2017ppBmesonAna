@@ -9,6 +9,8 @@
         "BsRAA.C": "cpp",
         "CalEffSystBP.C": "cpp",
         "CalEffSystBs.C": "cpp",
-        "PlotEffSyst2D.C": "cpp"
+        "PlotEffSyst2D.C": "cpp",
+        "Generate2DMaps.C": "cpp",
+        "MCStatCal.C": "cpp"
     }
 }

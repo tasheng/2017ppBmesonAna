@@ -21,8 +21,6 @@ using std::endl;
 
 void PlotEffSyst2D(int Opt){
 
-
-
 	TCanvas * c = new TCanvas("c","c",600,600);
 	c->cd();
 
@@ -38,7 +36,6 @@ void PlotEffSyst2D(int Opt){
     infile =  "OutFiles/BsSyst2D.root";
     outFile =  "OutFiles/BsError2D.root";
   }
-
 
 	TString BmesonName;
 	if(Opt == 0) BmesonName =  "BP";
