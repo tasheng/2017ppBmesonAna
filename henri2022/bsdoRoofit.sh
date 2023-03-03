@@ -33,11 +33,7 @@ TRGPbPbMC="(Bpt>0)"
 echo "TRGPbPb="$TRGPbPb
 
 mkdir -p ROOTfiles/
-OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_FULL="ROOTfiles/yields_Bs_full_${CENTPbPbMIN}_${CENTPbPbMAX}.root"
-OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_DOUBLE_1ST="ROOTfiles/yields_Bs_binned_cent_1st_pt.root"
-OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_DOUBLE_2ND="ROOTfiles/yields_Bs_binned_cent_2nd_pt.root"
-OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_DOUBLE_1ST_Y="ROOTfiles/yields_Bs_binned_cent_1st_y.root"
-OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_DOUBLE_2ND_Y="ROOTfiles/yields_Bs_binned_cent_2nd_y.root"
+OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_FULL="ROOTfiles/yields_Bs_full.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_Y="ROOTfiles/yields_Bs_binned_y.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_PT="ROOTfiles/yields_Bs_binned_pt.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_PT_trk="ROOTfiles/yields_Bs_binned_pt_trk.root"

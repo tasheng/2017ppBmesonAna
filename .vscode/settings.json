@@ -2,6 +2,7 @@
     "files.associations": {
         "roofitB.C": "cpp",
         "TnPWeight.C": "cpp",
-        "MCEff.C": "cpp"
+        "MCEff.C": "cpp",
+        "CrossSectionAna.C": "cpp"
     }
 }

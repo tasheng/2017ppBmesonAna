@@ -28,6 +28,8 @@ using std::endl;
 
 void CrossSectionAna(int DoTnP){
 
+	gSystem->mkdir("EffFinal" ,true)
+
 	const int NBins = 4;
 	//const int NBins = 6;
 
@@ -63,21 +65,14 @@ void CrossSectionAna(int DoTnP){
 	Float_t ByNew[NCand];
 	Float_t BEff[NCand];
 	Float_t BEffErr[NCand];
-
-
 	Float_t BEffInv[NCand];
 	Float_t BEffInvErr[NCand];
 	Float_t BEffInv1D[NCand];
 	Float_t BEffInvErr1D[NCand];
-
 	Float_t BEffInvFit[NCand];
 	Float_t BEffInvErrFit[NCand];
-
 	Float_t BEffInvBDTWeighted[NCand];
 	Float_t BEffInvErrBDTWeighted[NCand];
-
-
-
 	Float_t BEffInvUp[NCand];
 	Float_t BEffInvErrUp[NCand];
 	Float_t BEffInvDown[NCand];
@@ -159,24 +154,14 @@ void CrossSectionAna(int DoTnP){
 	double NewEffErr[NBins];
 	double NewEffTight[NBins];
 	double NewEffLoose[NBins];
-
 	double NewEffReal[NBins];
 	double NewEffRealErr[NBins];
-
-
-
 	double SumCountsUp[NBins];
 	double SumCountsErrUp[NBins];
-
 	double SumCountsDown[NBins];
 	double SumCountsErrDown[NBins];
-
-
 	double SumCountsEff[NBins];
 	double SumCountsEffErr[NBins];
-
-
-
 	double SumCountsSyst[NBins];
 	double SumCountsSystErr[NBins];
 	double NewEffSyst[NBins];
@@ -851,8 +836,8 @@ CorrDiffHisBin
 	RawYield->cd();
 	TH1D * hPt = (TH1D *) RawYield->Get("hPt");
 
-	TFile * RawYieldTight = new TFile(TString(fYield(0, fYield.Length() - 5)) + "_trk.root");
-	TH1D * hPtTight = (TH1D *) RawYieldTight->Get("hPt");
+	//TFile * RawYieldTight = new TFile(TString(fYield(0, fYield.Length() - 5)) + "_trk.root");
+	//TH1D * hPtTight = (TH1D *) RawYieldTight->Get("hPt");
 
 
 	double RawCount;
@@ -906,7 +891,7 @@ CorrDiffHisBin
 		CorrDiffHis->SetBinContent(i+1,CorrYieldDiff[i]);
 		CorrDiffHis->SetBinError(i+1,CorrYieldDiffErr[i]);
 
-		RawCountTight = hPtTight->GetBinContent(i+1);
+		// RawCountTight = hPtTight->GetBinContent(i+1);
 		CorrDiffHisTight->
       SetBinContent(i+1, (RawCountTight *  NewEffTight[i]) / (BRchain*2* lumi) );
 		CorrDiffHisTight->SetBinError(i+1, epsilon);
@@ -1024,8 +1009,8 @@ CorrDiffHisBin
   hInvEffTight->Write();
   hInvEffLoose->Write();
   hPt->Write();
-  hPtTight->SetName("hPtTight");
-  hPtTight->Write();
+  //hPtTight->SetName("hPtTight");
+  //hPtTight->Write();
 	foutCorr->Close();
 
 }
