@@ -28,7 +28,7 @@ using std::endl;
 
 void CrossSectionAna(int DoTnP){
 
-	gSystem->mkdir("EffFinal" ,true)
+	gSystem->mkdir("EffFinal" ,true);
 
 	const int NBins = 4;
 	//const int NBins = 6;
@@ -881,7 +881,7 @@ CorrDiffHisBin
 	CorrDiffHis->GetYaxis()->CenterTitle();
 
 
-	TH1D * CorrDiffHisTight = (TH1D*) CorrDiffHis->Clone("hPtSigma_tight");
+	//TH1D * CorrDiffHisTight = (TH1D*) CorrDiffHis->Clone("hPtSigma_tight");
 
 	for(int i = 0; i < NBins;i++){
 		RawCount = hPt->GetBinContent(i+1);
@@ -892,11 +892,9 @@ CorrDiffHisBin
 		CorrDiffHis->SetBinError(i+1,CorrYieldDiffErr[i]);
 
 		// RawCountTight = hPtTight->GetBinContent(i+1);
-		CorrDiffHisTight->
-      SetBinContent(i+1, (RawCountTight *  NewEffTight[i]) / (BRchain*2* lumi) );
-		CorrDiffHisTight->SetBinError(i+1, epsilon);
+		// CorrDiffHisTight->SetBinContent(i+1, (RawCountTight *  NewEffTight[i]) / (BRchain*2* lumi) );
+		// CorrDiffHisTight->SetBinError(i+1, epsilon);
 	}
-
 
 //	CorrDiffHis->SetTitle("2017 B^{0}_{s} pp Cross Section");
 	CorrDiffHis->SetTitle("(Preliminary) B^{0}_{s} #rightarrow J/#psi K^{+} p_{T} Differential Cross Section in pp");
@@ -1004,7 +1002,7 @@ CorrDiffHisBin
 	foutCorr->cd();
 	CorrDiffHis->Write();
 	CorrDiffHisBin->Write();
-	CorrDiffHisTight->Write();
+	// CorrDiffHisTight->Write();
   hInvEff->Write();
   hInvEffTight->Write();
   hInvEffLoose->Write();

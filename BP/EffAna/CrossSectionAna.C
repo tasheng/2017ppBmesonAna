@@ -29,6 +29,8 @@ using std::endl;
 
 void CrossSectionAna(int DoTnP){
 
+		gSystem->mkdir("EffFinal" ,true);
+
 	const int NBins = 7;
 	//const int NBins = 6;
 
@@ -705,8 +707,8 @@ void CrossSectionAna(int DoTnP){
 	RawYield->cd();
 	TH1D * hPt = (TH1D *) RawYield->Get("hPt");
 
-	TFile * RawYieldTight = new TFile(TString(fYield(0, fYield.Length() - 5)) + "_trk.root");
-	TH1D * hPtTight = (TH1D *) RawYieldTight->Get("hPt");
+	//TFile * RawYieldTight = new TFile(TString(fYield(0, fYield.Length() - 5)) + "_trk.root");
+	//TH1D * hPtTight = (TH1D *) RawYieldTight->Get("hPt");
 
 
 	double RawCount;
@@ -752,7 +754,7 @@ void CrossSectionAna(int DoTnP){
 	CorrDiffHis->GetYaxis()->CenterTitle();
 
 
-	TH1D * CorrDiffHisTight = (TH1D*) CorrDiffHis->Clone("hPtSigma_tight");
+	// TH1D * CorrDiffHisTight = (TH1D*) CorrDiffHis->Clone("hPtSigma_tight");
 
 	for(int i = 0; i < NBins;i++){
 		RawCount = hPt->GetBinContent(i+1);
@@ -762,10 +764,9 @@ void CrossSectionAna(int DoTnP){
 		CorrDiffHis->SetBinContent(i+1,CorrYieldDiff[i]);
 		CorrDiffHis->SetBinError(i+1,CorrYieldDiffErr[i]);
 
-		RawCountTight = hPtTight->GetBinContent(i+1);
-		CorrDiffHisTight->
-      SetBinContent(i+1, (RawCountTight *  NewEffTight[i]) / (BRchain*2* lumi) );
-		CorrDiffHisTight->SetBinError(i+1, epsilon);
+		//RawCountTight = hPtTight->GetBinContent(i+1);
+		//CorrDiffHisTight->SetBinContent(i+1, (RawCountTight *  NewEffTight[i]) / (BRchain*2* lumi) );
+		//CorrDiffHisTight->SetBinError(i+1, epsilon);
 	}
 
 
@@ -877,13 +878,13 @@ void CrossSectionAna(int DoTnP){
 	foutCorr->cd();
 	CorrDiffHis->Write();
 	CorrDiffHisBin->Write();
-	CorrDiffHisTight->Write();
+	//CorrDiffHisTight->Write();
   hInvEff->Write();
   hInvEffTight->Write();
   hInvEffLoose->Write();
   hPt->Write();
-  hPtTight->SetName("hPtTight");
-  hPtTight->Write();
+  //hPtTight->SetName("hPtTight");
+  //hPtTight->Write();
 	foutCorr->Close();
 
 }
