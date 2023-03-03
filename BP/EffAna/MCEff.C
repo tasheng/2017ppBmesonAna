@@ -45,14 +45,7 @@ void  MCEff(int DoTnP, int Rescale){
 	int ptmax = 50;
 
 	TString infile;
-
-	if(Rescale == 1){
-		infile = "/data/szhaozho/ReComputeBDTRescaled/BPMC.root";
-	}
-
-//	infile = "/data/szhaozho/2017ppSamplesFinal/Unskimmed/NewOfficialMC/BPMC.root";
-
-	infile = "/data3/tasheng/Unskimmed_gen/BP_MC_merged.root";
+	infile = "/data3/tasheng/presel/output/BP_MC_BDTs_nom_tnp.root";
 
 	TFile * fin = new TFile(infile.Data());
 

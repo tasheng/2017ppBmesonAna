@@ -47,19 +47,9 @@ void  MCEff(int DoTnP, int Rescale){
 	int ptmin = 10;
 	int ptmax = 50;
 
-	//TString infile = "/data/szhaozho/2017ppSamplesNew/BDTOutput/AllMerge/BPMCAllBDT.root";
-//	TString infile = "/data/szhaozho/2017ppSamples/UnSkimmed/OfficialMC/BsMC.root";
-	
-	TString infile = "../../UnskimmedSamples/OfficialMC/BsMC.root";
-	//TString infile = "/data/szhaozho/ppNewTMVA/CMSSW_10_3_2/src/Bs/ComputBDTRescale/BsMC.root";
-	
-
-	infile = "/data3/tasheng/Unskimmed_gen/Bs_MC_all.root";
-
-
+	infile = "/data3/tasheng/presel/output/Bs_MC_BDTs_nom_tnp.root";
 
 	TFile * fin = new TFile(infile.Data());
-
 	fin->cd();
 
 	TTree * ntphi = (TTree * ) fin->Get("Bfinder/ntphi");
@@ -71,10 +61,6 @@ void  MCEff(int DoTnP, int Rescale){
 	//	TTree * CentWeightTree =	(TTree * ) fin->Get("CentWeightTree");
 	TTree * ntGen = (TTree * ) fin->Get("Bfinder/ntGen");
 
-
-
-
-
 //	TString BDT1Name = "BDT_pt_3_5";
 //	TString BDT2Name = "BDT_pt_5_7";
 	TString BDT3Name = "BDT_pt_7_10";
@@ -84,7 +70,6 @@ void  MCEff(int DoTnP, int Rescale){
 //	TString BDT7Name = "BDT_pt_2_3";
 //	TString BDT8Name = "BDT_pt_1_2";
 //	TString BDT9Name = "BDT_pt_30_50";
-
 
 
 	if(Rescale == 1){
@@ -101,10 +86,6 @@ void  MCEff(int DoTnP, int Rescale){
 
 	}
 
-
-
-
-	
 //	TTree * BDT1 = (TTree *) fin->Get(BDT1Name.Data());
 //	TTree * BDT2 = (TTree *) fin->Get(BDT2Name.Data());
 	TTree * BDT3 = (TTree *) fin->Get(BDT3Name.Data());

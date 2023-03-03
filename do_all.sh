@@ -18,6 +18,7 @@ bptshape () {
     root -q -b -l ReweightBpt.C'(0)' &
     root -q -b -l ReweightBpt.C'(1)' &
     wait
+    popd
 }
 
 
@@ -36,10 +37,10 @@ bpEff () {
     # this is everything from yield to syst, other than MC syst
     pushd BP/EffAna
     # about 1hr
-    # takes unskimmed MC sample as input
     echo "Takes BPw.root as input. Make sure it is up to date"
     ls -l BDTWeights/BPw.root
-    #root -b -l -q MCEff.C'(1,0)' > eff.log # >> bpsyst2d.root
+    root -b -l -q MCEff.C'(1,0)' > eff.log # >> bpsyst2d.root
+    wait
     # CrossSectionAna.C contains 1 By cuts
     root -b -l -q CrossSectionAna.C'(1)'
     # root -b -l -q CrossSectionAnaMult.C'(1)'
@@ -53,9 +54,10 @@ bsEff () {
     pushd Bs/EffAna
     # about 1hr
     echo "Takes Bsw.root as input"
-    # root -b -l -q MCEff.C'(1,0)' > eff.log
+    root -b -l -q MCEff.C'(1,0)' > eff.log
     ls -l BDTWeights/Bsw.root
     root -b -l -q CrossSectionAna.C'(1)'
+    wait
     # root -b -l -q CrossSectionAnaMult.C'(1)'
     # >> Bs/EffAna/FinalFiles/BsPPCorrYieldPT.root
     popd
@@ -132,12 +134,15 @@ paperPlots () {
     root -b -l -q plotPt.C'(1,1,0,1,1)'
     popd
 }
-# maketnp
 
- bptshape
 
- yield
- wait
+
+#UNCOMMENT ACORDINGLY
+
+# bptshape
+
+# yield
+# wait
 
 #bpEff &
 #bsEff &
