@@ -39,7 +39,7 @@ using std::endl;
 
 void BPComparison(){
 
-	gSystem->mkdir("RAAPlots/BP", true);
+	gSystem->mkdir("Plots/BP", true);
 	gStyle->SetOptStat(0);
 
 	TCanvas * c = new TCanvas("c","c",600,600);
