@@ -26,6 +26,7 @@ BASECUTPbPb="(hiBin<181)&&Btrk1Pt>1.0&&Btrk2Pt>1.0&&Bchi2cl>0.05&&BsvpvDistance/
 CUTPbPb=${BASECUTPbPb}"&&((Bpt>5&&Bpt<10&&BDT_pt_5_10>0.17)||(Bpt>10&&Bpt<15&&BDT_pt_10_15>0.17)||(Bpt>15&&Bpt<20&&BDT_pt_15_20>0.26)||(Bpt>20&&Bpt<50&&BDT_pt_20_50>0.25))"
 CUTPbPb=${CUTPbPb}"&&abs(PVz)<15&&pclusterCompatibilityFilter&&pprimaryVertexFilter"
 CUTPbPb="Bpt>0"
+cut_trk_tight="(track>1)"
 
 #TRGPbPb="(HLT_HIL1DoubleMu0_v1||HLT_HIL1DoubleMu0_part1_v1||HLT_HIL1DoubleMu0_part2_v1||HLT_HIL1DoubleMu0_part3_v1)"
 TRGPbPb="(Bpt>0)"
@@ -55,17 +56,9 @@ rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
 fi
 
 if [ $DOANALYSISPbPb_ROOFIT_BINNED_PT_BP_TRK -eq 1  ]; then
-    cut_trk_tight="(track>1)"
-    root -b  -q 'roofitB.C('0','\"ntKp\"','0','1','0', \
-'\"$INPUTDATAPbPbCANDWISE_BP\"', \
-'\"$INPUTMCPbPbCANDWISE_BP\"','\"Bpt\"', \
-'\"$TRGPbPb\"','\"$cut_trk_tight\"','\"$SELGENPbPb\"', \
-'$ISMCPbPb','1','$ISDOWEIGHTPbPb', \
-'\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT_trk\"', \
-'\"results/BP/trk_tight_roofit\"','\"$NPROOFIT_PbPb\"', \
-'0','\"\"','\"$INPUTJPSI\"')' |& tee binned_pt_trk.log
+root -b  -q 'roofitB.C('0','\"ntKp\"','0','1','0','\"$INPUTDATAPbPbCANDWISE_BP\"','\"$INPUTMCPbPbCANDWISE_BP\"','\"Bpt\"','\"$TRGPbPb\"','\"$cut_trk_tight\"','\"$SELGENPbPb\"','$ISMCPbPb','1','$ISDOWEIGHTPbPb','\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT_trk\"','\"results/BP/trk_tight_roofit\"','\"$NPROOFIT_PbPb\"','0','\"\"','\"$INPUTJPSI\"')' 
 
-    rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
+rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
 fi
 
 

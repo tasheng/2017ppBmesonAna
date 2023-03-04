@@ -155,6 +155,8 @@ cout << endl << endl;
 	TFile* inf = new TFile(inputdata.Data());
 	TTree* skimtree_new = (TTree*)inf->Get(tree);
 	TFile* infMC = new TFile(inputmc.Data());
+	cout << inputdata.Data() << endl;
+	cout << inputmc.Data() << endl;
 	TTree* skimtreeMC_new = (TTree*)infMC->Get(tree);
 	TH1D* h;
 	TH1D* hMC;
