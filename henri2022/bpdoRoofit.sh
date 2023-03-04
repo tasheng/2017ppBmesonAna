@@ -11,6 +11,7 @@ INPUTDATAPbPbCANDWISE_BP="/data3/tasheng/presel/BPData_nom.root"
 #INPUTMCPbPbCANDWISE_BP="/lstore/cms/henrique/dados/BPMC_nom.root"
 #INPUTDATAPbPbCANDWISE_BP="/lstore/cms/henrique/dados/BPData_nom.root"
 
+#INPUTJPSI="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/jpsinp_inclusive.root" 
 INPUTJPSI="/data3/tasheng/presel/jpsinp_nom.root"
 #INPUTJPSI="/lstore/cms/henrique/dados/jpsinp_nom.root"
 #INPUTJPSI="~/dat/presel/jpsinp_nom.root"
@@ -38,7 +39,6 @@ OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_FULL="ROOTfiles/yields_Bp_full.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_Y="ROOTfiles/yields_Bp_binned_y.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT="ROOTfiles/yields_Bp_binned_pt.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT_trk="ROOTfiles/yields_Bp_binned_pt_trk.root"
-
 
 #NPROOFIT_PbPb="yes"  #must be !=1 in order to fir the mc file
 NPROOFIT_PbPb="467.13*TMath::Erf((Bmass-5.14)/-0.03)+467.13+63.57*TMath::Gaus(Bmass,5.06,0.0846)/(sqrt(2*3.14159)*0.0846)+21.5*TMath::Gaus(Bmass,5.36,0.0581)/(sqrt(2*3.14159)*0.0581)"
