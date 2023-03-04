@@ -36,18 +36,12 @@ using std::endl;
 
 void BsComparison(){
 
-
-
-	
+	gSystem->mkdir("RAAPlots/Bs", true);
 	gStyle->SetOptStat(0);
 
 	TCanvas * c = new TCanvas("c","c",600,600);
-
 	c->cd();
-
 	c->SetLeftMargin(0.16);
-
-
 
 
 //	TString InfileBs = "FinalFiles/BsPPCorrYieldPT.root";
