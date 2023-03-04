@@ -391,33 +391,22 @@ void BsComparison(){
 	float BsXsecPPX2015[NBins2015] = {11,17.5,35.0};
 	float BsXSecPPXErrDown2015[NBins2015] = {4,2.5,15};
 	float BsXSecPPXErrUp2015[NBins2015] = {4,2.5,15};
-	
 	float BsXsecPPY2015[NBins2015] = {316000,34100,3830};
 	float BsXSecPPYErrDown2015[NBins2015] = {37000,6300,670};
 	float BsXSecPPYErrUp2015[NBins2015] = {37000,6300,670};
-
 	float BsXSecPPYSystDown2015[NBins2015] = {62000,3200,360};
 	float BsXSecPPYSystUp2015[NBins2015] = {62000,3200,360};
-
 
 	TGraphAsymmErrors *BsPPCrossGraph2015 = new TGraphAsymmErrors(NBins2015, BsXsecPPX2015, BsXsecPPY2015,BsXSecPPXErrDown2015, BsXSecPPXErrUp2015,BsXSecPPYErrDown2015,BsXSecPPYErrUp2015);
 	TGraphAsymmErrors *BsPPCrossGraph2015Syst = new TGraphAsymmErrors(NBins2015, BsXsecPPX2015, BsXsecPPY2015,BsXSecPPXErrDown2015, BsXSecPPXErrUp2015,BsXSecPPYSystDown2015,BsXSecPPYSystUp2015);
 
-
-
 	BsPPCrossGraph2015Syst->SetFillColorAlpha(kGreen-9+2,0.5);
 	BsPPCrossGraph2015Syst->SetLineColor(kGreen-9+2);
-
-
-
-
 	BsPPCrossGraph2015->SetLineColor(kGreen+2);
 	BsPPCrossGraph2015->SetMarkerStyle(33);
 	BsPPCrossGraph2015->SetMarkerSize(1);
 	BsPPCrossGraph2015->SetMarkerColor(kGreen+2);
 	BsPPCrossGraph2015->Draw("epSAME");
-
-
 	BsPPCrossGraph2DScaledSyst->Draw("5SAME");
 	BsPPCrossGraph2015Syst->Draw("5same");	
 
