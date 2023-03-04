@@ -55,20 +55,11 @@ void BPComparison(){
 	// BPCross->SetMarkerSize(1);
 	// BPCross->SetMarkerColor(1);
 	// BPCross->SetLineColor(1);
-
-
-
-
-
-
-
 	//B+ PbPb//
 	
 	const int NBins = 7;
-
 	float BPXsecPPY[NBins];
 	float BPXsecPPX[NBins] = {6,8.5,12.5,17.5,25,40,55};
-
 	float BPXSecPPYErrUp[NBins];
 	float BPXSecPPYErrDown[NBins];
 
@@ -76,8 +67,6 @@ void BPComparison(){
 	// float BPXSecPPYErrDown[NBins];
 	// float BPXSecPPYErrUpRatio[NBins];
 	// float BPXSecPPYErrDownRatio[NBins];
-
-
 	// for(int i = 0; i < NBins; i++){
 	// 	BPXsecPPY[i] = BPCross->GetBinContent(i+1);
 	// 	BPXSecPPYErrUp[i] = BPCross->GetBinError(i+1);
@@ -119,7 +108,7 @@ void BPComparison(){
 	}
 
   std::vector<double> scaledPt = {5, 7, 10};
-  std::vector<double> factor = scaleFactor("~/dat/presel/BPMC_nom.root", "ntKp", scaledPt);
+  std::vector<double> factor = scaleFactor("/data3/tasheng/presel/BPMC_nom.root", "ntKp", scaledPt);
   for (auto i = 0; i < factor.size(); ++i) {
     cout << "applying scaling factor: " << factor[i] << "\n";
     BPXsecPPY2DScaled[i] *= factor[i];
@@ -131,18 +120,12 @@ void BPComparison(){
 
 	float BPXSecPPXErrUp[NBins] = {1,1.5,2.5,2.5,5,10,5};
 	float BPXSecPPXErrDown[NBins] = {1,1.5,2.5,2.5,5,10,5};
-
-
 	float BPXsecPbPbY[NBins] = {4.82132e+06/11.1,311668,270167,64384.4,208537/11.1,28700.6/11.1,7000.73/11.1};
 	float BPXsecPbPbX[NBins] = {6,8.73,12.4,17.2,25,40,55};
-
-
 	float BPXSecPbPbXErrUp[NBins] = {1,1.27,2.6,2.8,5,10,5};
 	float BPXSecPbPbXErrDown[NBins] = {1,1.23,2.4,2.2,5,10,5};
-
 	float BPXSecPbPbYErrUpRatio[NBins] = {0.278198,0.159,0.041,0.0654,0.0690334,0.104543,0.24575};
 	float BPXSecPbPbYErrDownRatio[NBins] = {0.278198,0.145,0.0795,0.065,0.0690334,0.104543,0.24575};
-
 	float BPXSecPbPbYErrUp[NBins];
 	float BPXSecPbPbYErrDown[NBins];
 
@@ -446,51 +429,30 @@ void BPComparison(){
 	float BPXsecPPX2015[NBins2015] = {8.5,12.5,17.5,25,40};
 	float BPXSecPPXErrDown2015[NBins2015] = {1.5,2.5,2.5,5,10};
 	float BPXSecPPXErrUp2015[NBins2015] = {1.5,2.5,2.5,5,10};
-	
 	float BPXsecPPY2015[NBins2015] = {2610000,744000,197000,46500,5300};
 	float BPXSecPPYErrDown2015[NBins2015] = {170000,29000,9000,2400,500};
 	float BPXSecPPYErrUp2015[NBins2015] = {170000,29000,9000,2400,500};
-
 	float BPXSecPPYSystDown2015[NBins2015] = {230000,59000,15000,3500,400};
 	float BPXSecPPYSystUp2015[NBins2015] = {230000,59000,15000,3500,400};
-
-
 
 	TGraphAsymmErrors *BPPPCrossGraph2015 = new TGraphAsymmErrors(NBins2015, BPXsecPPX2015, BPXsecPPY2015,BPXSecPPXErrDown2015, BPXSecPPXErrUp2015,BPXSecPPYErrDown2015,BPXSecPPYErrUp2015);
 	TGraphAsymmErrors *BPPPCrossGraph2015Syst = new TGraphAsymmErrors(NBins2015, BPXsecPPX2015, BPXsecPPY2015,BPXSecPPXErrDown2015, BPXSecPPXErrUp2015,BPXSecPPYSystDown2015,BPXSecPPYSystUp2015);
 
-
-
-
 	BPPPCrossGraph2015Syst->SetFillColorAlpha(kGreen-9+2,0.5);
 	BPPPCrossGraph2015Syst->SetLineColor(kGreen-9+2);
-
-
-
-
 	BPPPCrossGraph2015->SetLineColor(kGreen+2);
 	BPPPCrossGraph2015->SetMarkerStyle(33);
 	BPPPCrossGraph2015->SetMarkerSize(1);
 	BPPPCrossGraph2015->SetMarkerColor(kGreen+2);
 	BPPPCrossGraph2015->Draw("epSAME");
-
-
-
-
-
-
-
-
 	BPPPCrossGraph2DLow->SetLineColor(kOrange+1);
 	BPPPCrossGraph2DLow->SetMarkerStyle(25);
 	BPPPCrossGraph2DLow->SetMarkerSize(1);
 	BPPPCrossGraph2DLow->SetMarkerColor(kOrange+1);
-
 	BPPPCrossGraph2DHigh->SetLineColor(kOrange+1);
 	BPPPCrossGraph2DHigh->SetMarkerStyle(34);
 	BPPPCrossGraph2DHigh->SetMarkerSize(1);
 	BPPPCrossGraph2DHigh->SetMarkerColor(kOrange+1);
-
 
 
 	TFile * finFONLL = new TFile("FONLLs/forTzuAn/fonllOutput_pp_Bplus_5p03TeV_y2p4.root");

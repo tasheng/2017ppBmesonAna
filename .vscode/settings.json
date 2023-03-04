@@ -11,6 +11,10 @@
         "CalEffSystBs.C": "cpp",
         "PlotEffSyst2D.C": "cpp",
         "Generate2DMaps.C": "cpp",
-        "MCStatCal.C": "cpp"
+        "MCStatCal.C": "cpp",
+        "MCEff4.C": "cpp",
+        "plotPt.C": "cpp",
+        "BPComparison.C": "cpp",
+        "BsComparison.C": "cpp"
     }
 }

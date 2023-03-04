@@ -130,16 +130,13 @@ void BsComparison(){
 	}
 
   std::vector<double> scaledPt = {7, 10};
-  std::vector<double> factor = scaleFactor("~/dat/presel/BsMC_nom.root", "ntphi", scaledPt);
+  std::vector<double> factor = scaleFactor("/data3/tasheng/presel/BsMC_nom.root", "ntphi", scaledPt);
   for (auto i = 0; i < factor.size(); ++i) {
     cout << "applying scaling factor: " << factor[i] << "\n";
     BsXsecPPY2DScaled[i] *= factor[i];
 		BsXSecPPY2DErrUpScaled[i] *= factor[i];
 		BsXSecPPY2DErrDownScaled[i] *= factor[i];
   }
-
-
-
 
 //	float BsXSecPPXErrUp[NBins] = {1,1.5,2.5,2.5,5,10,5};
 //	float BsXSecPPXErrDown[NBins] = {1,1.5,2.5,2.5,5,10,5};

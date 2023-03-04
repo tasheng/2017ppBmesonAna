@@ -60,7 +60,6 @@ bsEff () {
     popd
 }
 
-
 nominal () {
     # central value
     cd BsBPFinalResults/BsBPRatio
@@ -132,27 +131,22 @@ paperPlots () {
     popd
 }
 
-
-
 #UNCOMMENT ACORDINGLY
 #(Run by THIS ORDER!)
 
- bptshape
+bptshape
 
- yield
- wait
+yield
+wait
 
 bpEff &
 bsEff &
 wait
 
 #syst
+#wait
+
 #nominal
-
-
-
-
-
 
 
 # bpStat&

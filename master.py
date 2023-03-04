@@ -46,14 +46,13 @@ def print_time():
         print(ctime(time), file)
 
 
-def get_pdf_syst(inFileList, outfile, hname, nbins):
+def get_pdf_syst(inFileList, outfile, hname, nbins, nshape):
     """
     get the biggest error from signal and background pdf variation
     return the root mean squared error
     """
     error_sig_bkg = np.zeros([2, nbins])
     # num of signal, num of bkg
-    nshape = [3, 3]
     for itype, file in enumerate(inFileList):
         with open(file) as fin:
             lines = fin.readlines()[2:]
@@ -61,6 +60,7 @@ def get_pdf_syst(inFileList, outfile, hname, nbins):
         xs = [np.mean([float(num) for num in re.findall(r'\d+', g)]) for g in xgroups]
         err = np.zeros([nshape[itype], nbins])
         for ishape in range(nshape[itype]):
+            print( np.array(re.findall(r'\d+\.\d*', lines[ishape + 1]), 'd') )
             err[ishape] = np.array(re.findall(r'\d+\.\d*', lines[ishape + 1]), 'd')
         bigger_error = np.amax(err, axis=0)
         error_sig_bkg[itype] = bigger_error
@@ -76,8 +76,8 @@ def get_pdf_syst(inFileList, outfile, hname, nbins):
     fout.Close()
     return
 
-get_pdf_syst(bp_pdf_list, "bp_pdf.root", "bp_error", 7)
-get_pdf_syst(bs_pdf_list, "bs_pdf.root", "bs_error", 4)
+get_pdf_syst(bp_pdf_list, "bp_pdf.root", "bp_error", 7, [3, 4])
+get_pdf_syst(bs_pdf_list, "bs_pdf.root", "bs_error", 4, [3, 3])
 
 def make_line(item, array, suf = '', form = '{:.2f}'):
     entry = [item.ljust(22)] + [form.format(num) + suf for num in array]
@@ -126,8 +126,6 @@ def read_tracking_syst(inYield, nbins):
     print(out_table)
     return g, out_table
 
-
-
 def get_tracking_syst(outfile, out_table):
     in_file_bp = "BP/EffAna/FinalFiles/BPPPCorrYieldPT.root"
     in_file_bs = "Bs/EffAna/FinalFiles/BsPPCorrYieldPT.root"
@@ -145,7 +143,6 @@ def get_tracking_syst(outfile, out_table):
         fout.write('\n')
         fout.write('\\PBs track selection systematics\n')
         fout.write(t_bs)
-
 
 
 get_tracking_syst("syst_track_sel.root", "syst_track_sel.txt")

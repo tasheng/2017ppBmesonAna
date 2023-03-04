@@ -42,7 +42,7 @@ void TnPWeight(int Opt){
 		// infile = "../UnskimmedSamples/OfficialMC/BsMC.root";
 		// infile = "../../bmva/TMVA/Bs/sample/BsMC_7_50.root";
 		// infile = "../../dat/Bs_MC_all.root";
-		infile = "/data3/tasheng/presel/output/BP_MC_BDTs_nom_tnp.root";
+		infile = "/data3/tasheng/presel/output/Bs_MC_BDTs_nom_tnp.root";
 		TreeName = "Bfinder/ntphi";
 		//	outfile = "BsTnPInfo.root";
 		outfile = "BsTnPInfo.root";
