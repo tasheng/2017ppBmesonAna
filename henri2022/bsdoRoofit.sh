@@ -4,8 +4,8 @@ DOANALYSISPbPb_ROOFIT_BINNED_PT_BS_TRK=0
 DOANALYSISPbPb_ROOFIT_BINNED_MULT_BS=0
 DOANALYSISPbPb_ROOFIT_BINNED_Y_BS=0
 
-#INPUTMCPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BsMC.root"  
-#INPUTDATAPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BsData.root" 
+#INPUTMCPbPbCANDWISE_BS="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BsMC.root"  
+#INPUTDATAPbPbCANDWISE_BS="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BsData.root" 
 INPUTMCPbPbCANDWISE_BS="/data3/tasheng/presel/BsMC_nom.root"
 INPUTDATAPbPbCANDWISE_BS="/data3/tasheng/presel/BsData_nom.root"
 #INPUTMCPbPbCANDWISE_BS="/lstore/cms/henrique/dados/BsMC_nom.root"
@@ -72,7 +72,7 @@ root -b  -q 'roofitB.C+('0','\"ntphi\"','0','1','0','\"$INPUTDATAPbPbCANDWISE_BS
 rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
 fi
 
-if [ $DOANALYSISPbPb_ROOFIT_BINNED_PT_BS_TRK -eq 1  ]; then
+if [ $DOANALYSISPbPb_ROOFIT_BINNED_PT_BS_TRK -eq 1 ]; then
 root -b  -q 'roofitB.C('0','\"ntphi\"','0','1','0','\"$INPUTDATAPbPbCANDWISE_BS\"','\"$INPUTMCPbPbCANDWISE_BS\"','\"Bpt\"','\"$TRGPbPb\"','\"$cut_trk_tight\"','\"$SELGENPbPb\"','$ISMCPbPb','1','$ISDOWEIGHTPbPb','\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_PT_trk\"','\"results/Bs/trk_tight_roofit\"','\"$NPROOFIT_PbPb\"','0')'
 
 rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
