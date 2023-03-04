@@ -15,6 +15,7 @@
         "MCEff4.C": "cpp",
         "plotPt.C": "cpp",
         "BPComparison.C": "cpp",
-        "BsComparison.C": "cpp"
+        "BsComparison.C": "cpp",
+        "BPNewFidNoScale.C": "cpp"
     }
 }
