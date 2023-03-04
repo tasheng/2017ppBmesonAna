@@ -4,8 +4,8 @@ DOANALYSISPbPb_ROOFIT_BINNED_PT_BS_TRK=0
 DOANALYSISPbPb_ROOFIT_BINNED_MULT_BS=0
 DOANALYSISPbPb_ROOFIT_BINNED_Y_BS=0
 
-#INPUTDATAPbPbCANDWISE_BS="~/data/BsData.root"
-#INPUTMCPbPbCANDWISE_BS="~/data/BsMC.root"
+#INPUTMCPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BsMC.root"  
+#INPUTDATAPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BsData.root" 
 INPUTMCPbPbCANDWISE_BS="/data3/tasheng/presel/BsMC_nom.root"
 INPUTDATAPbPbCANDWISE_BS="/data3/tasheng/presel/BsData_nom.root"
 #INPUTMCPbPbCANDWISE_BS="/lstore/cms/henrique/dados/BsMC_nom.root"

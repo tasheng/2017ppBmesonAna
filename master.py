@@ -51,17 +51,21 @@ def get_pdf_syst(inFileList, outfile, hname, nbins, nshape):
     get the biggest error from signal and background pdf variation
     return the root mean squared error
     """
-    error_sig_bkg = np.zeros([2, nbins])
-    # num of signal, num of bkg
+    #2-d array with first line for signal pdf variation and second line for bckg pdf variation (biggest deviations only)
+    error_sig_bkg = np.zeros([2, nbins])  
+    
     for itype, file in enumerate(inFileList):
         with open(file) as fin:
             lines = fin.readlines()[2:]
+
         xgroups = re.findall(r'\d+\D+\d+', lines[0])
         xs = [np.mean([float(num) for num in re.findall(r'\d+', g)]) for g in xgroups]
         err = np.zeros([nshape[itype], nbins])
+
         for ishape in range(nshape[itype]):
             print( np.array(re.findall(r'\d+\.\d*', lines[ishape + 1]), 'd') )
             err[ishape] = np.array(re.findall(r'\d+\.\d*', lines[ishape + 1]), 'd')
+
         bigger_error = np.amax(err, axis=0)
         error_sig_bkg[itype] = bigger_error
     error_sum = np.sqrt(np.sum(error_sig_bkg ** 2, axis=0))
@@ -143,6 +147,4 @@ def get_tracking_syst(outfile, out_table):
         fout.write('\n')
         fout.write('\\PBs track selection systematics\n')
         fout.write(t_bs)
-
-
 get_tracking_syst("syst_track_sel.root", "syst_track_sel.txt")

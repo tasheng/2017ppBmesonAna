@@ -4,8 +4,8 @@ DOANALYSISPbPb_ROOFIT_BINNED_PT_BP_TRK=0
 DOANALYSISPbPb_ROOFIT_BINNED_Y_BP=0
 DOANALYSISPbPb_ROOFIT_BINNED_MULTI_BP=0
 
-#INPUTMCPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPMC.root"  //outdated
-#INPUTDATAPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPData.root"  //outdated
+#INPUTMCPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPMC.root"  
+#INPUTDATAPbPbCANDWISE_BP="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BPData.root" 
 INPUTMCPbPbCANDWISE_BP="/data3/tasheng/presel/BPMC_nom.root"
 INPUTDATAPbPbCANDWISE_BP="/data3/tasheng/presel/BPData_nom.root"
 #INPUTMCPbPbCANDWISE_BP="/lstore/cms/henrique/dados/BPMC_nom.root"
@@ -41,7 +41,6 @@ OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_BINNED_PT_trk="ROOTfiles/yields_Bp_binned_pt_tr
 
 #NPROOFIT_PbPb="yes"  #must be !=1 in order to fir the mc file
 NPROOFIT_PbPb="467.13*TMath::Erf((Bmass-5.14)/-0.03)+467.13+63.57*TMath::Gaus(Bmass,5.06,0.0846)/(sqrt(2*3.14159)*0.0846)+21.5*TMath::Gaus(Bmass,5.36,0.0581)/(sqrt(2*3.14159)*0.0581)"
-
 
 if [ $DOANALYSISPbPb_ROOFIT_FULL_BP  -eq 1  ]; then
 root -b  -q 'roofitB.C('0','\"ntKp\"','1','1','0','\"$INPUTDATAPbPbCANDWISE_BP\"','\"$INPUTMCPbPbCANDWISE_BP\"','\"Bpt\"','\"$TRGPbPb\"','\"$CUTPbPb\"','\"$SELGENPbPb\"','$ISMCPbPb','1','$ISDOWEIGHTPbPb','\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BP_FULL\"','\"results/BP\"','\"$NPROOFIT_PbPb\"','0','\"\"','\"$INPUTJPSI\"')'

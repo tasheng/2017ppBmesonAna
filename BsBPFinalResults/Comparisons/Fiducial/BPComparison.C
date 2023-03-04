@@ -155,10 +155,8 @@ void BPComparison(){
 
 	float BPXSecPPYSystUp[NBins];
 	float BPXSecPPYSystDown[NBins];
-
 	float BPXSecPPYSystUpScaled[NBins];
 	float BPXSecPPYSystDownScaled[NBins];
-
 
   // percent error
 	float BPTrackingSyst[NBins] = {[0 ... NBins - 1] = 5};
@@ -199,8 +197,10 @@ void BPComparison(){
                                         TMath::Power(BPPDFSyst[i], 2) + TMath::Power(BPTrackSelSyst[i], 2) +
                                         TMath::Power(BPPtShapeSyst[i], 2) + TMath::Power(BPTnPSystUp[i], 2)) / 100;
 	}
+
   // global uncertainty from branching ratio and luminosity
   // Fixed, copied from the paper draft
+
   std::vector<float> globUncert(NBins, 0.035);
 
 	for(int i = 0; i < NBins; i++){
@@ -217,27 +217,15 @@ void BPComparison(){
 
 	float BPXSecPbPbYSystUpRatio[NBins] = {0.3577,0.1404,0.1714,0.0775,0.0858,0.0715,0.1253};
 	float BPXSecPbPbYSystDownRatio[NBins] = {0.3210,0.1359,0.1705,0.0761,0.0843,0.0699,0.1220};
-
-
 	float BPXSecPbPbYSystUp[NBins];
 	float BPXSecPbPbYSystDown[NBins];
 
-
 	for(int i = 0; i < NBins; i++){
-
 		BPXSecPbPbYSystDown[i] = (BPXSecPbPbYSystDownRatio[i]) * BPXsecPbPbY[i];
 		BPXSecPbPbYSystUp[i] = (BPXSecPbPbYSystUpRatio[i]) * BPXsecPbPbY[i];
-
 	}
 
-
-
-
-
 	//Setup the Syst
-
-
-
 	TH2D * HisEmpty = new TH2D("HisEmpty","",100,5,60,100,100.0,2000000);
 	HisEmpty->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
 	HisEmpty->GetYaxis()->SetTitle("d#sigma/dp_{T} (pb c/GeV)");

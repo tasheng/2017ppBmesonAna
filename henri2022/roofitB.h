@@ -37,7 +37,7 @@ template<typename... Targs>
 void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotName,  Targs... options);
 
 // draw legend and suppress parameters
-const bool drawLegend = true;
+const bool drawLegend = false;
 using namespace RooFit;
 using namespace std;
 
@@ -840,11 +840,11 @@ void latex_table(std::string filename, int n_col, int n_lin, std::vector<std::st
 		file_check << labels[i-1] << " & ";
 
 		for(int c=1; c<n_col-1; c++){
-			file << std::setprecision(3)<< numbers[c-1][i-1]<< " \\% & ";
-			file_check << std::setprecision(3) << numbers[c-1][i-1]<< " \\% & ";
+			file << /*std::setprecision(3)*/ << numbers[c-1][i-1]<< " \\% & ";
+			file_check << /*std::setprecision(3)*/ << numbers[c-1][i-1]<< " \\% & ";
 									}
-		file << std::setprecision(3)<< numbers[n_col-2][i-1]<< " \\% \\\\" << std::endl;
-		file_check << std::setprecision(3)<< numbers[n_col-2][i-1]<< " \\% \\\\" << std::endl; 
+		file << /*std::setprecision(3)*/ << numbers[n_col-2][i-1]<< " \\% \\\\" << std::endl;
+		file_check << /*std::setprecision(3)*/ << numbers[n_col-2][i-1]<< " \\% \\\\" << std::endl; 
 	}
 
 	file << "\\bottomrule" << std::endl;
