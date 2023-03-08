@@ -143,7 +143,7 @@ void setTDRStyle() {
   // tdrStyle->SetHistMinimumZero(kTRUE);
 
   tdrStyle->SetHatchesLineWidth(5);
-  tdrStyle->SetHatchesSpacing(0.05);
+  // tdrStyle->SetHatchesSpacing(0.05);
 
   tdrStyle->cd();
 
