@@ -45,17 +45,11 @@ void BsRAA(){
 	gStyle->SetOptStat(0);
 
 	TCanvas * c = new TCanvas("c","c",600,600);
-
 	c->cd();
-
 	c->SetLeftMargin(0.16);
-
-
-
 
 	TString InfileBs = "../../Bs/EffAna/FinalFiles/BsPPCorrYieldPT.root";
 	//TString InfileBs = "BsPPCorrYieldPT.root";
-
 
 	TFile * FileBs = new TFile(InfileBs.Data());
 
@@ -64,77 +58,46 @@ void BsRAA(){
 	BsCross->SetMarkerSize(1);
 	BsCross->SetMarkerColor(1);
 	BsCross->SetLineColor(1);
-
-
-
 	BsCross->Draw("ep");
-
-
 
 	//B+ PbPb//
 	
 	const int NBins = 4;
-
 	float BsXsecPPY[NBins];
 	float BsXsecPPX[NBins] = {8.5,12.5,17.5,35};
-
 	float BsXSecPPYErrUp[NBins];
 	float BsXSecPPYErrDown[NBins];
-
-
 	float BsXSecPPYErrUpPercent[NBins];
 	float BsXSecPPYErrDownPercent[NBins];
 
-
 	for(int i = 0; i < NBins; i++){
-
 		BsXsecPPY[i] = BsCross->GetBinContent(i+1);
 		BsXSecPPYErrUp[i] = BsCross->GetBinError(i+1);
 		BsXSecPPYErrDown[i] = BsCross->GetBinError(i+1);
 		BsXSecPPYErrUpPercent[i] = BsXSecPPYErrUp[i]/BsXsecPPY[i];
 		BsXSecPPYErrDownPercent[i] = BsXSecPPYErrDown[i]/BsXsecPPY[i];
-		
 	}
-
-
 
 	float BsXSecPPXErrUp[NBins] = {1.5,2.5,2.5,15};
 	float BsXSecPPXErrDown[NBins] = {1.5,2.5,2.5,15};
-	
-
-
 	float BsXsecPbPbY[NBins] = {160432,75523.7,25354.5,2272.18};
 	float BsXsecPbPbX[NBins] = {8.75,12.6,17.4,27.3};
-
-
 	float BsXSecPbPbXErrUp[NBins] = {1.25,2.4,2.4,22.7};
 	float BsXSecPbPbXErrDown[NBins] = {1.25,2.6,2.6,7.3};
-
 	float BsXSecPbPbYErrUpPercent[NBins] = {0.513,0.224,0.216,0.216};
 	float BsXSecPbPbYErrDownPercent[NBins] = {0.483,0.256,0.207,0.163};
-
-
 	float BsXSecPbPbYErrUp[NBins];
 	float BsXSecPbPbYErrDown[NBins];
 
 	for(int i = 0; i < NBins; i++){
-
 		BsXSecPbPbYErrUp[i] = BsXSecPbPbYErrUpPercent[i] * BsXsecPbPbY[i];
 		BsXSecPbPbYErrDown[i] = BsXSecPbPbYErrDownPercent[i] * BsXsecPbPbY[i];
-
 	}
-
-
-
 
 	//Syst//
 
-
-
 	float BsXSecPPYSystUp[NBins];
 	float BsXSecPPYSystDown[NBins];
-
-
 
   TString errorFile = "../../2DMapSyst/OutFiles/BsError2D.root";
   TFile fError(errorFile);
@@ -212,13 +175,6 @@ void BsRAA(){
 
 	}
 
-
-
-
-
-
-
-
 	TH2D * HisEmpty = new TH2D("HisEmpty","",100,7,50,100,200.0,350000);
 	HisEmpty->GetXaxis()->SetTitle("B^{0}_{s} p_{T} (GeV/c)");
 	HisEmpty->GetYaxis()->SetTitle("Cross Section (Or Production Yield)");
@@ -228,7 +184,6 @@ void BsRAA(){
 	HisEmpty->Draw();
 
 	TGraphAsymmErrors *BsPPCrossGraph = new TGraphAsymmErrors(NBins, BsXsecPPX, BsXsecPPY,BsXSecPPXErrDown, BsXSecPPXErrUp,BsXSecPPYErrDown,BsXSecPPYErrUp);
-	
 	TGraphAsymmErrors *BPPbPbCrossGraph = new TGraphAsymmErrors(NBins, BsXsecPbPbX, BsXsecPbPbY,BsXSecPbPbXErrDown, BsXSecPbPbXErrUp,BsXSecPbPbYErrDown,BsXSecPbPbYErrUp);
 
 	BPPbPbCrossGraph->SetLineColor(kGreen+2);
@@ -236,30 +191,20 @@ void BsRAA(){
 	BPPbPbCrossGraph->SetMarkerStyle(20);
 	BPPbPbCrossGraph->SetMarkerSize(1);
 	BPPbPbCrossGraph->SetMarkerColor(kGreen+2);
-
 	BsPPCrossGraph->SetLineColor(kBlue+2);
 //	BsPPCrossGraph->SetFillColorAlpha(kBlue-9,0.5);
 	BsPPCrossGraph->SetMarkerStyle(21);
 	BsPPCrossGraph->SetMarkerSize(1);
 	BsPPCrossGraph->SetMarkerColor(kBlue+2);
-
-
 	TGraphAsymmErrors *BPPPCrossGraphSyst  = new TGraphAsymmErrors(NBins, BsXsecPPX, BsXsecPPY, BsXSecPPXErrDown, BsXSecPPXErrUp, BsXSecPPYSystDown,BsXSecPPYSystUp);
   	TGraphAsymmErrors *BPPbPbCrossGraphSyst    = new TGraphAsymmErrors(NBins, BsXsecPbPbX, BsXsecPbPbY, BsXSecPbPbXErrDown, BsXSecPbPbXErrUp, BsXSecPbPbYSystDown,BsXSecPbPbYSystUp);
-
-
 	BPPPCrossGraphSyst->SetFillColorAlpha(kBlue-9,0.5);
 	BPPPCrossGraphSyst->SetLineColor(kBlue-9);
 	BPPbPbCrossGraphSyst->SetFillColorAlpha(kGreen-9,0.5);
 	BPPbPbCrossGraphSyst->SetLineColor(kGreen-9);
 
-
-
-
 	BPPbPbCrossGraph->Draw("epsame");	
 	BsPPCrossGraph->Draw("epsame");	
-
-
 	BPPPCrossGraphSyst->Draw("5same");	
 	BPPbPbCrossGraphSyst->Draw("5same");	
 
@@ -275,17 +220,11 @@ void BsRAA(){
 
 
 	c->SaveAs("RAAPlots/Bs/BsPbPbPPCross.png");
-
-
 	c->SetLogy();
-
 	c->SaveAs("RAAPlots/Bs/BsPbPbPPCrossLog.png");
 
 
 	//2015 References
-
-
-
 	TH2D * HisEmpty2 = new TH2D("HisEmpty2","",100,5,60,100,100.0,3000000);
 	HisEmpty2->GetXaxis()->SetTitle("B^{0}_{s} p_{T} (GeV/c)");
 	HisEmpty2->GetYaxis()->SetTitle("Cross Section (Or Production Yield)");
@@ -293,24 +232,17 @@ void BsRAA(){
 	HisEmpty2->GetYaxis()->CenterTitle();
 	HisEmpty2->GetYaxis()->SetTitleOffset(1.8);
 	HisEmpty2->Draw();
-
 	BsPPCrossGraph->Draw("ep");
-
-
 	const int NBins2015PP = 3;
 	float BsXsecPPX2015[NBins2015PP] = {11,17.5,35.0};
 	float BsXSecPPXErrDown2015[NBins2015PP] = {4,2.5,15};
 	float BsXSecPPXErrUp2015[NBins2015PP] = {4,2.5,15};
-	
 	float BsXsecPPY2015[NBins2015PP] = {316000,34100,3830};
 	float BsXSecPPYErrDown2015[NBins2015PP] = {37000,6300,670};
 	float BsXSecPPYErrUp2015[NBins2015PP] = {37000,6300,670};
 
 
 	TGraphAsymmErrors *BsPPCrossGraph2015 = new TGraphAsymmErrors(NBins2015PP, BsXsecPPX2015, BsXsecPPY2015,BsXSecPPXErrDown2015, BsXSecPPXErrUp2015,BsXSecPPYErrDown2015,BsXSecPPYErrUp2015);
-
-
-
 	BsPPCrossGraph2015->SetLineColor(kOrange+2);
 	BsPPCrossGraph2015->SetMarkerStyle(25);
 	BsPPCrossGraph2015->SetMarkerSize(1);

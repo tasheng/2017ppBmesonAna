@@ -29,6 +29,8 @@ using std::endl;
 
 void CrossSectionAna(int DoTnP){
 
+  gSystem->mkdir("EffFinal" ,true);
+
 	// const int NBins = 7;
 	const int NBins = ptbinsvec.size() - 1;
 
@@ -62,21 +64,14 @@ void CrossSectionAna(int DoTnP){
 	Float_t ByNew[NCand];
 	Float_t BEff[NCand];
 	Float_t BEffErr[NCand];
-
-
 	Float_t BEffInv[NCand];
 	Float_t BEffInvErr[NCand];
 	Float_t BEffInv1D[NCand];
 	Float_t BEffInvErr1D[NCand];
-
 	Float_t BEffInvFit[NCand];
 	Float_t BEffInvErrFit[NCand];
-
 	Float_t BEffInvBDTWeighted[NCand];
 	Float_t BEffInvErrBDTWeighted[NCand];
-
-
-
 	Float_t BEffInvUp[NCand];
 	Float_t BEffInvErrUp[NCand];
 	Float_t BEffInvDown[NCand];
@@ -150,7 +145,6 @@ void CrossSectionAna(int DoTnP){
 
 
 	double ptBins[NBins + 1];
-
 	int Counts[NBins];
 	int CountsTight[NBins];
 	int CountsLoose[NBins];
@@ -162,24 +156,14 @@ void CrossSectionAna(int DoTnP){
 	double NewEffErr[NBins];
 	double NewEffTight[NBins];
 	double NewEffLoose[NBins];
-
 	double NewEffReal[NBins];
 	double NewEffRealErr[NBins];
-
-
-
 	double SumCountsUp[NBins];
 	double SumCountsErrUp[NBins];
-
 	double SumCountsDown[NBins];
 	double SumCountsErrDown[NBins];
-
-
 	double SumCountsEff[NBins];
 	double SumCountsEffErr[NBins];
-
-
-
 	double SumCountsSyst[NBins];
 	double SumCountsSystErr[NBins];
 	double NewEffSyst[NBins];
@@ -227,79 +211,52 @@ void CrossSectionAna(int DoTnP){
 
 	}
 
-
-
 	int EtaBin;
 	int PtBin;
-
-
-
-
 	double trgtnp1;
 	double trktnp1;
 	double muidtnp1;
-
 	double trgtnp1systup;
 	double trgtnp1systdown;
 	double trgtnp1statup;
 	double trgtnp1statdown;
-
-
 	double trktnp1systup;
 	double trktnp1systdown;
 	double trktnp1statup;
 	double trktnp1statdown;
-
 	double muidtnp1systup;
 	double muidtnp1systdown;
 	double muidtnp1statup;
 	double muidtnp1statdown;
-
-
 	double tnptotal1;
 	double tnptotal1up;
 	double tnptotal1down;
-
-
 	double tnptotal1systup;
 	double tnptotal1systdown;
 	double tnptotal1statup;
 	double tnptotal1statdown;
-
-
-
 	double trgtnp2;
 	double trktnp2;
 	double muidtnp2;
-
 	double trgtnp2systup;
 	double trgtnp2systdown;
 	double trgtnp2statup;
 	double trgtnp2statdown;
-
-
 	double trktnp2systup;
 	double trktnp2systdown;
 	double trktnp2statup;
 	double trktnp2statdown;
-
 	double muidtnp2systup;
 	double muidtnp2systdown;
 	double muidtnp2statup;
 	double muidtnp2statdown;
-
-
 	double tnptotal2;
 	double tnptotal2up;
 	double tnptotal2down;
-
 	double tnptotal2systup;
 	double tnptotal2systdown;
 	double tnptotal2statup;
 	double tnptotal2statdown;
-
-
-
 	double tnpabssystup;
 	double tnpabssystdown;
 
@@ -401,7 +358,6 @@ void CrossSectionAna(int DoTnP){
 
 
 	TH1D * hInvEff = new TH1D("hInvEff","",NBins,ptBins);
-
 
 	hInvEff->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
 	hInvEff->GetYaxis()->SetTitle("<1/(Eff * Acc)>");
@@ -589,7 +545,6 @@ void CrossSectionAna(int DoTnP){
 	c->SaveAs(Form("EffFinal/ReAnaEffReal_%dBins.png",NBins));
 	c->SaveAs(Form("EffFinal/pdf/ReAnaEffReal_%dBins.pdf",NBins));
 
-
 		//TnP Syst DONE//
 
   TString fYield = "../../henri2022/ROOTfiles/yields_Bp_binned_pt.root";
@@ -599,7 +554,6 @@ void CrossSectionAna(int DoTnP){
 
 	TFile * RawYieldTight = new TFile(TString(fYield(0, fYield.Length() - 5)) + "_trk.root");
 	TH1D * hPtTight = (TH1D *) RawYieldTight->Get("hPt");
-
 
 	double RawCount;
 	double RawCountErr;
@@ -626,23 +580,17 @@ void CrossSectionAna(int DoTnP){
 
 	}
 
-
-
 	TFile * foutCorr;
 	if(DoTnP == 0)	foutCorr = new TFile("FinalFiles/BPPPCorrYieldPTNoTnP.root","RECREATE");
 	if(DoTnP == 1)	foutCorr = new TFile("FinalFiles/BPPPCorrYieldPT.root","RECREATE");
-
-
 
 	foutCorr->cd();
 	TH1D * CorrDiffHis = new TH1D("hPtSigma","",NBins,ptBins);
 	CorrDiffHis->GetXaxis()->SetTitle("p_{T} (GeV/c)");
 	CorrDiffHis->GetYaxis()->SetTitle("d #sigma/d p_{T} (pb GeV^{-1} c)");
-
 	CorrDiffHis->GetYaxis()->SetTitleOffset(1.3);
 	CorrDiffHis->GetXaxis()->CenterTitle();
 	CorrDiffHis->GetYaxis()->CenterTitle();
-
 
 	TH1D * CorrDiffHisTight = (TH1D*) CorrDiffHis->Clone("hPtSigma_tight");
 
@@ -655,8 +603,7 @@ void CrossSectionAna(int DoTnP){
 		CorrDiffHis->SetBinError(i+1,CorrYieldDiffErr[i]);
 
 		RawCountTight = hPtTight->GetBinContent(i+1);
-		CorrDiffHisTight->
-      SetBinContent(i+1, (RawCountTight *  NewEffTight[i]) / (BRchain*2* lumi) );
+		CorrDiffHisTight->SetBinContent(i+1, (RawCountTight *  NewEffTight[i]) / (BRchain*2* lumi) );
 		CorrDiffHisTight->SetBinError(i+1, epsilon);
 	}
 
@@ -693,10 +640,8 @@ void CrossSectionAna(int DoTnP){
 		RawCountErr = hPt->GetBinError(i+1);
 		Eff1D[i] = Eff1DHis->GetBinContent(i+1);
 		Eff1DErr[i] = Eff1DHis->GetBinError(i+1);
-		
 
 		//cout << "Eff1D[i] = " << Eff1D[i] << "    NewEff[i] = " <<  NewEff[i]  << endl; 
-
 		cout << " Eff1D[i] =   " << 1.0/Eff1D[i] << "  NewEff[i] =  " << NewEff[i] << endl; 
 
 

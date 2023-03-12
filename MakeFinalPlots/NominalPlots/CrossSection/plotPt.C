@@ -498,7 +498,8 @@ void plotPt(bool bSavePlots       = 1,
 		pgBpl_syst_low->SetLineColor(kGreen-9);
 
 
-    TString bpFonDir = "../../../BsBPFinalResults/Comparisons/Fiducial/FONLLs/forTzuAn/";
+    //TString bpFonDir = "../../../BsBPFinalResults/Comparisons/Fiducial/FONLLs/forTzuAn/";
+        TString bpFonDir = "../../../BsBPFinalResults/Comparisons/Fiducial/FONLLs/";
     TString bsFonDir = "../../../BsBPFinalResults/Comparisons/Fiducial/FONLLs/";
 
     makePlot(0,
@@ -516,8 +517,8 @@ void plotPt(bool bSavePlots       = 1,
              bs_high, bs_high_yStatL, bs_high_yStatH, bs_high_ySystL, bs_high_ySystH,
              glbSystUpBs);
 
-    makePlot(1, bpFonDir + "fonllOutput_pp_Bplus_5p03TeV_y2p4.root",
-             bpFonDir + "fonllOutput_pp_Bplus_5p03TeV_yFid.root",
+    makePlot(1, bpFonDir + "BPFONLL.root",
+             bpFonDir + "BPFONLLFid.root",
              outputDir,
              pgBpl_low, pgBpl_syst_low, pgBpl_lowWhite,
              pgBpl_high, pgBpl_syst_high,

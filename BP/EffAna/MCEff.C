@@ -30,6 +30,14 @@ bool reweightPtOnY = true;
 
 
 void  MCEff(int DoTnP, int Rescale){
+	gSystem->mkdir( "Syst" , true);
+	gSystem->mkdir( "NewEff2DMaps" , true);
+	gSystem->mkdir( "1DEffPlots" , true);
+	gSystem->mkdir( "TnPHis" , true);
+	gSystem->mkdir( "MuonInfoPlots" , true);
+	gSystem->mkdir( "Eff2DMapTnP" , true);
+	gSystem->mkdir( "Plot1DEfficiency/Pt" , true);
+	gSystem->mkdir( "Plot1DEfficiency/Mult" , true);
 
 	gStyle->SetOptStat(0);
 
@@ -37,14 +45,7 @@ void  MCEff(int DoTnP, int Rescale){
 	int ptmax = 50;
 
 	TString infile;
-
-	if(Rescale == 1){
-		infile = "/data/szhaozho/ReComputeBDTRescaled/BPMC.root";
-	}
-
-//	infile = "/data/szhaozho/2017ppSamplesFinal/Unskimmed/NewOfficialMC/BPMC.root";
-
-	infile = "/data3/tasheng/Unskimmed_gen/BP_MC_merged.root";
+	infile = "/data3/tasheng/presel/output/BP_MC_BDTs_nom_tnp.root";
 
 	TFile * fin = new TFile(infile.Data());
 
@@ -96,10 +97,6 @@ void  MCEff(int DoTnP, int Rescale){
 
 
 	TTree * root = (TTree * ) fin->Get("Bfinder/root");
-
-
-
-
 	TTree * TnPInfo = (TTree *) fin->Get("TnPInfo");
 
 	Int_t nMult;
@@ -117,19 +114,11 @@ void  MCEff(int DoTnP, int Rescale){
 	Int_t pclusterCompatibilityFilter;
 	Int_t pprimaryVertexFilter;
 	Int_t phfCoincFilter2Th4;
-
-
-
-
-
 	Int_t   Bsize;
 	Float_t Btrk1Pt[NCand];
 	Float_t Btrk2Pt[NCand];
-
 	Float_t Btrk1PtErr[NCand];
 	Float_t Btrk2PtErr[NCand];
-
-
 	Float_t Bchi2cl[NCand];
 	Float_t BsvpvDistance[NCand];
 	Float_t BsvpvDisErr[NCand];
@@ -137,13 +126,9 @@ void  MCEff(int DoTnP, int Rescale){
 	Float_t Btrk1Eta[NCand];
 	Float_t Btrk2Eta[NCand];
 	Float_t By[NCand];
-
 	Bool_t Bmu1isTriggered[NCand];
 	Bool_t Bmu2isTriggered[NCand];
-
 	Float_t Bmass[NCand];
-
-
 	Float_t Bmumumass[NCand];
 	Float_t Bmu1eta[NCand];
 	Float_t Bmu1pt[NCand];
@@ -156,47 +141,30 @@ void  MCEff(int DoTnP, int Rescale){
 	Bool_t Bmu1TMOneStationTight[NCand];
 	Int_t Bmu1InPixelLayer[NCand];
 	Int_t Bmu1InStripLayer[NCand];
-
 	Bool_t Bmu2TMOneStationTight[NCand];	
 	Int_t Bmu2InPixelLayer[NCand];
 	Int_t Bmu2InStripLayer[NCand];
-
-
 	Bool_t Bmu1isGlobalMuon[NCand];
 	Bool_t Bmu2isGlobalMuon[NCand];
-
-
 	Bool_t Bmu1isTrackerMuon[NCand];
 	Bool_t Bmu2isTrackerMuon[NCand];
-
 	Float_t Bmu1dxyPV[NCand];
 	Float_t Bmu2dxyPV[NCand];
-
 	Float_t Bmu1dzPV[NCand];
 	Float_t Bmu2dzPV[NCand];
-
 	Bool_t Btrk1highPurity[NCand];
 	Bool_t Btrk2highPurity[NCand];
-
 	Float_t Btktkmass[NCand];
-
 	Float_t Btrk1PixelHit[NCand];
 	Float_t Btrk2PixelHit[NCand];
-
 	Float_t Btrk1StripHit[NCand];
 	Float_t Btrk2StripHit[NCand];
-
 	Float_t Btrk1Chi2ndf[NCand];
 	Float_t Btrk2Chi2ndf[NCand];
-
-
 	Float_t Btrk1nStripLayer[NCand];
 	Float_t Btrk2nStripLayer[NCand];
-
 	Float_t Btrk1nPixelLayer[NCand];
 	Float_t Btrk2nPixelLayer[NCand];
-
-
 	Float_t Bgen[NCand];
 	Float_t Bgenpt[NCand];
 	Float_t Bgeny[NCand];
@@ -206,10 +174,7 @@ void  MCEff(int DoTnP, int Rescale){
 
 	Float_t pthat;
 	Float_t weight;
-
 	Float_t Bdtheta[NCand];
-
-
 //	Double_t BDT_pt_3_5[NCand];
 	Double_t BDT_pt_5_7[NCand];
 	Double_t BDT_pt_7_10[NCand];
@@ -241,7 +206,6 @@ void  MCEff(int DoTnP, int Rescale){
 	ntHi->SetBranchAddress("pthat",&pthat);
 	ntHi->SetBranchAddress("weight",&weight);
 
-
 	int HBHENoiseFilterResult;
 	int pPAprimaryVertexFilter;
 	int pBeamScrapingFilter;
@@ -249,8 +213,6 @@ void  MCEff(int DoTnP, int Rescale){
 	ntSkim->SetBranchAddress("pBeamScrapingFilter",&pBeamScrapingFilter);
 	ntSkim->SetBranchAddress("pPAprimaryVertexFilter",&pPAprimaryVertexFilter);
 	ntSkim->SetBranchAddress("HBHENoiseFilterResult",&HBHENoiseFilterResult);
-
-
 	ntKp->SetBranchAddress("Bsize",&Bsize);
 	ntKp->SetBranchAddress("PVz",&PVz);
 	ntKp->SetBranchAddress("Btrk1Pt",Btrk1Pt);
@@ -266,13 +228,8 @@ void  MCEff(int DoTnP, int Rescale){
 	//ntKp->SetBranchAddress("Btrk2Eta",Btrk2Eta);
 	ntKp->SetBranchAddress("Bmass",Bmass);
 	ntKp->SetBranchAddress("Bdtheta",Bdtheta);
-
-
-
 	ntKp->SetBranchAddress("Bmu1isTriggered",Bmu1isTriggered);
 	ntKp->SetBranchAddress("Bmu2isTriggered",Bmu2isTriggered);
-
-
 	ntKp->SetBranchAddress("Bmumumass",Bmumumass);
 	ntKp->SetBranchAddress("Bmu1eta",Bmu1eta);
 	ntKp->SetBranchAddress("Bmu2eta",Bmu2eta);
@@ -285,15 +242,11 @@ void  MCEff(int DoTnP, int Rescale){
 	ntKp->SetBranchAddress("Bmu1TMOneStationTight",Bmu1TMOneStationTight);
 	ntKp->SetBranchAddress("Bmu1InPixelLayer",Bmu1InPixelLayer);
 	ntKp->SetBranchAddress("Bmu1InStripLayer",Bmu1InStripLayer);
-
 	ntKp->SetBranchAddress("Bmu2TMOneStationTight",Bmu2TMOneStationTight);
 	ntKp->SetBranchAddress("Bmu2InPixelLayer",Bmu2InPixelLayer);
 	ntKp->SetBranchAddress("Bmu2InStripLayer",Bmu2InStripLayer);
-
-
 	ntKp->SetBranchAddress("Bmu1isGlobalMuon",Bmu1isGlobalMuon);
 	ntKp->SetBranchAddress("Bmu2isGlobalMuon",Bmu2isGlobalMuon);
-
 	ntKp->SetBranchAddress("Bmu1isTrackerMuon",Bmu1isTrackerMuon);
 	ntKp->SetBranchAddress("Bmu2isTrackerMuon",Bmu2isTrackerMuon);
 
@@ -309,34 +262,22 @@ void  MCEff(int DoTnP, int Rescale){
 	ntKp->SetBranchAddress("Bmu2dxyPV",Bmu2dxyPV);
 	ntKp->SetBranchAddress("Bmu1dzPV",Bmu1dzPV);
 	ntKp->SetBranchAddress("Bmu2dzPV",Bmu2dzPV);
-
-
 	ntKp->SetBranchAddress("Btrk1highPurity",Btrk1highPurity);
 	ntKp->SetBranchAddress("Btrk2highPurity",Btrk2highPurity);
-
 	ntKp->SetBranchAddress("Btktkmass",Btktkmass);
-
-
 	ntKp->SetBranchAddress("Btrk1PixelHit",Btrk1PixelHit);
 	ntKp->SetBranchAddress("Btrk2PixelHit",Btrk2PixelHit);
 	ntKp->SetBranchAddress("Btrk1StripHit",Btrk1StripHit);
 	ntKp->SetBranchAddress("Btrk2StripHit",Btrk2StripHit);
-
-
-
 	ntKp->SetBranchAddress("Btrk1Chi2ndf",Btrk1Chi2ndf);
 	ntKp->SetBranchAddress("Btrk2Chi2ndf",Btrk2Chi2ndf);
-
 	ntKp->SetBranchAddress("Bgen",Bgen);
 	ntKp->SetBranchAddress("Bgenpt",Bgenpt);
 	ntKp->SetBranchAddress("Bgeny",Bgeny);
-
-
 	ntKp->SetBranchAddress("Btrk1nStripLayer",Btrk1nStripLayer);	
 	ntKp->SetBranchAddress("Btrk2nStripLayer",Btrk2nStripLayer);
 	ntKp->SetBranchAddress("Btrk1nPixelLayer",Btrk1nPixelLayer);
 	ntKp->SetBranchAddress("Btrk2nPixelLayer",Btrk2nPixelLayer);
-
 
 	if(Rescale == 0){
 
@@ -372,12 +313,8 @@ void  MCEff(int DoTnP, int Rescale){
 
 	ntKp->SetBranchAddress("Bmu1SoftMuID",Bmu1SoftMuID);
 	ntKp->SetBranchAddress("Bmu2SoftMuID",Bmu2SoftMuID);
-
-
 	ntKp->SetBranchAddress("Bmu1isAcc",Bmu1isAcc);
 	ntKp->SetBranchAddress("Bmu2isAcc",Bmu2isAcc);
-
-
 
 	Int_t Gsize;
 	Float_t Gy[NCand];
@@ -385,22 +322,15 @@ void  MCEff(int DoTnP, int Rescale){
 	Int_t GisSignal[NCand];
 	Int_t GcollisionId[NCand];
 	Int_t GpdgId[NCand];
-
 	Float_t Gmu1pt[NCand];
 	Float_t Gmu1eta[NCand];
 	Float_t Gmu1phi[NCand];
-
 	Float_t Gmu2pt[NCand];
 	Float_t Gmu2eta[NCand];
 	Float_t Gmu2phi[NCand];
-
 	Float_t Gtk1pt[NCand];
 	Float_t Gtk1eta[NCand];
 	Float_t Gtk1phi[NCand];
-
-
-
-
 
 	ntGen->SetBranchAddress("Gsize",&Gsize);
 	ntGen->SetBranchAddress("Gy",Gy);
@@ -414,15 +344,12 @@ void  MCEff(int DoTnP, int Rescale){
 	ntGen->SetBranchAddress("Gmu2pt",Gmu2pt);
 	ntGen->SetBranchAddress("Gmu2eta",Gmu2eta);
 	ntGen->SetBranchAddress("Gmu2phi",Gmu2phi);
-
-
 	ntGen->SetBranchAddress("Gtk1pt",Gtk1pt);
 	ntGen->SetBranchAddress("Gtk1eta",Gtk1eta);
 	ntGen->SetBranchAddress("Gtk1phi",Gtk1phi);
 
 	Int_t HLT_HIL1DoubleMu0_v1;
 	ntHlt->SetBranchAddress("HLT_HIL1DoubleMu0_v1",&HLT_HIL1DoubleMu0_v1);
-
 
 	double CentWeight;
 
@@ -622,17 +549,12 @@ void  MCEff(int DoTnP, int Rescale){
 	TH2D * TnPWeightHisSystDown = new TH2D("TnPWeightHisSystDown","",BptBin,BptBinning,yBinN,yBinning);
 	TH2D * BDTWeightHisSyst = new TH2D("BDTWeightHisSyst","",BptBin,BptBinning,yBinN,yBinning);
 	TH2D * BptWeightHisSyst = new TH2D("BptWeightHisSyst","",BptBin,BptBinning,yBinN,yBinning);
-
 	TH2D * TrkLooseHis = (TH2D*) TnPWeightHis->Clone("TrkLooseHis");
 	TH2D * TrkTightHis = (TH2D*) TnPWeightHis->Clone("TrkTightHis");
-
 	TH2D * TnPWeightHisMuidUp = new TH2D("TnPWeightHisMuidUp","",BptBin,BptBinning,yBinN,yBinning);
 	TH2D * TnPWeightHisMuidDown = new TH2D("TnPWeightHisMuidDown","",BptBin,BptBinning,yBinN,yBinning);
-
 	TH2D * TnPWeightHisTrkUp = new TH2D("TnPWeightHisTrkUp","",BptBin,BptBinning,yBinN,yBinning);
 	TH2D * TnPWeightHisTrkDown = new TH2D("TnPWeightHisTrkDown","",BptBin,BptBinning,yBinN,yBinning);
-
-
 	TH2D * TnPWeightHisTrgUp = new TH2D("TnPWeightHisTrgUp","",BptBin,BptBinning,yBinN,yBinning);
 	TH2D * TnPWeightHisTrgDown = new TH2D("TnPWeightHisTrgDown","",BptBin,BptBinning,yBinN,yBinning);
 
@@ -808,15 +730,11 @@ void  MCEff(int DoTnP, int Rescale){
   if (reweightPtOnY) {
     for (auto iy = 0; iy < yBinN; ++iy) {
       BptWtF[iy] = (TF1*) fBptWeight.Get(TString::Format("BptWeight_y%d", iy));
-    }
+    	}
   }
 
 	int BDTWeightBin;
 	float BDTWeight;
-
-
-
-
 
 	TH1D * Eff1DRECOMultHis = new TH1D("Eff1DRECOMultHis","",NMultiBin,MultiBin1D);
 

@@ -1,15 +1,13 @@
 DOANALYSISPbPb_ROOFIT_BINNED_PT_BS=1
-DOANALYSISPbPb_ROOFIT_FULL_BS=0
+DOANALYSISPbPb_ROOFIT_FULL_BS=2
 DOANALYSISPbPb_ROOFIT_BINNED_PT_BS_TRK=0
 DOANALYSISPbPb_ROOFIT_BINNED_MULT_BS=0
 DOANALYSISPbPb_ROOFIT_BINNED_Y_BS=0
 
-# INPUTDATAPbPbCANDWISE_BS="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BsData.root"
-# INPUTMCPbPbCANDWISE_BS="/afs/cern.ch/user/t/tsheng/public/forHenrique/trk5/BsMC.root"
-# INPUTMCPbPbCANDWISE_BS="../../CutSkim/BsMC.root"
-# INPUTDATAPbPbCANDWISE_BS="../../CutSkim/BsData.root"
-INPUTMCPbPbCANDWISE_BS="~/dat/presel/BsMC_nom.root"
-INPUTDATAPbPbCANDWISE_BS="~/dat/presel/BsData_nom.root"
+INPUTMCPbPbCANDWISE_BS="/data3/tasheng/presel/BsMC_nom.root"
+INPUTDATAPbPbCANDWISE_BS="/data3/tasheng/presel/BsData_nom.root"
+#INPUTMCPbPbCANDWISE_BS="/lstore/cms/henrique/dados/BsMC_nom.root"
+#INPUTDATAPbPbCANDWISE_BS="/lstore/cms/henrique/dados/BsData_nom.root"
 
 LABEL=""
 
@@ -26,6 +24,7 @@ BASECUTPbPb="(hiBin<181)&&Btrk1Pt>1.0&&Btrk2Pt>1.0&&Bchi2cl>0.05&&BsvpvDistance/
 CUTPbPb=${BASECUTPbPb}"&&((Bpt>5&&Bpt<10&&BDT_pt_5_10>0.17)||(Bpt>10&&Bpt<15&&BDT_pt_10_15>0.17)||(Bpt>15&&Bpt<20&&BDT_pt_15_20>0.26)||(Bpt>20&&Bpt<50&&BDT_pt_20_50>0.25))"
 CUTPbPb=${CUTPbPb}"&&abs(PVz)<15&&pclusterCompatibilityFilter&&pprimaryVertexFilter"
 CUTPbPb="1"
+cut_trk_tight="(track>1)"
 
 TRGPbPb="(Bpt>0)"
 TRGPbPbMC="(Bpt>0)"
@@ -33,11 +32,7 @@ TRGPbPbMC="(Bpt>0)"
 echo "TRGPbPb="$TRGPbPb
 
 mkdir -p ROOTfiles/
-OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_FULL="ROOTfiles/yields_Bs_full_${CENTPbPbMIN}_${CENTPbPbMAX}.root"
-OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_DOUBLE_1ST="ROOTfiles/yields_Bs_binned_cent_1st_pt.root"
-OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_DOUBLE_2ND="ROOTfiles/yields_Bs_binned_cent_2nd_pt.root"
-OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_DOUBLE_1ST_Y="ROOTfiles/yields_Bs_binned_cent_1st_y.root"
-OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_DOUBLE_2ND_Y="ROOTfiles/yields_Bs_binned_cent_2nd_y.root"
+OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_FULL="ROOTfiles/yields_Bs_full.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_Y="ROOTfiles/yields_Bs_binned_y.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_PT="ROOTfiles/yields_Bs_binned_pt.root"
 OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_PT_trk="ROOTfiles/yields_Bs_binned_pt_trk.root"
@@ -75,16 +70,10 @@ root -b  -q 'roofitB.C+('0','\"ntphi\"','0','1','0','\"$INPUTDATAPbPbCANDWISE_BS
 rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
 fi
 
-if [ $DOANALYSISPbPb_ROOFIT_BINNED_PT_BS_TRK -eq 1  ]; then
-    cut_trk_tight="(track>1)"
-    root -b  -q 'roofitB.C('0','\"ntphi\"','0','1','0', \
-'\"$INPUTDATAPbPbCANDWISE_BS\"', \
-'\"$INPUTMCPbPbCANDWISE_BS\"','\"Bpt\"', \
-'\"$TRGPbPb\"','\"$cut_trk_tight\"','\"$SELGENPbPb\"', \
-'$ISMCPbPb','1','$ISDOWEIGHTPbPb', \
-'\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_PT_trk\"', \
-'\"results/Bs/trk_tight_roofit\"','\"$NPROOFIT_PbPb\"', \
-'0')' |& tee binned_pt_trk.log
+if [ $DOANALYSISPbPb_ROOFIT_BINNED_PT_BS_TRK -eq 1 ]; then
+root -b  -q 'roofitB.C('0','\"ntphi\"','0','1','0','\"$INPUTDATAPbPbCANDWISE_BS\"','\"$INPUTMCPbPbCANDWISE_BS\"','\"Bpt\"','\"$TRGPbPb\"','\"$cut_trk_tight\"','\"$SELGENPbPb\"','$ISMCPbPb','1','$ISDOWEIGHTPbPb','\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_PT_trk\"','\"results/Bs/trk_tight_roofit\"','\"$NPROOFIT_PbPb\"','0')'
+
+rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
 fi
 
 if [ $DOANALYSISPbPb_ROOFIT_BINNED_Y_BS  -eq 1  ]; then

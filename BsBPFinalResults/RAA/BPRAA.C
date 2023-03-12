@@ -40,8 +40,8 @@ using std::endl;
 
 void BPRAA(){
 
-
-
+	gSystem->mkdir("RAAPlots/BP", true);
+	gSystem->mkdir("RAAPlots/Bs", true);
 	
 	gStyle->SetOptStat(0);
 
@@ -172,13 +172,11 @@ void BPRAA(){
 		
 	}
 
-
 	//PbPb
 
 
 	float BPXSecPbPbYSystUp[NBins];
 	float BPXSecPbPbYSystDown[NBins];
-
 
 	for(int i = 0; i < NBins; i++){
 
@@ -186,17 +184,6 @@ void BPRAA(){
 		BPXSecPbPbYSystUp[i] = (BPXSecPbPbYSystUpRatio[i]) * BPXsecPbPbY[i];
 
 	}
-
-
-
-	
-
-
-
-
-
-
-
 
 	TH2D * HisEmpty = new TH2D("HisEmpty","",100,5,60,100,100.0,2000000);
 	HisEmpty->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
@@ -207,7 +194,6 @@ void BPRAA(){
 	HisEmpty->Draw();
 
 	TGraphAsymmErrors *BPPPCrossGraph = new TGraphAsymmErrors(NBins, BPXsecPPX, BPXsecPPY,BPXSecPPXErrDown, BPXSecPPXErrUp,BPXSecPPYErrDown,BPXSecPPYErrUp);
-	
 	TGraphAsymmErrors *BPPbPbCrossGraph = new TGraphAsymmErrors(NBins, BPXsecPbPbX, BPXsecPbPbY,BPXSecPbPbXErrDown, BPXSecPbPbXErrUp,BPXSecPbPbYErrDown,BPXSecPbPbYErrUp);
 
 	BPPbPbCrossGraph->SetLineColor(kGreen+2);
@@ -222,21 +208,15 @@ void BPRAA(){
 	BPPPCrossGraph->SetMarkerSize(1);
 	BPPPCrossGraph->SetMarkerColor(kBlue+2);
 
-
 	TGraphAsymmErrors *BPPPCrossGraphSyst  = new TGraphAsymmErrors(NBins, BPXsecPPX, BPXsecPPY, BPXSecPPXErrDown, BPXSecPPXErrUp, BPXSecPPYSystDown,BPXSecPPYSystUp);
   	TGraphAsymmErrors *BPPbPbCrossGraphSyst    = new TGraphAsymmErrors(NBins, BPXsecPbPbX, BPXsecPbPbY, BPXSecPbPbXErrDown, BPXSecPbPbXErrUp, BPXSecPbPbYSystDown,BPXSecPbPbYSystUp);
-
 
 	BPPPCrossGraphSyst->SetFillColorAlpha(kBlue-9,0.5);
 	BPPPCrossGraphSyst->SetLineColor(kBlue-9);
 	BPPbPbCrossGraphSyst->SetFillColorAlpha(kGreen-9,0.5);
 	BPPbPbCrossGraphSyst->SetLineColor(kGreen-9);
-
-
-
 	BPPPCrossGraph->Draw("epsame");	
 	BPPbPbCrossGraph->Draw("epsame");	
-
 	BPPPCrossGraphSyst->Draw("5same");	
 	BPPbPbCrossGraphSyst->Draw("5same");	
 	
@@ -250,22 +230,11 @@ void BPRAA(){
 	leg->AddEntry(BPPbPbCrossGraph,"2018 PbPb 5.02 TeV","PL");
 	leg->AddEntry(BPPPCrossGraph,"2017 pp 5.02 TeV","PL");
 	leg->Draw("same");
-
-
 	c->SaveAs("RAAPlots/BP/BPPbPbPPCross.png");
-
 	c->SetLogy();
-
 	c->SaveAs("RAAPlots/BP/BPPbPbPPCrossLog.png");
 
-
-
-
-
-
 	//Fid and Non-Fid
-
-	
 	//Fid Non Fid
 
 	TH2D * HisEmpty6 = new TH2D("HisEmpty6","",100,5,60,100,100.0,8000000);
@@ -290,13 +259,7 @@ void BPRAA(){
 	BPCross2->SetMarkerColor(1);
 	BPCross2->SetLineColor(1);
 
-
-	
-
-
 	float BPXsecPPY2[NBins];
-
-
 	float BPXSecPPYErrUpRatio2[NBins];
 	float BPXSecPPYErrDownRatio2[NBins];
 	float BPXSecPPYErrUp2[NBins];

@@ -41,6 +41,7 @@ using std::endl;
 
 void BPComparison(){
 
+	gSystem->mkdir("Plots/BP", true);
 	gStyle->SetOptStat(0);
 
 	TCanvas * c = new TCanvas("c","c",600,600);
@@ -57,13 +58,6 @@ void BPComparison(){
 	// BPCross->SetMarkerSize(1);
 	// BPCross->SetMarkerColor(1);
 	// BPCross->SetLineColor(1);
-
-
-
-
-
-
-
 	//B+ PbPb//
 	
 	const int NBins = ptbinsvec.size() - 1;
@@ -78,8 +72,6 @@ void BPComparison(){
 	// float BPXSecPPYErrDown[NBins];
 	// float BPXSecPPYErrUpRatio[NBins];
 	// float BPXSecPPYErrDownRatio[NBins];
-
-
 	// for(int i = 0; i < NBins; i++){
 	// 	BPXsecPPY[i] = BPCross->GetBinContent(i+1);
 	// 	BPXSecPPYErrUp[i] = BPCross->GetBinError(i+1);
@@ -170,10 +162,8 @@ void BPComparison(){
 
 	float BPXSecPPYSystUp[NBins];
 	float BPXSecPPYSystDown[NBins];
-
 	float BPXSecPPYSystUpScaled[NBins];
 	float BPXSecPPYSystDownScaled[NBins];
-
 
   // percent error
 	float BPTrackingSyst[NBins] = {[0 ... NBins - 1] = 5};
@@ -214,8 +204,10 @@ void BPComparison(){
                                         TMath::Power(BPPDFSyst[i], 2) + TMath::Power(BPTrackSelSyst[i], 2) +
                                         TMath::Power(BPPtShapeSyst[i], 2) + TMath::Power(BPTnPSystUp[i], 2)) / 100;
 	}
+
   // global uncertainty from branching ratio and luminosity
   // Fixed, copied from the paper draft
+
   std::vector<float> globUncert(NBins, 0.035);
 
 	for(int i = 0; i < NBins; i++){
@@ -235,22 +227,12 @@ void BPComparison(){
 	float BPXSecPbPbYSystUp[NBins];
 	float BPXSecPbPbYSystDown[NBins];
 
-
 	for(int i = 0; i < NBins; i++){
-
 		BPXSecPbPbYSystDown[i] = (BPXSecPbPbYSystDownRatio[i]) * BPXsecPbPbY[i];
 		BPXSecPbPbYSystUp[i] = (BPXSecPbPbYSystUpRatio[i]) * BPXsecPbPbY[i];
-
 	}
 
-
-
-
-
 	//Setup the Syst
-
-
-
 	TH2D * HisEmpty = new TH2D("HisEmpty","",100,5,60,100,100.0,2000000);
 	HisEmpty->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
 	HisEmpty->GetYaxis()->SetTitle("d#sigma/dp_{T} (pb c/GeV)");
@@ -442,57 +424,36 @@ void BPComparison(){
 	float BPXsecPPX2015[NBins2015] = {8.5,12.5,17.5,25,40};
 	float BPXSecPPXErrDown2015[NBins2015] = {1.5,2.5,2.5,5,10};
 	float BPXSecPPXErrUp2015[NBins2015] = {1.5,2.5,2.5,5,10};
-	
 	float BPXsecPPY2015[NBins2015] = {2610000,744000,197000,46500,5300};
 	float BPXSecPPYErrDown2015[NBins2015] = {170000,29000,9000,2400,500};
 	float BPXSecPPYErrUp2015[NBins2015] = {170000,29000,9000,2400,500};
-
 	float BPXSecPPYSystDown2015[NBins2015] = {230000,59000,15000,3500,400};
 	float BPXSecPPYSystUp2015[NBins2015] = {230000,59000,15000,3500,400};
-
-
 
 	TGraphAsymmErrors *BPPPCrossGraph2015 = new TGraphAsymmErrors(NBins2015, BPXsecPPX2015, BPXsecPPY2015,BPXSecPPXErrDown2015, BPXSecPPXErrUp2015,BPXSecPPYErrDown2015,BPXSecPPYErrUp2015);
 	TGraphAsymmErrors *BPPPCrossGraph2015Syst = new TGraphAsymmErrors(NBins2015, BPXsecPPX2015, BPXsecPPY2015,BPXSecPPXErrDown2015, BPXSecPPXErrUp2015,BPXSecPPYSystDown2015,BPXSecPPYSystUp2015);
 
-
-
-
 	BPPPCrossGraph2015Syst->SetFillColorAlpha(kGreen-9+2,0.5);
 	BPPPCrossGraph2015Syst->SetLineColor(kGreen-9+2);
-
-
-
-
 	BPPPCrossGraph2015->SetLineColor(kGreen+2);
 	BPPPCrossGraph2015->SetMarkerStyle(33);
 	BPPPCrossGraph2015->SetMarkerSize(1);
 	BPPPCrossGraph2015->SetMarkerColor(kGreen+2);
 	BPPPCrossGraph2015->Draw("epSAME");
-
-
-
-
-
-
-
-
 	BPPPCrossGraph2DLow->SetLineColor(kOrange+1);
 	BPPPCrossGraph2DLow->SetMarkerStyle(25);
 	BPPPCrossGraph2DLow->SetMarkerSize(1);
 	BPPPCrossGraph2DLow->SetMarkerColor(kOrange+1);
-
 	BPPPCrossGraph2DHigh->SetLineColor(kOrange+1);
 	BPPPCrossGraph2DHigh->SetMarkerStyle(34);
 	BPPPCrossGraph2DHigh->SetMarkerSize(1);
 	BPPPCrossGraph2DHigh->SetMarkerColor(kOrange+1);
 
-
-
-	TFile * finFONLL = new TFile("FONLLs/forTzuAn/fonllOutput_pp_Bplus_5p03TeV_y2p4.root");
+    //	TFile * finFONLL = new TFile("FONLLs/forTzuAn/fonllOutput_pp_Bplus_5p03TeV_y2p4.root");
+	TFile * finFONLL = new TFile("FONLLs/BPFONLL.root");
 	finFONLL->cd();
 	TGraphAsymmErrors *BPFONLL = (TGraphAsymmErrors*) finFONLL->Get("gaeSigmaBplus");
-	// BPFONLL->SetLineColor(kRed+2);
+	BPFONLL->SetLineColor(kRed+2);
 	BPFONLL->SetMarkerStyle(20);
 	BPFONLL->SetMarkerSize(1);
 	BPFONLL->SetMarkerColor(kRed+2);

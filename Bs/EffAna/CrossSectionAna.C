@@ -18,8 +18,6 @@
 #include "../../parameter.h"
 //#include "tnp_weight_lowptPbPb.h"
 
-
-
 //#include "his.h"
 using namespace std;
 
@@ -27,6 +25,8 @@ using std::cout;
 using std::endl;
 
 void CrossSectionAna(int DoTnP){
+
+	gSystem->mkdir("EffFinal" ,true);
 
 	const int NBins = 4;
 	//const int NBins = 6;
@@ -49,9 +49,7 @@ void CrossSectionAna(int DoTnP){
 	fin->cd();
 
 	TTree * EffInfoTree = (TTree * ) fin->Get("ntphi");
-
 	int NEvents = EffInfoTree->GetEntries();
-
 	const int NCand = 15;
 
 	Int_t BsizeNew;
@@ -63,21 +61,14 @@ void CrossSectionAna(int DoTnP){
 	Float_t ByNew[NCand];
 	Float_t BEff[NCand];
 	Float_t BEffErr[NCand];
-
-
 	Float_t BEffInv[NCand];
 	Float_t BEffInvErr[NCand];
 	Float_t BEffInv1D[NCand];
 	Float_t BEffInvErr1D[NCand];
-
 	Float_t BEffInvFit[NCand];
 	Float_t BEffInvErrFit[NCand];
-
 	Float_t BEffInvBDTWeighted[NCand];
 	Float_t BEffInvErrBDTWeighted[NCand];
-
-
-
 	Float_t BEffInvUp[NCand];
 	Float_t BEffInvErrUp[NCand];
 	Float_t BEffInvDown[NCand];
@@ -159,24 +150,14 @@ void CrossSectionAna(int DoTnP){
 	double NewEffErr[NBins];
 	double NewEffTight[NBins];
 	double NewEffLoose[NBins];
-
 	double NewEffReal[NBins];
 	double NewEffRealErr[NBins];
-
-
-
 	double SumCountsUp[NBins];
 	double SumCountsErrUp[NBins];
-
 	double SumCountsDown[NBins];
 	double SumCountsErrDown[NBins];
-
-
 	double SumCountsEff[NBins];
 	double SumCountsEffErr[NBins];
-
-
-
 	double SumCountsSyst[NBins];
 	double SumCountsSystErr[NBins];
 	double NewEffSyst[NBins];
@@ -234,7 +215,6 @@ void CrossSectionAna(int DoTnP){
 
 	if(NBins == 6){
 
-
 		ptbinsvec.push_back(5);
 		ptbinsvec.push_back(7);		
 		ptbinsvec.push_back(10);
@@ -242,15 +222,11 @@ void CrossSectionAna(int DoTnP){
 		ptbinsvec.push_back(20);
 		ptbinsvec.push_back(50);
 		ptbinsvec.push_back(100);
-
-
-
 	}
 
 
 
 	if(NBins == 7){
-
 
 		//ptbinsvec.push_back(3);
 		ptbinsvec.push_back(5);
@@ -259,7 +235,6 @@ void CrossSectionAna(int DoTnP){
 		ptbinsvec.push_back(15);
 		ptbinsvec.push_back(20);
 		ptbinsvec.push_back(30);		
-
 		ptbinsvec.push_back(50);
 	//	ptbinsvec.push_back(100);
 		ptbinsvec.push_back(60);
@@ -282,9 +257,6 @@ void CrossSectionAna(int DoTnP){
 		ptbinsvec.push_back(30);
 		ptbinsvec.push_back(50);
 		ptbinsvec.push_back(100);
-
-
-
 	}
 
 	if(NBins == 10){
@@ -301,13 +273,7 @@ void CrossSectionAna(int DoTnP){
 		ptbinsvec.push_back(50);
 		ptbinsvec.push_back(100);
 
-
-
 	}
-
-
-
-
 
 	for(int i = 0; i < NBins + 1; i++){
 		ptBins[i] =  ptbinsvec[i];
@@ -337,78 +303,52 @@ void CrossSectionAna(int DoTnP){
 	}
 
 
-
 	int EtaBin;
 	int PtBin;
-
-
-
-
 	double trgtnp1;
 	double trktnp1;
 	double muidtnp1;
-
 	double trgtnp1systup;
 	double trgtnp1systdown;
 	double trgtnp1statup;
 	double trgtnp1statdown;
-
-
 	double trktnp1systup;
 	double trktnp1systdown;
 	double trktnp1statup;
 	double trktnp1statdown;
-
 	double muidtnp1systup;
 	double muidtnp1systdown;
 	double muidtnp1statup;
 	double muidtnp1statdown;
-
-
 	double tnptotal1;
 	double tnptotal1up;
 	double tnptotal1down;
-
-
 	double tnptotal1systup;
 	double tnptotal1systdown;
 	double tnptotal1statup;
 	double tnptotal1statdown;
-
-
-
 	double trgtnp2;
 	double trktnp2;
 	double muidtnp2;
-
 	double trgtnp2systup;
 	double trgtnp2systdown;
 	double trgtnp2statup;
 	double trgtnp2statdown;
-
-
 	double trktnp2systup;
 	double trktnp2systdown;
 	double trktnp2statup;
 	double trktnp2statdown;
-
 	double muidtnp2systup;
 	double muidtnp2systdown;
 	double muidtnp2statup;
 	double muidtnp2statdown;
-
-
 	double tnptotal2;
 	double tnptotal2up;
 	double tnptotal2down;
-
 	double tnptotal2systup;
 	double tnptotal2systdown;
 	double tnptotal2statup;
 	double tnptotal2statdown;
-
-
-
 	double tnpabssystup;
 	double tnpabssystdown;
 
@@ -443,7 +383,7 @@ void CrossSectionAna(int DoTnP){
 			for(int k = 0; k < NBins; k++){
 
 				//	if((BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08  && ((BptNew[j] > 7 && BptNew[j] < 10 && ByNew[j] > 1.5 )||(BptNew[j] > 10)) && (Bmu1Type > -0.1 && Bmu2Type > -0.1)))
-				if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.3663) < 0.08 && TMath::Abs(ByNew[j]) < 2.4 && ((BptNew[j] > 5 && BptNew[j] < 10 && ByNew[j] > 1.5 )||(BptNew[j] > 10)) )
+				if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.3663) < 0.08 && TMath::Abs(ByNew[j]) < 2.4 && ((BptNew[j] > 5 && BptNew[j] < 10 && TMath::Abs(ByNew[j]) > 1.5 )||(BptNew[j] > 10)) )
 				{
 
 
@@ -564,10 +504,7 @@ void CrossSectionAna(int DoTnP){
 	hInvEffUp->SetMarkerStyle(20);
 	hInvEffUp->SetMinimum(0);
 
-
-
 	TH1D * hInvEffDown = new TH1D("hInvEffDown","",NBins,ptBins);
-
 
 	hInvEffDown->GetXaxis()->SetTitle("B^{0}_{s} p_{T} (GeV/c)");
 	hInvEffDown->GetYaxis()->SetTitle("<1/(Eff * Acc)>");
@@ -593,47 +530,27 @@ void CrossSectionAna(int DoTnP){
 		NewEffErr[i] = TMath::Sqrt(SumCountsErr[i])/Counts[i];
 		NewEffTight[i] = SumCountsTight[i]/CountsTight[i];
 		NewEffLoose[i] = SumCountsLoose[i]/CountsLoose[i];
-
-
 		NewEffUp[i] = SumCountsUp[i]/Counts[i];
 		NewEffErrUp[i] = TMath::Sqrt(SumCountsErrUp[i])/Counts[i];
-
-
-
 		NewEffDown[i] = SumCountsDown[i]/Counts[i];
 		NewEffErrDown[i] = TMath::Sqrt(SumCountsErrDown[i])/Counts[i];
-
-
 		NewEffReal[i] = SumCountsEff[i]/Counts[i];
 		NewEffRealErr[i] = TMath::Sqrt(SumCountsEffErr[i])/Counts[i];
-
-
 		hInvEff->SetBinContent(i+1,NewEff[i]);
 		hInvEff->SetBinError(i+1,NewEffErr[i]);
-
 		hInvEffTight->SetBinContent(i+1, NewEffTight[i]);
 		hInvEffTight->SetBinError(i+1, epsilon);
     // TODO: currently loose is the same as nominal
 		hInvEffLoose->SetBinContent(i+1, NewEff[i]);
 		hInvEffLoose->SetBinError(i+1, epsilon);
-
 		hEff->SetBinContent(i+1,1/NewEff[i]);
 		hEff->SetBinError(i+1,NewEffErr[i]/(NewEff[i] * NewEff[i]));
-
-
 		NewEffSyst[i] = SumCountsSyst[i]/Counts[i];
 		NewEffSystErr[i] = TMath::Sqrt(SumCountsSystErr[i])/Counts[i];
-
-
 		hInvEffSyst->SetBinContent(i+1,	NewEffSyst[i]);
 		hInvEffSyst->SetBinError(i+1, NewEffSystErr[i]);
-
-
-
 		hInvEffUp->SetBinContent(i+1,NewEffUp[i]);
 		hInvEffUp->SetBinError(i+1,NewEffErrUp[i]);
-
-
 		hInvEffDown->SetBinContent(i+1,NewEffDown[i]);
 		hInvEffDown->SetBinError(i+1,NewEffErrDown[i]);
 
@@ -858,10 +775,8 @@ CorrDiffHisBin
 	double RawCount;
 	double RawCountErr;
 	double RawCountTight;
-
 	double CorrYield= 0;
 	double CorrYieldErr= 0;
-
 	double CorrYieldDiff[NBins];
 	double CorrYieldDiffErr[NBins];
 
@@ -906,12 +821,10 @@ CorrDiffHisBin
 		CorrDiffHis->SetBinContent(i+1,CorrYieldDiff[i]);
 		CorrDiffHis->SetBinError(i+1,CorrYieldDiffErr[i]);
 
-		RawCountTight = hPtTight->GetBinContent(i+1);
-		CorrDiffHisTight->
-      SetBinContent(i+1, (RawCountTight *  NewEffTight[i]) / (BRchain*2* lumi) );
-		CorrDiffHisTight->SetBinError(i+1, epsilon);
+		 RawCountTight = hPtTight->GetBinContent(i+1);
+		 CorrDiffHisTight->SetBinContent(i+1, (RawCountTight *  NewEffTight[i]) / (BRchain*2* lumi) );
+		 CorrDiffHisTight->SetBinError(i+1, epsilon);
 	}
-
 
 //	CorrDiffHis->SetTitle("2017 B^{0}_{s} pp Cross Section");
 	CorrDiffHis->SetTitle("(Preliminary) B^{0}_{s} #rightarrow J/#psi K^{+} p_{T} Differential Cross Section in pp");
@@ -920,17 +833,13 @@ CorrDiffHisBin
 	CorrDiffHis->SetMarkerSize(1);
 	CorrDiffHis->SetMarkerStyle(20);
 
-
-
 	c->cd();
 	c->SetLogy();
 	CorrDiffHis->Draw("ep");
 
 	//pt Binned Correction//
 
-
 	TH1D * Eff1DHis = (TH1D * ) fin1DEff->Get("Eff1DHis");
-	
 	TH1D * CorrDiffHisBin = (TH1D * ) CorrDiffHis ->Clone("CorrDiffHisBin");
 
 	CorrDiffHisBin->SetMarkerColor(kRed);

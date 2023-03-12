@@ -1,0 +1,21 @@
+{
+    "files.associations": {
+        "roofitB.C": "cpp",
+        "TnPWeight.C": "cpp",
+        "MCEff.C": "cpp",
+        "CrossSectionAna.C": "cpp",
+        "PlotBsBPRatio.C": "cpp",
+        "BPRAA.C": "cpp",
+        "BsRAA.C": "cpp",
+        "CalEffSystBP.C": "cpp",
+        "CalEffSystBs.C": "cpp",
+        "PlotEffSyst2D.C": "cpp",
+        "Generate2DMaps.C": "cpp",
+        "MCStatCal.C": "cpp",
+        "MCEff4.C": "cpp",
+        "plotPt.C": "cpp",
+        "BPComparison.C": "cpp",
+        "BsComparison.C": "cpp",
+        "BPNewFidNoScale.C": "cpp"
+    }
+}

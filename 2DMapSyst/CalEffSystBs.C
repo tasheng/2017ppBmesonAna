@@ -13,12 +13,8 @@
 #include <iostream>
 #include <fstream>
 //#include "tnp_weight_lowptPbPb.h"
-
-
-
 //#include "his.h"
 using namespace std;
-
 using std::cout;
 using std::endl;
 
@@ -28,7 +24,6 @@ void CalEffSystBs(){
 	//const int NBins = 6;
 
 	int TnP = 1;
-
 
 //	double BRchain = 6.02061e-5;
 	double BRchain = 3.1189e-5;
@@ -42,7 +37,7 @@ void CalEffSystBs(){
 	// FileName = "../SkimmedSamples/BsData.root";
 	// FileName = "../CutSkim/BsData_trkpt5.root";
 	// FileName = "../CutSkim/BsData.root";
-	FileName = "~/dat/presel/BsData_nom.root";
+	FileName = "/data3/tasheng/presel/BsData_nom.root";
 	TFile * fin = new TFile(FileName.Data());
 	fin->cd();
 
@@ -248,13 +243,7 @@ void CalEffSystBs(){
 		ptbinsvec.push_back(50);
 		ptbinsvec.push_back(100);
 
-
-
 	}
-
-
-
-
 
 	for(int i = 0; i < NBins + 1; i++){
 		ptBins[i] =  ptbinsvec[i];
@@ -273,97 +262,60 @@ void CalEffSystBs(){
 		SumCountsErrUp[i] = 0;
 		SumCountsDown[i] = 0;
 		SumCountsErrDown[i] = 0;
-
-
-
-
 	}
-
-
-
 
 
 	int EtaBin;
 	int PtBin;
-
-
-
-
 	double trgtnp1;
 	double trktnp1;
 	double muidtnp1;
-
 	double trgtnp1systup;
 	double trgtnp1systdown;
 	double trgtnp1statup;
 	double trgtnp1statdown;
-
-
 	double trktnp1systup;
 	double trktnp1systdown;
 	double trktnp1statup;
 	double trktnp1statdown;
-
 	double muidtnp1systup;
 	double muidtnp1systdown;
 	double muidtnp1statup;
 	double muidtnp1statdown;
-
-
 	double tnptotal1;
 	double tnptotal1up;
 	double tnptotal1down;
-
-
 	double tnptotal1systup;
 	double tnptotal1systdown;
 	double tnptotal1statup;
 	double tnptotal1statdown;
-
-
-
 	double trgtnp2;
 	double trktnp2;
 	double muidtnp2;
-
 	double trgtnp2systup;
 	double trgtnp2systdown;
 	double trgtnp2statup;
 	double trgtnp2statdown;
-
-
 	double trktnp2systup;
 	double trktnp2systdown;
 	double trktnp2statup;
 	double trktnp2statdown;
-
 	double muidtnp2systup;
 	double muidtnp2systdown;
 	double muidtnp2statup;
 	double muidtnp2statdown;
-
-
 	double tnptotal2;
 	double tnptotal2up;
 	double tnptotal2down;
-
 	double tnptotal2systup;
 	double tnptotal2systdown;
 	double tnptotal2statup;
 	double tnptotal2statdown;
-
-
-
-
-
-
 	double tnpabssystup;
 	double tnpabssystdown;
 
 	TFile * finSyst2D = new TFile("../Bs/EffAna/NewEff2DMaps/BsSyst2D.root");
 	
-
-
 	TH2D * invEff2D = (TH2D *) finSyst2D->Get("invEff2D");
 	TH2D * invEff2DTnPSystUp = (TH2D *) finSyst2D->Get("invEff2DTnPSystUp");
 	TH2D * invEff2DTnPSystDown = (TH2D *) finSyst2D->Get("invEff2DTnPSystDown");
@@ -387,18 +339,13 @@ void CalEffSystBs(){
 			for(int k = 0; k < NBins; k++){
 
 				//	if((BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08  && ((BptNew[j] > 7 && BptNew[j] < 10 && ByNew[j] > 1.5 )||(BptNew[j] > 10)) && (Bmu1Type > -0.1 && Bmu2Type > -0.1)))
-				if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.3663) < 0.08 && TMath::Abs(ByNew[j]) < 2.4 && ((BptNew[j] > 5 && BptNew[j] < 10 && ByNew[j] > 1.5 )||(BptNew[j] > 10)) )
+				if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.3663) < 0.08 && TMath::Abs(ByNew[j]) < 2.4 && ((BptNew[j] > 5 && BptNew[j] < 10 && TMath::Abs(ByNew[j]) > 1.5 )||(BptNew[j] > 10)) )
 				{
-
-
-
 					XBin = invEff2D->GetXaxis()->FindBin( BptNew[j]);
 					YBin = invEff2D->GetYaxis()->FindBin( TMath::Abs(ByNew[j]));
 					BEffInv[j] = invEff2D->GetBinContent(XBin,YBin);
 					BEffInvErr[j] = invEff2D->GetBinError(XBin,YBin);
 					BEff[j] = 1.0/invEff2D->GetBinContent(XBin,YBin);
-
-
 					BEffInvTnPUp[j] = invEff2DTnPSystUp->GetBinContent(XBin,YBin);
 					BEffInvTnPDown[j] = invEff2DTnPSystDown->GetBinContent(XBin,YBin);
 					BEffInvBDT[j] = invEff2DBDTSyst->GetBinContent(XBin,YBin);
@@ -412,23 +359,15 @@ void CalEffSystBs(){
 						SumCountsEffErr[k] = SumCountsEffErr[k] + BEffErr[j] * BEffErr[j];
 						SumCountsSyst[k] = 	SumCountsSyst[k]  + BEffInvBDTWeighted[j];
 						SumCountsSystErr[k] = 	SumCountsSystErr[k]  + BEffInvErrBDTWeighted[j] * BEffInvErrBDTWeighted[j];
-
 						SumCountsUp[k] = SumCountsUp[k] + BEffInvUp[j];
 						SumCountsErrUp[k] = SumCountsErrUp[k] + BEffInvErrUp[j] * BEffInvErrUp[j];
-
 						SumCountsDown[k] = SumCountsDown[k] + BEffInvDown[j];
 						SumCountsErrDown[k] = SumCountsErrUp[k] + BEffInvErrDown[j] * BEffInvErrDown[j];
-
-
-
-
 						SumCountsTnPUpSyst[k] = BEffInvTnPUp[j] + SumCountsTnPUpSyst[k];
 						SumCountsTnPDownSyst[k] = BEffInvTnPDown[j] + SumCountsTnPDownSyst[k];
-
 						SumCountsBDTSyst[k] = BEffInvBDT[j] + SumCountsBDTSyst[k];
 						SumCountsBptSyst[k] = BEffInvBpt[j] + SumCountsBptSyst[k];
 
-			
 						Counts[k] = Counts[k] + 1;
 
 
@@ -531,27 +470,17 @@ void CalEffSystBs(){
 
 		Eff2DHis->SetBinContent(i+1, NewEff[i]);
 		Eff2DHis->SetBinError(i+1, NewEffErr[i]);
-
-
 		Eff2DTnPUpSystHis->SetBinContent(i+1, EffTnPUp[i]);		
 		Eff2DTnPUpSystHis->SetBinError(i+1, NewEffErr[i]);
-
 		Eff2DTnPDownSystHis->SetBinContent(i+1, EffTnPDown[i]);		
 		Eff2DTnPDownSystHis->SetBinError(i+1, NewEffErr[i]);
-		
-
 		Eff2DBDTHis->SetBinContent(i+1, EffBDT[i]);		
 		Eff2DBDTHis->SetBinError(i+1, NewEffErr[i]);
-	
-
 		Eff2DBptHis->SetBinContent(i+1, EffBpt[i]);		
 		Eff2DBptHis->SetBinError(i+1, NewEffErr[i]);
-
-
 	}
 	
-
-
+	gSystem->mkdir("OutFiles", true);
 	TFile * fout = new TFile("OutFiles/BsSyst2D.root","RECREATE");
 	fout->cd();
 

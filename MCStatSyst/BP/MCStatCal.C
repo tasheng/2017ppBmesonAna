@@ -448,10 +448,7 @@ void MCStatCal(){
 		if(q%1 == 0)	cout << "Now Working On File " << q << endl;
 
 		TFile * finEff;
-
-
 		finEff = new TFile("OutFiles/GenStatSyst.root");
-
 		finEff->cd();
 
 		TFile* finNom = new TFile("../../BP/EffAna/NewEff2DMaps/EffFineBDT.root");
@@ -466,24 +463,17 @@ void MCStatCal(){
 		int XBin;
 		int YBin;
 
-
-
-
-
 		for( int i = 0; i < NEvents; i++){
 
 			EffInfoTree->GetEntry(i);
 			//MuonInfoTree->GetEntry(i);
 
-
 			for(int j = 0; j < BsizeNew; j++){
-
 
 				for(int k = 0; k < NBins; k++){
 
 					if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08 &&  TMath::Abs(ByNew[j]) < 2.4  && ((BptNew[j] > 5 && BptNew[j] < 10 && abs(ByNew[j]) > 0 )||(BptNew[j] > 10)))
 					{
-
 
 						XBin = invEff2D->GetXaxis()->FindBin( BptNew[j]);
 						YBin = invEff2D->GetYaxis()->FindBin( TMath::Abs(ByNew[j]));
@@ -491,15 +481,10 @@ void MCStatCal(){
 						BSelInv[j] = invSel2D->GetBinContent(XBin,YBin);						
 						BAccInv[j] = invAcc2D->GetBinContent(XBin,YBin);
 
-
-
-
-
 						if(BEffInv[j] > 0){
 							SumCounts[k] = SumCounts[k] + BEffInv[j];
 							SumCountsSel[k] = SumCountsSel[k] + BSelInv[j];
 							SumCountsAcc[k] = SumCountsAcc[k] + BAccInv[j];
-
 							Counts[k] = Counts[k] + 1;
 
 						}
@@ -537,43 +522,29 @@ void MCStatCal(){
         std::setw(columnWidth) << 1 / NewEff[k] << "\n";
         // std::setw(columnWidth) << 1 / NewAcc[k] * 1 / NewSel[k] << "\n";
 
-
 			EffInvDistribution[k]->Fill(NewEff[k]);
 			SelInvDistribution[k]->Fill(NewSel[k]);			
 			AccInvDistribution[k]->Fill(NewAcc[k]);
-
-
 
 			Counts[k] = 0;
 			SumCounts[k] = 0;
 			SumCountsSel[k] = 0;
 			SumCountsAcc[k] = 0;
 
-
-
 		}
 
     return;
 		finEff->Close();
-	
-
 	}
 
 
 	TCanvas * c = new TCanvas("c","c",600,600);
 	c->cd();
 
-
-
-
 	TLine *l4[NBins];
-
 	TLatex * texChi[NBins];
 
-
 	//Efficiency//
-
-
 	float RMS;
 	float MeanValue;
 	float Error;
@@ -584,7 +555,6 @@ void MCStatCal(){
 	MCSystStatHis->GetYaxis()->SetTitleOffset(1.4);
 	MCSystStatHis->GetXaxis()->CenterTitle();
 	MCSystStatHis->GetYaxis()->CenterTitle();
-
 	MCSystStatHis->SetMarkerSize(1);
 	MCSystStatHis->SetMarkerColor(1);
 	MCSystStatHis->SetMarkerStyle(20);
@@ -603,7 +573,6 @@ void MCStatCal(){
 
 		EffInvDistribution[i]->SetMinimum(0);
 		EffInvDistribution[i]->Draw();
-
 		texChi[i] = new TLatex(0.10,0.85, Form("B^{+} GeV/c %.0f < p_{T} < %0.f GeV/c", ptBins[i],ptBins[i+1] ));
 		texChi[i]->SetNDC();
 		texChi[i]->SetTextAlign(12);
@@ -620,12 +589,10 @@ void MCStatCal(){
 		l4[i]->Draw("SAME");
 
 		c->SaveAs(Form("Plots/Eff/MCStatEff_%d.png",i));
-		
 
 		RMS = EffInvDistribution[i]->GetRMS();
 		MeanValue = EffInvDistribution[i]->GetMean();
 		Error = RMS/MeanValue;
-
 		MCSystStatHis->SetBinContent(i+1,Error);
 		MCSystStatHis->SetBinError(i+1,Error/100);
 	
@@ -636,19 +603,12 @@ void MCStatCal(){
 	MCSystStatHis->Draw("ep");
 	c->SaveAs("Plots/MCStatSyst.png");
 
-
-
 	//Selection//
-
-
 
 	for(int i = 0; i < NBins; i++){
 
-
-
 		SelInvDistribution[i]->SetMinimum(0);
 		SelInvDistribution[i]->Draw();
-
 		texChi[i] = new TLatex(0.10,0.85, Form("B^{+} GeV/c %.0f < p_{T} < %0.f GeV/c", ptBins[i],ptBins[i+1] ));
 		texChi[i]->SetNDC();
 		texChi[i]->SetTextAlign(12);
@@ -662,7 +622,6 @@ void MCStatCal(){
 		RMS = SelInvDistribution[i]->GetRMS();
 		MeanValue = SelInvDistribution[i]->GetMean();
 		Error = RMS/MeanValue;
-
 
 		cout << "<1/eff> Stat Syst: " <<  Error << endl;
 	}
@@ -686,24 +645,21 @@ void MCStatCal(){
 		texChi[i]->Draw("SAME");
 		c->SaveAs(Form("Plots/Acc/MCStatAcc_%d.png",i));
 	
-	
 		RMS = AccInvDistribution[i]->GetRMS();
 		MeanValue = AccInvDistribution[i]->GetMean();
 		Error = RMS/MeanValue;
 
 		cout << "<1/acc> Stat Syst: " <<  Error << endl;
 
-
 	}
-
 
   // save output
   TFile fout("mcstat.root", "recreate");
   for (auto i = 0; i < NBins; ++i) {
     EffInvDistribution[i]->Write();
-		AccInvDistribution[i]->Write();
-    SelInvDistribution[i]->Write();
-  }
+	AccInvDistribution[i]->Write();
+	SelInvDistribution[i]->Write();
+  	}
   fout.Close();
 
 }

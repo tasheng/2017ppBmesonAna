@@ -15,11 +15,8 @@
 //#include "tnp_weight_lowptPbPb.h"
 #include "../parameter.h"
 
-
-
 //#include "his.h"
 using namespace std;
-
 using std::cout;
 using std::endl;
 
@@ -35,13 +32,11 @@ void CalEffSystBP(){
 //	gStyle->SetOptTitle(0);
 	gStyle->SetOptStat(0);
 
-
 	TString FileName;
-
 	// FileName = "../SkimmedSamples/BPData.root";
 	// FileName = "../CutSkim/BPData_trkpt5.root";
 	// FileName = "../CutSkim/BPData.root";
-	FileName = "~/dat/presel/BPData_nom.root";
+	FileName = "/data3/tasheng/presel/BPData_nom.root";
 
 	TFile * fin = new TFile(FileName.Data());
 	fin->cd();
@@ -61,21 +56,14 @@ void CalEffSystBP(){
 	Float_t ByNew[NCand];
 	Float_t BEff[NCand];
 	Float_t BEffErr[NCand];
-
-
 	Float_t BEffInv[NCand];
 	Float_t BEffInvErr[NCand];
 	Float_t BEffInv1D[NCand];
 	Float_t BEffInvErr1D[NCand];
-
 	Float_t BEffInvFit[NCand];
 	Float_t BEffInvErrFit[NCand];
-
 	Float_t BEffInvBDTWeighted[NCand];
 	Float_t BEffInvErrBDTWeighted[NCand];
-
-
-
 	Float_t BEffInvUp[NCand];
 	Float_t BEffInvErrUp[NCand];
 	Float_t BEffInvDown[NCand];
@@ -86,7 +74,6 @@ void CalEffSystBP(){
 	EffInfoTree->SetBranchAddress("By",ByNew);
 	EffInfoTree->SetBranchAddress("Bpt",BptNew);
 	
-
 	Float_t BEffInvTnPUp[NCand];
 	Float_t BEffInvTnPDown[NCand];
 	Float_t BEffInvBDT[NCand];
@@ -99,53 +86,30 @@ void CalEffSystBP(){
 	EffInfoTree->SetBranchAddress("BEff",BEff);
 	EffInfoTree->SetBranchAddress("BEffInv1D",BEffInv1D);
 	EffInfoTree->SetBranchAddress("BEffInvErr1D",BEffInvErr1D);
-
 	EffInfoTree->SetBranchAddress("BEffInvFit",BEffInvFit);
 	EffInfoTree->SetBranchAddress("BEffInvErrFit",BEffInvErrFit);
-
 	EffInfoTree->SetBranchAddress("BEffInv",BEffInv);
 	EffInfoTree->SetBranchAddress("BEffInvErr",BEffInvErr);
-
 	EffInfoTree->SetBranchAddress("BEffInvBDTWeighted",BEffInvBDTWeighted);
 	EffInfoTree->SetBranchAddress("BEffInvErrBDTWeighted",BEffInvErrBDTWeighted);
-
-
-
 	EffInfoTree->SetBranchAddress("BEffInvUp",BEffInvUp);
 	EffInfoTree->SetBranchAddress("BEffInvErrUp",BEffInvErrUp);
-
 	EffInfoTree->SetBranchAddress("BEffInvDown",BEffInvDown);
 	EffInfoTree->SetBranchAddress("BEffInvErrDown",BEffInvErrDown);
 	*/
 
-
-
-
-
 	/*
 	   Int_t Bmu1Type[NCand];
 	   Int_t Bmu2Type[NCand];
-
-
-
-
-
 	   TTree * MuonInfoTree = (TTree * ) fin->Get("MuonInfoTree");
-
 	   MuonInfoTree->SetBranchAddress("Bmu1Type",Bmu1Type);
 	   MuonInfoTree->SetBranchAddress("Bmu2Type",Bmu2Type);
-
-
 	   Float_t Bmu1etaNew[NCand];
 	   Float_t Bmu2etaNew[NCand];
-
 	   Float_t Bmu1ptNew[NCand];
 	   Float_t Bmu2ptNew[NCand];
-
-
 	   EffInfoTree->SetBranchAddress("Bmu1eta",Bmu1etaNew);
 	   EffInfoTree->SetBranchAddress("Bmu2eta",Bmu2etaNew);
-
 	   EffInfoTree->SetBranchAddress("Bmu1pt",Bmu1ptNew);
 	   EffInfoTree->SetBranchAddress("Bmu2pt",Bmu2ptNew);
 
@@ -159,24 +123,14 @@ void CalEffSystBP(){
 	double SumCountsErr[NBins];
 	double NewEff[NBins];
 	double NewEffErr[NBins];
-
 	double NewEffReal[NBins];
 	double NewEffRealErr[NBins];
-
-
-
 	double SumCountsUp[NBins];
 	double SumCountsErrUp[NBins];
-
 	double SumCountsDown[NBins];
 	double SumCountsErrDown[NBins];
-
-
 	double SumCountsEff[NBins];
 	double SumCountsEffErr[NBins];
-
-
-
 	double SumCountsSyst[NBins];
 	double SumCountsSystErr[NBins];
 	double NewEffSyst[NBins];
@@ -188,8 +142,6 @@ void CalEffSystBP(){
 	double SumCountsTnPDownSyst[NBins];
 	double SumCountsBDTSyst[NBins];
 	double SumCountsBptSyst[NBins];
-
-
 
 	//	double CorrectionFactor[NBins];
 
@@ -206,8 +158,6 @@ void CalEffSystBP(){
 	for(int i = 0; i < NBins + 1; i++){
 		ptBins[i] =  ptbinsvec[i];
 	}
-
-
 
 	for(int i = 0; i < NBins; i++){
 		Counts[i] = 0;
@@ -258,83 +208,54 @@ void CalEffSystBP(){
 
 	int EtaBin;
 	int PtBin;
-
-
-
-
 	double trgtnp1;
 	double trktnp1;
 	double muidtnp1;
-
 	double trgtnp1systup;
 	double trgtnp1systdown;
 	double trgtnp1statup;
 	double trgtnp1statdown;
-
-
 	double trktnp1systup;
 	double trktnp1systdown;
 	double trktnp1statup;
 	double trktnp1statdown;
-
 	double muidtnp1systup;
 	double muidtnp1systdown;
 	double muidtnp1statup;
 	double muidtnp1statdown;
-
-
 	double tnptotal1;
 	double tnptotal1up;
 	double tnptotal1down;
-
-
 	double tnptotal1systup;
 	double tnptotal1systdown;
 	double tnptotal1statup;
 	double tnptotal1statdown;
-
-
-
 	double trgtnp2;
 	double trktnp2;
 	double muidtnp2;
-
 	double trgtnp2systup;
 	double trgtnp2systdown;
 	double trgtnp2statup;
 	double trgtnp2statdown;
-
-
 	double trktnp2systup;
 	double trktnp2systdown;
 	double trktnp2statup;
 	double trktnp2statdown;
-
 	double muidtnp2systup;
 	double muidtnp2systdown;
 	double muidtnp2statup;
 	double muidtnp2statdown;
-
-
 	double tnptotal2;
 	double tnptotal2up;
 	double tnptotal2down;
-
 	double tnptotal2systup;
 	double tnptotal2systdown;
 	double tnptotal2statup;
 	double tnptotal2statdown;
-
-
-
 	double tnpabssystup;
 	double tnpabssystdown;
 
-
 	TFile * finSyst2D = new TFile("../BP/EffAna/NewEff2DMaps/BPSyst2D.root");
-	
-
-
 	TH2D * invEff2D = (TH2D *) finSyst2D->Get("invEff2D");
 	TH2D * invEff2DTnPSystUp = (TH2D *) finSyst2D->Get("invEff2DTnPSystUp");
 	TH2D * invEff2DTnPSystDown = (TH2D *) finSyst2D->Get("invEff2DTnPSystDown");
@@ -434,42 +355,22 @@ void CalEffSystBP(){
 		NewEff[i] = SumCounts[i]/Counts[i];
 		NewEffErr[i] = TMath::Sqrt(SumCountsErr[i])/Counts[i];
 
-
 		NewEffUp[i] = SumCountsUp[i]/Counts[i];
 		NewEffErrUp[i] = TMath::Sqrt(SumCountsErrUp[i])/Counts[i];
-
-
 
 		NewEffDown[i] = SumCountsDown[i]/Counts[i];
 		NewEffErrDown[i] = TMath::Sqrt(SumCountsErrDown[i])/Counts[i];
 
-
 		NewEffReal[i] = SumCountsEff[i]/Counts[i];
 		NewEffRealErr[i] = TMath::Sqrt(SumCountsEffErr[i])/Counts[i];
 
-
-
-
-
 		NewEffSyst[i] = SumCountsSyst[i]/Counts[i];
 		NewEffSystErr[i] = TMath::Sqrt(SumCountsSystErr[i])/Counts[i];
-
-
-
-
-
 
 		EffTnPUp[i] = SumCountsTnPUpSyst[i]/Counts[i];
 		EffTnPDown[i] = SumCountsTnPDownSyst[i]/Counts[i];
 		EffBDT[i] = SumCountsBDTSyst[i]/Counts[i];
 		EffBpt[i] = SumCountsBptSyst[i]/Counts[i];
-
-
-
-
-
-
-
 
 	}
 
@@ -483,7 +384,6 @@ void CalEffSystBP(){
 	Eff2DHis->GetYaxis()->CenterTitle();
 	Eff2DHis->GetXaxis()->SetTitleOffset(1.2);	
 	Eff2DHis->GetYaxis()->SetTitleOffset(1.5);
-
 
 	TH1D * Eff2DTnPUpSystHis = new TH1D("Eff2DTnPUpSystHis","",NBins,ptBins);
 
@@ -502,8 +402,6 @@ void CalEffSystBP(){
 	Eff2DTnPDownSystHis->GetYaxis()->CenterTitle();
 	Eff2DTnPDownSystHis->GetXaxis()->SetTitleOffset(1.2);	
 	Eff2DTnPDownSystHis->GetYaxis()->SetTitleOffset(1.5);
-
-
 
 	TH1D * Eff2DBDTHis = new TH1D("Eff2DBDTHis","",NBins,ptBins);
 
@@ -529,27 +427,18 @@ void CalEffSystBP(){
 
 		Eff2DHis->SetBinContent(i+1, NewEff[i]);
 		Eff2DHis->SetBinError(i+1, NewEffErr[i]);
-
-
 		Eff2DTnPUpSystHis->SetBinContent(i+1, EffTnPUp[i]);		
 		Eff2DTnPUpSystHis->SetBinError(i+1, NewEffErr[i]);
-
 		Eff2DTnPDownSystHis->SetBinContent(i+1, EffTnPDown[i]);		
 		Eff2DTnPDownSystHis->SetBinError(i+1, NewEffErr[i]);
-		
-
 		Eff2DBDTHis->SetBinContent(i+1, EffBDT[i]);		
 		Eff2DBDTHis->SetBinError(i+1, NewEffErr[i]);
-	
-
 		Eff2DBptHis->SetBinContent(i+1, EffBpt[i]);		
 		Eff2DBptHis->SetBinError(i+1, NewEffErr[i]);
 
-
 	}
 	
-
-
+	gSystem->mkdir("OutFiles", true);
 	TFile * fout = new TFile("OutFiles/BPSyst2D.root","RECREATE");
 	fout->cd();
 

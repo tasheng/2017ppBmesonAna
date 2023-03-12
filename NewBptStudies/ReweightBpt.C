@@ -50,12 +50,12 @@ void ReweightBpt(int Opt){
 	TCut GenCut;
 	if(Opt == 0){
 		ParName = "BP";
-		inputMC =  "../Unskimmed/NewOfficialMC/BPMC.root";
+		inputMC =  "../../Unskimmed/NewOfficialMC/BPMC.root";
 		// inputFONLL = "FONLLFine/BPFONLLFine.root";
 		GenCut = "TMath::Abs(Gy)<2.4 && TMath::Abs(GpdgId)==521 && GisSignal==1 && GcollisionId==0";
 	} else if(Opt == 1){
 		ParName = "Bs";
-		inputMC =  "../Unskimmed/NewOfficialMC/BsMC.root";
+		inputMC =  "../../Unskimmed/NewOfficialMC/BsMC.root";
 		// inputFONLL = "FONLLFine/BPFONLLFine.root";
 		GenCut = "(TMath::Abs(Gy)<2.4&&TMath::Abs(GpdgId)==531&&GisSignal>0)";
 	}
@@ -87,6 +87,8 @@ void ReweightBpt(int Opt){
     fits.push_back(*fFit);
   }
 
+
+	gSystem->mkdir("ResultFile", true);
   // Save the output
   TFile fout(Form("ResultFile/BptWeight_%s.root", ParName.Data()), "recreate");
   for (auto f : fits) {
@@ -262,6 +264,7 @@ void reweightInY(TH1D* GptMC, TGraphAsymmErrors* gaeBplusReference, TCut weightp
 	Unity->SetLineColor(kBlue + 2);
 	Unity->Draw();
 
+	gSystem->mkdir("plotReweight", true);
 	c->SaveAs(Form("plotReweight/%sBptReweigt%s%s.png",
                  ParName.Data(),MethodLabel.Data(), iY.Data()));
 	c->SaveAs(Form("plotReweight/%sBptReweigt%s%s.pdf",

@@ -33,9 +33,11 @@
 void plot_jpsifit(RooWorkspace& w, int nbin_hist, TString pdf, RooAbsPdf* model, RooDataSet* ds, TString plotName,  bool with_sig);
 void fix_parameters(RooWorkspace& w, TString pdfName, bool release=false);
 void fit_jpsinp (RooWorkspace& w, int nbin_hist, TString pdf, int pti, int ptf, bool includeSignal=true);
+template<typename... Targs>
+void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotName,  Targs... options);
 
 // draw legend and suppress parameters
-const bool drawLegend = true;
+const bool drawLegend = false;
 using namespace RooFit;
 using namespace std;
 
@@ -53,10 +55,11 @@ int nbinsmasshisto=100;
 Int_t _count=0;
 RooWorkspace* outputw = new RooWorkspace("w");
 
+
 RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanvas* cMC, RooDataSet* ds, RooDataSet* dsMC, RooDataHist* dh, RooRealVar* mass, RooPlot* &outframe, int ptmin, int ptmax, int isMC, TString npfit, RooWorkspace& w)
 {
-
-	if (ptmin == 50 & ptmax == 60){nbinsmasshisto = 50;} //to much fine binned for the case of 50-60 Bp
+	
+	if (tree == "ntphi"){nbinsmasshisto = 50;} //to much fine binned for bs case
 	cout<<"total data: "<<ds->numEntries()<<endl;
 	TH1* h = dh->createHistogram("Bmass");
 	h->Sumw2(kFALSE);
@@ -68,6 +71,7 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	frameMC->GetYaxis()->SetTitle(TString::Format("Events / (%g MeV/c^{2})",(mass->getMax()-mass->getMin())/nbinsmasshisto*1000));
 	frameMC->GetYaxis()->SetTitleOffset(2.);
 	frameMC->GetYaxis()->SetTitleSize(0.035);
+	frameMC->GetXaxis()->SetTitleFont(42);
 	frameMC->GetYaxis()->SetTitleFont(42);
 	frameMC->GetXaxis()->SetLabelFont(42);
 	frameMC->GetYaxis()->SetLabelFont(42);
@@ -76,7 +80,7 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	frameMC->SetStats(0);
 	frameMC->GetXaxis()->SetNdivisions(-50205);
 
-	TPad *pMC1 = new TPad("pMC1","pMC1",0.,0.215,1.,1.);
+	TPad *pMC1 = new TPad("pMC1","pMC1",0.,0.215,1.,1);
 	// TPad *p1 = new TPad("p1","p1",0.05,0.05,0.99,0.99);
 	pMC1->SetBorderMode(1); 
 	pMC1->SetFrameBorderMode(0); 
@@ -91,6 +95,8 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	pMC2->SetFrameBorderMode(0); 
 	pMC2->SetTicks(1,1); 
 	//pMC2->Draw();
+
+	
 
 	// give better initial values to the Bmesons mass
 	double init_mean = BS_MASS;
@@ -175,8 +181,10 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	texB_N_vs_count->SetTextSize(0.03);
 	texB_N_vs_count->SetLineWidth(1);
 	texB_N_vs_count->Draw();
+	//cMC->SetLogy();
 
-	TLegend *legMC = new TLegend(0.8,0.82,0.89,0.89,NULL,"brNDC");
+	TLegend *legMC = new TLegend(0.62,0.55,0.89,0.75,NULL,"brNDC"); 
+	legMC = new TLegend(0.75,0.75,0.89,0.89,NULL,"brNDC");
 	legMC->SetBorderSize(0);
 	legMC->SetTextSize(0.025);     
 	legMC->SetTextFont(42);
@@ -184,6 +192,7 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	legMC->AddEntry(frameMC->findObject(Form("dsMC_cut%d", _count)), " MC","lp");
 	legMC->AddEntry(frameMC->findObject(Form("modelMC%d_%s",_count,pdf.Data()))," Sig. PDF","f");
   	if (drawLegend) {legMC -> Draw();}
+
 
 //PLOT MC
 //PULL MC
@@ -195,7 +204,7 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 	pull_histMC->SetMarkerSize(0.5);
 	RooPlot* pull_plotMC = mass->frame();
 	(pull_plotMC->GetXaxis())->SetRangeUser(init_mean-subt, init_mean+subt);
-	line_ref->plotOn(pull_plotMC, LineStyle(7), LineColor(kOrange-3), LineWidth(1));  
+	line_ref->plotOn(pull_plotMC, LineStyle(7), LineColor(kOrange-3), LineWidth(1)); 
 	pull_plotMC->addPlotable(static_cast<RooPlotable*>(pull_histMC),"XP");
 	pull_plotMC->SetTitle("");
 	pull_plotMC->SetMarkerStyle(6);
@@ -226,27 +235,44 @@ RooFitResult *fit(TString variation, TString pdf,TString tree, TCanvas* c, TCanv
 if(npfit != "1" && variation=="" && pdf==""){ 
 
 	// DEFINE MODEL to fit the non prompt background
+		//inclusive MC signal Model
+		RooRealVar* meannp = 0;
+		RooRealVar* sigma1np = 0;
+		RooProduct* sigma2np;
+		RooRealVar* ratio_sigma12np = 0;
+		RooRealVar* cofs_b_np = 0;
+		meannp = new RooRealVar(Form("meannp%d_%s",_count,""),"meannp",5.281,5.24,5.32);
+		sigma1np = new RooRealVar(Form("sigma1np%d_%s",_count,""),"sigma1np",0.02,0.01,0.03);
+		ratio_sigma12np = new RooRealVar(Form("ratio_sigma12np%d_%s",_count,""),"ratio_sigma12np", 2.4, 0.1, 10);
+		sigma2np = new RooProduct(Form("sigma2np%d_%s",_count,""), "sigma2np", RooArgList(*sigma1np, *ratio_sigma12np));
+		cofs_b_np = new RooRealVar(Form("cofs_b_np%d_%s",_count,""), "cofs_b_np", 0.5, 0., 1.);
+		RooGaussian* signal1_b_np = new RooGaussian(Form("signal1_b_np%d_%s",_count,""),"signal_gauss1_b_np",*mass,*meannp,*sigma1np);
+		RooGaussian* signal2_b_np = new RooGaussian(Form("signal2_b_np%d_%s",_count,""),"signal_gauss2_b_np",*mass,*meannp,*sigma2np); 
+		RooAddPdf* signalnp = new RooAddPdf(Form("signalnp%d_%s",_count,""), "signalnp", RooArgList(*signal1_b_np,*signal2_b_np),*cofs_b_np);
+		w.import(*signalnp);
+		//inclusive MC signal Model
+
 	// MC Part. Reconstructed Background Model
 	RooRealVar* m_nonprompt_scale=0;
 	RooRealVar* m_nonprompt_shift=0;
-	m_nonprompt_scale = new RooRealVar(Form("m_nonprompt_scale%d_%s",_count,""), "m_nonprompt_scale",0.04, 0.02, 0.065);
-  	m_nonprompt_shift = new RooRealVar(Form("m_nonprompt_shift%d_%s",_count,""), "m_nonprompt_shift", 5.13425, 5.1, 5.25);
+	m_nonprompt_scale = new RooRealVar(Form("m_nonprompt_scale%d_%s",_count,""), "m_nonprompt_scale",0.04, 0.01, 1);
+    m_nonprompt_shift = new RooRealVar(Form("m_nonprompt_shift%d_%s",_count,""), "m_nonprompt_shift", 5.13425, 5., 5.4);
 	RooGenericPdf* erfc = new RooGenericPdf(Form("erfc%d_%s",_count,""), "erfc", Form("TMath::Erfc((Bmass-m_nonprompt_shift%d_%s)/m_nonprompt_scale%d_%s)",_count,"",_count,""), RooArgList(*mass, *m_nonprompt_scale, *m_nonprompt_shift));
 	// MC Part. Reconstructed Background Model
 
 	// MC Combinatorial Background Model
+	//RooRealVar* alpha_np; 
 	RooRealVar* alpha_np; 
-	if (ptmin==50){ alpha_np = new RooRealVar(Form("alpha_np%d_%s", _count,""), "alpha_np",-0.1, -2, -0.05);}
-	else{alpha_np = new RooRealVar(Form("alpha_np%d_%s", _count,""), "alpha_np",-0.6, -3., 1.);}
-	RooExponential* COMB_jpsi = new RooExponential(Form("COMB_jpsi%d_%s",_count,""), "COMB_jpsi", *mass, *alpha_np);
+	alpha_np = new RooRealVar(Form("alpha_np%d_%s", _count,""), "alpha_np",-0.6, -15., 1.);
+	RooExponential COMB_jpsi(Form("COMB_jpsi%d_%s",_count,""), "COMB_jpsi", *mass, *alpha_np);
 	// MC Combinatorial Background Model
 
-	RooRealVar jpsinp_fraction(Form("jpsinp_fraction%d_%s",_count,""), "fraction", 0.35, 0.2, 1);
-	RooAddPdf* m_jpsinp_cont = new RooAddPdf(Form("m_jpsinp_cont%d_%s",_count,""), "model for jpsi nonprompt bg", RooArgList(*COMB_jpsi, *erfc), RooArgList(jpsinp_fraction));
+	RooRealVar jpsinp_fraction(Form("jpsinp_fraction%d_%s",_count,""), "fraction", 0.35, 0.05, 1);
+	RooAddPdf* m_jpsinp_cont = new RooAddPdf(Form("m_jpsinp_cont%d_%s",_count,""), "model for jpsi nonprompt bg", RooArgList(COMB_jpsi, *erfc), RooArgList(jpsinp_fraction));
 	w.import(*m_jpsinp_cont);
 	// DEFINE MODEL to fit the non prompt background
 	
-	fit_jpsinp(w, nbinsmasshisto, pdf, ptmin, ptmax);}
+	fit_jpsinp(w,  nbinsmasshisto, pdf, ptmin, ptmax);}
 // FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp
 
 	//FIT THE DATA FIT THE DATA FIT THE DATA
@@ -255,7 +281,7 @@ if(npfit != "1" && variation=="" && pdf==""){
 
 	c->cd();
 	RooPlot* frame = mass->frame("");
-	TPad *p1 = new TPad("p1","p1",0.,0.215,1.,1.);
+	TPad *p1 = new TPad("p1","p1",0.,0.215,1.,1);
 	p1->SetBorderMode(1); 
 	p1->SetFrameBorderMode(0); 
 	p1->SetBorderSize(2);
@@ -323,8 +349,8 @@ if(npfit != "1" && variation=="" && pdf==""){
 		erfc = w.pdf(Form("erfc%d_%s",_count,""));   
 		RooRealVar* jpsipi_to_signal_ratio;
 		if ( variation== "background" && pdf == "jpsi_sig"){
-						jpsipi_to_signal_ratio = new RooRealVar("jpsipi_to_signal_ratio","jpsipi_to_signal_ratio", 0.0517);         // from average of pT bins
-						jpsipi_to_signal_ratio->setConstant();}      
+			jpsipi_to_signal_ratio = new RooRealVar("jpsipi_to_signal_ratio","jpsipi_to_signal_ratio", 0.0517);    // from average of pT bins
+			jpsipi_to_signal_ratio->setConstant();}      
 		else { jpsipi_to_signal_ratio = w.var("jpsipi_to_signal_ratio"); }
 		nbkg_peaking = new RooProduct(Form("nbkg_peaking%d_%s",_count,pdf.Data()), "number of jpsi pi with fixed ratio to n_signal", RooArgList(nsig, *jpsipi_to_signal_ratio));
 				}
@@ -341,6 +367,7 @@ if(tree == "ntphi"){
 	if(variation=="signal" && pdf=="1gauss") model = new RooAddPdf(Form("model%d_%s",_count,pdf.Data()),"",RooArgList(sig1,bkg),RooArgList(nsig,nbkg));
 	if(variation=="signal" && (pdf=="3gauss"|| pdf=="fixed"|| pdf=="gauss_cb" )) model = new RooAddPdf(Form("model%d_%s",_count,pdf.Data()),"",RooArgList(*sig, bkg),RooArgList(nsig, nbkg));
 }
+
 /////////////////BP BP BP BP BP BP BP BP
     if(npfit != "1" && (pdf=="jpsi_sig" || pdf=="")) model = new RooAddPdf(Form("model%d_%s",_count,pdf.Data()),"",RooArgList(bkg,*sig, *erfc,*jpsipi),RooArgList(nbkg,nsig,nbkg_part_r,*nbkg_peaking));
 	if(npfit != "1" && pdf=="mass_range"){ model = new RooAddPdf(Form("model%d_%s",_count,pdf.Data()),"",RooArgList(*sig,bkg,*jpsipi),RooArgList(nsig,nbkg,*nbkg_peaking));}
@@ -375,9 +402,9 @@ if(tree == "ntphi"){
 
   	TString fitRange = (pdf == "mass_range") ? "m_range" : "all";
 	RooFitResult* fitResult = model->fitTo(*ds,Save(), Minos(),Extended(kTRUE), Range(fitRange));
-	cout << "DATA FIT Done " << endl;
 	w.import(*model);
 	w.import(nsig);
+
 
 ////// ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT ROOFIT
 
@@ -385,13 +412,13 @@ if(tree == "ntphi"){
   ds->plotOn(frame, Name(Form("ds_cut%d", _count)), Binning(nbinsmasshisto), MarkerSize(0.5), MarkerStyle(8), MarkerColor(1), LineColor(1), LineWidth(1)); 
   model->plotOn(frame, Name(Form("model%d_%s", _count, pdf.Data())), Range(fitRange), Precision(1e-6), DrawOption("L"), LineColor(2), LineWidth(1));
   model->plotOn(frame, Name(Form("sig%d_%s", _count, pdf.Data())),  Components(*sig), Range(fitRange), Precision(1e-6), DrawOption("LF"), FillStyle(3002), FillColor(kOrange-3), LineStyle(7), LineColor(kOrange-3), LineWidth(1)); 
-
-    if(npfit != "1"){
+  if(npfit != "1")	{
+	//TString option = (pdf == "mass_range")? "L" : "LF";
+    //RooCmdArg drawRange = (pdf == "mass_range")? Range(fitRange) : RooCmdArg();
     model->plotOn(frame, RooFit::Name(Form("erfc%d_%s",_count,"")) , Components(*erfc), Range(fitRange),  NormRange(fitRange), LineColor(kGreen+3), LineStyle(9), LineWidth(2), DrawOption("L"));
-	model->plotOn(frame, RooFit::Name("B->J/#psi #pi"), Components(*jpsipi), NormRange(fitRange), DrawOption("LF"), FillColor(kMagenta), LineStyle(1), LineColor(kMagenta), LineWidth(1)); 
-			}
-	model->plotOn(frame, Name(Form("bkg%d_%s",_count,pdf.Data())) ,  Components(bkg), Range(fitRange), Precision(1e-6),  DrawOption("L"), LineStyle(7), LineColor(4), LineWidth(1));
-
+	model->plotOn(frame, RooFit::Name("B->J/#psi #pi"), Components(*jpsipi), NormRange(fitRange), DrawOption("LF"), FillColor(kMagenta+1), LineStyle(1), LineColor(kMagenta+1), LineWidth(1)); 
+					}
+   model->plotOn(frame, Name(Form("bkg%d_%s",_count,pdf.Data())) ,  Components(bkg), Range(fitRange), Precision(1e-6),  DrawOption("L"), LineStyle(7), LineColor(4), LineWidth(1));
 
 	if(drawLegend){model->paramOn(frame,Layout(1, 1, 1), Format("NEU",AutoPrecision(3)));}
 	else{model->paramOn(frame,Layout(0.6, 0.98, 0.68), Format("NEU",AutoPrecision(2)));}
@@ -441,7 +468,6 @@ if(tree == "ntphi"){
 	pull_plot->GetXaxis()->SetTickLength(0.16);
 	pull_plot->GetXaxis()->SetNdivisions(-50205);
 	pull_plot->Draw();
-	pull_plot->Draw();
 
 	/*
 	   mass->setRange("signal",5.2,5.6);
@@ -489,7 +515,7 @@ if(tree == "ntphi"){
 	if (tree == "ntphi"){leg = new TLegend(0.80,0.75,0.89,0.89,NULL,"brNDC");}
 	else{leg = new TLegend(0.8,0.7,0.89,0.89,NULL,"brNDC");}
 	leg->SetBorderSize(0);
-	leg->SetTextSize(0.025);     
+	leg->SetTextSize(0.025);
 	leg->SetTextFont(42);
 	leg->SetFillStyle(0);
 	leg->AddEntry(frame->findObject(Form("ds_cut%d", _count)), " Data","LEP");
@@ -498,8 +524,7 @@ if(tree == "ntphi"){
 	leg->AddEntry(frame->findObject(Form("bkg%d_%s",_count,pdf.Data()))," Comb. Bkg.","l");
 	if(npfit != "1"){
 		leg -> AddEntry(frame->findObject("B->J/#psi #pi")," B #rightarrow J/#psi #pi^{#pm}","f");
-		leg -> AddEntry(frame->findObject(Form("erfc%d_%s",_count,pdf.Data()))," B #rightarrow J/#psi X","l");
-	}
+		leg -> AddEntry(frame->findObject(Form("erfc%d_%s",_count,pdf.Data()))," B #rightarrow J/#psi X","l");}
   	if (drawLegend) {leg -> Draw();}  
 
 	nsig.setVal(0.);
@@ -577,39 +602,65 @@ void fit_jpsinp(RooWorkspace& w, int nbin_hist, TString pdf, int pti, int ptf, b
 
   	// Apply y selections and pT bins
   	d_s = (RooDataSet*) d_s->reduce(Form("(Bpt>%d && Bpt < %d)&&((Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10))",pti , ptf) );
+
 	// Get rid of B+ at gen level
 	RooDataSet* ds_cont = (RooDataSet*) d_s->reduce("Bgen != 23333 && Bgen != 23335 && Bgen > 5000");
+	// Signal MC inclusive
+	RooDataSet* ds_sig = (RooDataSet*) d_s->reduce("Bgen == 23333");
 
 	// Crteate the necessary folders and define paths
   	gSystem->mkdir(Form("./results/BP/%i_%i", pti, ptf),true);
 	TString jpsi_fit_plot = "./results/BP/" + TString::Format("%i_%i/np_fit_pt%i-%i%s.pdf", pti, ptf, pti, ptf, "");
+	TString incSIG_fit_plot = "./results/BP/" + TString::Format("%i_%i/InclusiveMC_Signal_fit_%i-%i%s.pdf", pti, ptf, pti, ptf, "");
   	TString jpsi_plot_with_sig = "./results/BP/" + TString::Format("%i_%i/np_fit_signal_pt%i-%i%s.pdf", pti, ptf, pti, ptf, "");
 
 	//[START] FIX SHAPE (NP background)
 	RooAbsPdf* m_jpsinp_cont = w.pdf(Form("m_jpsinp_cont%d_%s",_count, pdf.Data()));
 	// FIT
 	auto cont_result = m_jpsinp_cont->fitTo(*ds_cont, Save());
+	// FIT
 	plot_jpsifit(w, nbin_hist, pdf, m_jpsinp_cont, ds_cont, jpsi_fit_plot, false);
 	fix_parameters(w, Form("m_jpsinp_cont%d_%s",_count,pdf.Data()));
 	//[END] FIX SHAPE (NP background) 
 
+	//[START] FIT inclusiveMC SIGNAL 
+	RooRealVar Bmass = *(w.var("Bmass"));
+	RooAbsPdf* signalnp = w.pdf(Form("signalnp%d_%s",_count,pdf.Data()));  
+  	RooRealVar n_signal_np(Form("n_signal_np%d_%s",_count,pdf.Data()), "n_signal_np", 1000, 0., 150000); 
+	RooExtendPdf signal_ext(Form("signal_ext%d_%s",_count,pdf.Data()), "extended signal pdf", *signalnp, n_signal_np);
+	// FIT
+	Bmass.setRange("bmc", 5.15, 5.4);
+	auto signal_result = signal_ext.fitTo(*ds_sig, Range("bmc"), Save(), Extended());
+	// FIT
+	plot_mcfit(w, &signal_ext, ds_sig, incSIG_fit_plot,  Range("bmc"), LineColor(kRed),LineStyle(1), LineWidth(2));		
+	fix_parameters(w, Form("signalnp%d_%s",_count,pdf.Data()));	
+	//[END] FIT inclusiveMC SIGNAL 
+
+	//FIX RATIO
+		// Fix the ratio of jpsipi to signal
+		RooRealVar jpsipi_to_signal_ratio("jpsipi_to_signal_ratio", "jpsipi_to_signal_ratio",0.05, 0, 1);
+		jpsipi_to_signal_ratio.setVal(0.0384);   		// from PDG 	
+  		jpsipi_to_signal_ratio.setConstant();
+		w.import(jpsipi_to_signal_ratio);
+	//FIX RATIO
+
 	// TEST THE FIT TEplotNameST THE FIT
 	// Import from WorkSpace and define variables
 	RooAbsPdf* erfc = w.pdf(Form("erfc%d_%s",_count,pdf.Data()));
-	RooAbsPdf* COMB_jpsi = w.pdf(Form("COMB_jpsi%d_%s",_count,pdf.Data()));
-	RooAbsPdf* signalnp = w.pdf("signalnp");    
+	RooAbsPdf* COMB_jpsi = w.pdf(Form("COMB_jpsi%d_%s",_count,pdf.Data()));  
 	RooAbsPdf* jpsipi = w.pdf("jpsipi");    
-  	RooRealVar* sigma1_np = w.var("sigma1np");          
-	RooRealVar* jpsipi_to_signal_ratio = w.var("jpsipi_to_signal_ratio");  
+  	RooRealVar* sigma1_np = w.var(Form("sigma1np%d_%s",_count,pdf.Data()));      
 	RooRealVar n_cont(Form("n_cont_np%d_%s",_count,pdf.Data()), "n_cont_np", 1000, 0., (d_s->sumEntries())*2);
 	RooRealVar n_erfc(Form("n_nonprompt%d_%s",_count,pdf.Data()), "n_nonprompt", 1000, 0., (d_s->sumEntries())*2);
-	RooRealVar nbin_signal(Form("n_signal_np%d_%s",_count,pdf.Data()), "n_signal_np", 1000, 0., 150000);
-	RooProduct* n_jpsipi = new RooProduct(Form("n_jpsipi_by_signal%d_%s",_count,pdf.Data()), "number of jpsis pi with fixed ratio to n_signal", RooArgList(nbin_signal, *jpsipi_to_signal_ratio));
-	
-	// Unfix the signal with to better describe each pT bin peak
-  	//sigma1_np->setConstant(false);
+	RooProduct* n_jpsipi = new RooProduct(Form("n_jpsipi_by_signal%d_%s",_count,pdf.Data()), "number of jpsis pi with fixed ratio to n_signal", RooArgList(n_signal_np, jpsipi_to_signal_ratio));
+	RooRealVar* alpha_comb_m =  w.var(Form("alpha_np%d_%s", _count,""));
+
+	// Unfix the signal and back to better describe each pT bin peak
+  	sigma1_np->setConstant(false);
+	alpha_comb_m->setConstant(false);
+
 	// BUILD TOTAL PDF
-	RooAddPdf* model_inclusive = new RooAddPdf(Form("model_inclusive%d_%s",_count,pdf.Data()), "NP with B+", RooArgList(*signalnp, *jpsipi, *erfc, *COMB_jpsi), RooArgList(nbin_signal, *n_jpsipi, n_erfc, n_cont));
+	RooAddPdf* model_inclusive = new RooAddPdf(Form("model_inclusive%d_%s",_count,pdf.Data()), "NP with B+", RooArgList(*signalnp, *jpsipi, *erfc, *COMB_jpsi), RooArgList(n_signal_np, *n_jpsipi, n_erfc, n_cont));
     // FITFITFIT JUST TO CHECK 
     model_inclusive->fitTo(*d_s, Save(), Extended(), NumCPU(4));
 	// Plot
@@ -618,6 +669,7 @@ void fit_jpsinp(RooWorkspace& w, int nbin_hist, TString pdf, int pti, int ptf, b
 }
 
 void plot_jpsifit(RooWorkspace& w, int nbin_hist, TString pdf, RooAbsPdf* model, RooDataSet* ds, TString plotName, bool with_sig) {
+  
   TCanvas* can_np= new TCanvas("can_mc","",600,600);
   can_np->cd();
   TPad *p1 = new TPad("p1","p1",0.,0.2,1.,0.99);
@@ -627,55 +679,102 @@ void plot_jpsifit(RooWorkspace& w, int nbin_hist, TString pdf, RooAbsPdf* model,
   p1->SetBottomMargin(0.10);
   p1->Draw(); 
   p1->cd();
-
+  
   RooRealVar Bmass = *(w.var("Bmass"));
   Bmass.setRange("bmass", 5.0, 6.0);
   RooPlot* massframe = Bmass.frame(Title(" "));
-  	massframe->GetYaxis()->SetTitle(TString::Format("Events / (%g MeV/c^{2})",(Bmass.getMax()-Bmass.getMin())/100*1000));
-	massframe->GetXaxis()->SetTitle("m_{J/#psi #pi^{#pm}} (GeV/c^{2})");
-	massframe->GetXaxis()->CenterTitle();
-	massframe->GetYaxis()->SetTitleOffset(1.5);
-	massframe->GetXaxis()->SetTitleOffset(1.2);
-	massframe->GetYaxis()->SetTitleSize(0.035);
-	massframe->GetYaxis()->SetTitleFont(42);
-	massframe->GetXaxis()->SetLabelFont(42);
-	massframe->GetYaxis()->SetLabelFont(42);
-	massframe->GetXaxis()->SetLabelSize(0.035);
-	massframe->GetYaxis()->SetLabelSize(0.035);	
-	massframe->GetXaxis()->SetRangeUser(5.,5.6);
-  ds->plotOn(massframe, RooFit::Name("NP"), Binning(nbin_hist), MarkerSize(0.5),MarkerStyle(8),LineColor(1),LineWidth(1));
+  massframe->GetYaxis()->SetTitle(TString::Format("Events / (%g MeV/c^{2})",(Bmass.getMax()-Bmass.getMin())/100*1000));
+  massframe->GetXaxis()->SetTitle("m_{J/#psi #pi^{#pm}} (GeV/c^{2})");
+  massframe->GetXaxis()->CenterTitle();
+  massframe->GetYaxis()->SetTitleOffset(1.5);
+  massframe->GetXaxis()->SetTitleOffset(1.2);
+  massframe->GetYaxis()->SetTitleSize(0.035);
+  massframe->GetYaxis()->SetTitleFont(42);
+  massframe->GetXaxis()->SetLabelFont(42);
+  massframe->GetYaxis()->SetLabelFont(42);
+  massframe->GetXaxis()->SetLabelSize(0.035);
+  massframe->GetYaxis()->SetLabelSize(0.035);	
+  massframe->GetXaxis()->SetRangeUser(5.,5.6);
+  ds->plotOn(massframe, RooFit::Name("NP"),Binning(nbin_hist), MarkerSize(0.5),MarkerStyle(8),LineColor(1),LineWidth(1));
   model->plotOn(massframe, RooFit::Name("NP Fit"), NormRange("bmass"),LineColor(kRed), LineStyle(1), LineWidth(1));
   model->plotOn(massframe, RooFit::Name("par"),Components(Form("erfc%d_%s",_count,pdf.Data())), NormRange("bmass"), LineColor(kGreen+3), LineStyle(9), LineWidth(2), DrawOption("L"));
   model->plotOn(massframe, RooFit::Name("COMB_jpsi"),Components(Form("COMB_jpsi%d_%s",_count,pdf.Data())), NormRange("bmass"),LineColor(kBlue), LineWidth(1), LineStyle(kDashed));
   if (with_sig) {
-    model->plotOn(massframe, RooFit::Name("signal"),Components("signalnp"), NormRange("bmass"), LineColor(kOrange-3), LineStyle(1), LineWidth(1), FillStyle(3002),FillColor(kOrange-3), VLines(), DrawOption("LF"));
-    model->plotOn(massframe, RooFit::Name("B->J/#psi #pi"),Components("jpsipi"), NormRange("bmass"),DrawOption("LF"), FillColor(kMagenta), LineStyle(1), LineColor(kMagenta), LineWidth(1)); 
+   model->plotOn(massframe, RooFit::Name("signal"),Components(Form("signalnp%d_%s",_count,pdf.Data())), NormRange("bmass"), LineColor(kOrange-3), LineStyle(1), LineWidth(1), FillStyle(3002),FillColor(kOrange-3), VLines(), DrawOption("LF"));
+   model->plotOn(massframe, RooFit::Name("B->J/#psi #pi"),Components("jpsipi"), NormRange("bmass"),DrawOption("LF"), FillColor(kMagenta+1), LineStyle(1), LineColor(kMagenta+1), LineWidth(1)); 
   }
-    model->paramOn(massframe,  Layout(0.6, 0.95, 0.65),Format("NEU", AutoPrecision(1)));
-  	massframe->getAttText()->SetTextSize(0.025);
-	massframe->getAttFill()->SetFillStyle(0);
-	massframe->getAttLine()->SetLineWidth(0);
+
+  model->paramOn(massframe,  Layout(0.6, 0.95, 0.65),Format("NEU", AutoPrecision(1)));
+  massframe->getAttText()->SetTextSize(0.025);
+  massframe->getAttFill()->SetFillStyle(0);
+  massframe->getAttLine()->SetLineWidth(0);
   massframe->Draw();
-	cout << "test" << endl;
 
   TLatex txt;
   TLegend *leg = new TLegend(0.75,0.71,0.89,0.89,NULL,"brNDC");
-	leg->SetBorderSize(0);
-	leg->SetTextSize(0.025);     
-	leg->SetTextFont(42);
-	leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->SetTextSize(0.025);     
+  leg->SetTextFont(42);
+  leg->SetFillStyle(0);
   leg->AddEntry(massframe->findObject("NP"), " MC", "ple");
   leg->AddEntry(massframe->findObject("par"), " Part. Rec. Bkg.", "l");
-  leg->AddEntry(massframe->findObject("NP Fit")," Part. + Comb Bkg.","l");
+  leg->AddEntry(massframe->findObject("NP Fit"),"Part. + Comb Bkg.","l");
   // compare yields with gen particles
   if (with_sig) {
-    leg->AddEntry(massframe->findObject("signal"), " Signal", "f");
+    leg->AddEntry(massframe->findObject("signal"), "signal", "f");
     leg->AddEntry(massframe->findObject("COMB_jpsi"), " Comb. Bkg.", "l");
-    leg->AddEntry(massframe->findObject("B->J/#psi #pi"), " B->J/#psi #pi", "f");
+    leg->AddEntry(massframe->findObject("B->J/#psi #pi"), "B->J/#psi #pi", "f");
   				}
   leg->Draw();
   can_np->SaveAs(plotName);
 				}
+
+
+template<typename... Targs>
+void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotName, Targs... options) {
+  
+  TCanvas* can_mc= new TCanvas("can_mc","",700,700);
+  can_mc->cd();
+  TPad *p1 = new TPad("p1","p1",0.,0.215,1.,1);
+  p1->SetBorderMode(1); 
+  p1->SetFrameBorderMode(0); 
+  p1->SetBorderSize(2);
+  p1->SetBottomMargin(0.10);
+  p1->Draw(); 
+  p1->cd();
+
+  RooRealVar Bmass = *(w.var("Bmass"));
+  RooPlot* massframe = Bmass.frame(Title(" "));
+  massframe->GetYaxis()->SetTitle(TString::Format("Events / (%g MeV/c^{2})",(Bmass.getMax()-Bmass.getMin())/100*1000));
+  massframe->GetXaxis()->SetTitle("m_{J/#psi #pi^{#pm}} (GeV/c^{2})");
+  massframe->GetXaxis()->CenterTitle();
+  massframe->GetYaxis()->SetTitleOffset(1.5);
+  massframe->GetXaxis()->SetTitleOffset(1.2);
+  massframe->GetYaxis()->SetTitleSize(0.035);
+  massframe->GetYaxis()->SetTitleFont(42);
+  massframe->GetXaxis()->SetLabelFont(42);
+  massframe->GetYaxis()->SetLabelFont(42);
+  massframe->GetXaxis()->SetLabelSize(0.035);
+  massframe->GetYaxis()->SetLabelSize(0.035);	
+  massframe->GetXaxis()->SetRangeUser(5.15,5.45);
+  if (plotName == "./results/BP/InclusiveMC_JPsipi_fit.pdf") {massframe->GetXaxis()->SetRangeUser(5,6);}
+  ds->plotOn(massframe, Name("dsjpp") , MarkerSize(0.5), MarkerStyle(8), LineColor(1), LineWidth(1));
+  model->plotOn(massframe, RooFit::Name("MCFit"), options...);
+  model->paramOn(massframe, Layout(0.62, 0.89, 0.75), "", Format("NEU", AutoPrecision(1)) ) ;
+  massframe->getAttText()->SetTextSize(0.025);
+  massframe->getAttFill()->SetFillStyle(0);
+  massframe->getAttLine()->SetLineWidth(0);
+  massframe->Draw();
+  TLegend *leg_jpp = new TLegend(0.75,0.8,0.89,0.89,NULL,"brNDC");
+  leg_jpp->SetBorderSize(0);
+  leg_jpp->SetTextSize(0.025);     
+  leg_jpp->SetTextFont(42);
+  leg_jpp->SetFillStyle(0);
+  leg_jpp->AddEntry(massframe->findObject("dsjpp"), " MC","p");
+  leg_jpp->AddEntry(massframe->findObject("MCFit")," Peaking Bkg. PDF","f");
+  leg_jpp->Draw();
+  can_mc->SaveAs(plotName);
+}
 
 /* Fix or release the parameters for a given PDF */
 void fix_parameters(RooWorkspace& w, TString pdfName, bool release) {
@@ -741,11 +840,11 @@ void latex_table(std::string filename, int n_col, int n_lin, std::vector<std::st
 		file_check << labels[i-1] << " & ";
 
 		for(int c=1; c<n_col-1; c++){
-			file << std::setprecision(3)<< numbers[c-1][i-1]<< " \\% & ";
-			file_check << std::setprecision(3) << numbers[c-1][i-1]<< " \\% & ";
+			file << /*std::setprecision(3)<<*/  numbers[c-1][i-1]<< " \\% & ";
+			file_check << /*std::setprecision(3)<<*/  numbers[c-1][i-1]<< " \\% & ";
 									}
-		file << std::setprecision(3)<< numbers[n_col-2][i-1]<< " \\% \\\\" << std::endl;
-		file_check << std::setprecision(3)<< numbers[n_col-2][i-1]<< " \\% \\\\" << std::endl; 
+		file << /*std::setprecision(3)<<*/  numbers[n_col-2][i-1]<< " \\% \\\\" << std::endl;
+		file_check << /*std::setprecision(3)<<*/  numbers[n_col-2][i-1]<< " \\% \\\\" << std::endl; 
 	}
 
 	file << "\\bottomrule" << std::endl;
@@ -824,14 +923,23 @@ void validate_fit(RooWorkspace* w, TString pdf, TString tree, TString variable, 
 	double n_signal_init = params[0].getVal();
 	double n_signal_error_init = params[0].getError();
 
+	cout << "N_signal initial value: " << n_signal_init << endl;
+	cout << "N_signal initial Error value: " << n_signal_error_init << endl;
+
 	int params_size = params.size();
 
+	cout << "params_size " << params_size << endl;
+
 	RooMCStudy* mcstudy = new RooMCStudy(*model, Bmass,  Extended(), FitOptions(Save(kTRUE), PrintEvalErrors(0)));
+	
 	mcstudy->generateAndFit(5000);
-	cout << "DONE Generate and Fit" << endl;
+
+	cout << "DONE Generate and Fit " << endl;
+
 
 	TString XName[2] = {"P(Y)","mean"};
 	vector<RooPlot*> framesPull, framesParam, framesError;
+
 	for(int i = 0; i < params_size; ++i)
 	{
 		framesPull.push_back(mcstudy->plotPull(params.at(i),FrameBins(50),FrameRange(-5,5)));
@@ -841,60 +949,32 @@ void validate_fit(RooWorkspace* w, TString pdf, TString tree, TString variable, 
 		framesError.push_back(mcstudy->plotError(params.at(i),FrameBins(50)));
 		framesError[i]->SetTitle("");
 	}
+
 	vector<TGraph*> h1;
 	vector<TGraph*> h2;
 	vector<TGraph*> h3;
+
 	for(int i = 0; i < params_size; ++i){
 		h1.push_back(static_cast<TGraph*>(framesPull.at(i)->getObject(0)));
 		h2.push_back(static_cast<TGraph*>(framesParam.at(i)->getObject(0)));
 		h3.push_back(static_cast<TGraph*>(framesError.at(i)->getObject(0)));
 	}
 
+
 	TCanvas* c_pull = new TCanvas("pulls", "pulls", 700, 700);
-
-	for(int i = 0; i < params_size; ++i){
-		c_pull->cd();
-		h1[i]->SetTitle("");
-		h1[i]->Draw();
-		c_pull->Update();
-		h1[i]->Fit("gaus","","",-5,5);
-		h1[i]->GetFunction("gaus")->SetLineColor(4);
-		h1[i]->GetFunction("gaus")->SetLineWidth(5);
-		h1[i]->Draw("APsame");
-	}
-
 	TCanvas* c_params = new TCanvas("params", "params", 700, 700);
-	for(int i = 0; i < params_size; ++i){
-		c_params->cd();
-		framesParam.at(i)->GetYaxis()->SetTitle("Toy MCs");
-		framesParam.at(i)->GetYaxis()->SetTitleOffset(1.4);
-		framesParam.at(i)->Draw();
-	}
-
-	/*TCanvas* c_params = new TCanvas("params", "params", 900, 800);
-	  for(int i = 0; i < params_size; ++i){
-	  c_params->cd();
-	  h2[i]->SetTitle("");
-	  h2[i]->Draw();
-	  c_params->Update();
-	  if(particle == 0){h2[i]->Fit("gaus","","",900,1200);}
-	  else if(particle == 1){h2[i]->Fit("gaus","","",60, 120);}
-	  h2[i]->GetFunction("gaus")->SetLineColor(4);
-	  h2[i]->GetFunction("gaus")->SetLineWidth(5);
-	//h2[i]->GetXaxis()->SetTitle();
-	h2[i]->GetYaxis()->SetTitle("Toy MCs");
-	h2[i]->Draw("same");
-	}*/
-
-
-
 	TCanvas* c_errors = new TCanvas("errors", "errors", 700, 700);
-	for(int i = 0; i < params_size; ++i){
-		c_errors->cd();
-		framesError.at(i)->GetYaxis()->SetTitle("Toy MCs");
-		framesError.at(i)->GetYaxis()->SetTitleOffset(1.4);
-		framesError.at(i)->Draw();
-	}
+
+	gPad->SetLeftMargin(0.15);
+	gStyle->SetStatX(0.95);		//Stat box x position (top right hand corner)	
+	gStyle->SetStatY(0.9); 		//Stat box y position 	
+	gStyle->SetStatW(0.1);	 		//Stat box width as fraction of pad size	0.05	
+	gStyle->SetStatFont(62);  		//Stat box font
+	gStyle->SetStatFontSize(0);
+	gStyle->SetOptFit(0111);
+	gStyle->SetStatBorderSize(0);
+	gStyle->SetStatColor(0);
+	gStyle->SetStatStyle(0);		//Stat box fill style hollow
 
 	for(int i = 0; i < params_size; ++i){
 
@@ -904,14 +984,7 @@ void validate_fit(RooWorkspace* w, TString pdf, TString tree, TString variable, 
 		c_pull->cd();
 		h1[i]->SetTitle("");
 		h1[i]->Fit("gaus","","",-5,5);
-		gStyle->SetStatX(0.95);		//Stat box x position (top right hand corner)	
-	    gStyle->SetStatY(0.9); 		//Stat box y position 	
-		gStyle->SetStatW(0.1);	 		//Stat box width as fraction of pad size	0.05	
-		gStyle->SetStatFont(62);  		//Stat box font
-		gStyle->SetOptFit(0111);
-		gStyle->SetStatBorderSize(0);
-		gStyle->SetStatColor(0);
-		gStyle->SetStatStyle(0);		//Stat box fill style hollow
+		
 		c_pull->Update();
 		h1[i]->GetFunction("gaus")->SetLineColor(kCyan+2);
 		h1[i]->GetFunction("gaus")->SetLineWidth(1);
@@ -919,32 +992,33 @@ void validate_fit(RooWorkspace* w, TString pdf, TString tree, TString variable, 
 		h1[i]->GetFunction("gaus")->SetFillColor(kCyan+2);
 		h1[i]->GetXaxis()->SetTitle(Form("%s",XName[i].Data()));
 		h1[i]->GetYaxis()->SetTitle("Toy MCs");
-		h1[i]->GetXaxis()->CenterTitle();
-		h1[i]->GetYaxis()->CenterTitle();
 		h1[i]->GetXaxis()->SetRangeUser(-5, 5);
 		h1[i]->Draw("APsame");
-
+	
 		c_errors->cd();
 		h3[i]->SetTitle("");
-		h3[i]->Draw();
-		c_errors->Update();
 		h3[i]->Fit("gaus","","",n_signal_error_init*0.5,n_signal_error_init*1.5);
+		
+		c_errors->Update();
 		h3[i]->GetFunction("gaus")->SetLineColor(4);
-		h3[i]->GetFunction("gaus")->SetLineWidth(5);
+		h3[i]->GetFunction("gaus")->SetLineWidth(1);
 		h3[i]->GetXaxis()->SetTitle(Form("%s Error",XName[i].Data()));
 		h3[i]->GetYaxis()->SetTitle("");
 		h3[i]->Draw("APsame");
 
 		c_params->cd();
 		h2[i]->SetTitle("");
-		h2[i]->Draw();
-		c_params->Update();
 		h2[i]->Fit("gaus","","",n_signal_init * 0.5,n_signal_init * 1.5);
+
+		c_params->Update();
 		h2[i]->GetFunction("gaus")->SetLineColor(4);
-		h2[i]->GetFunction("gaus")->SetLineWidth(5);
+		h2[i]->GetFunction("gaus")->SetLineWidth(1);
 		h2[i]->GetXaxis()->SetTitle(Form("%s Mean",XName[i].Data()));
 		h2[i]->GetYaxis()->SetTitle("");
 		h2[i]->Draw("APsame");
+
+
+
 
 		/*if(tree=="ntKp"){
 			//c_pull->SaveAs("./mcstudy/pulls_poisson_Bu.pdf");
