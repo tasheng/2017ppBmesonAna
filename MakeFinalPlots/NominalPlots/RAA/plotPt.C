@@ -45,6 +45,7 @@ Output: xsec vs pt, ratio vs pt.
 #include "auxiliaryRef.h"
 
 #include "theoryPrediction/drawTheory.h"
+#include "theoryPrediction/drawTheory_Bs.h"
 #include "theoryPrediction/uti.h"
 
 //#include "outsideSource/lhcb.C"
@@ -52,30 +53,41 @@ Output: xsec vs pt, ratio vs pt.
 using namespace std;
 
 
-constexpr double xHigh = 60;
+double xLow = 5;
+double xHigh = 60;
 double yLow = 0.0;
 double yHigh = 1.55;
 
 const map<int, string> pname = {
     {0, "BP"},
-    {1, "Bs"}
+    {1, "Bs"},
+    {2, "BP_light"},
+    {3, "BPBs_light"}
     };
 
 
-bool drawLight = 1;
+bool drawLight = 0;
 void adjustLegend(TLegend* l);
 
 
 void plotPt(bool bSavePlots       = 1,
-		bool bDoDebug         = 0, //  figure out if things are read properly
-		bool whichPlot        = 1, //0 is x-sec, 1 is for ratio
-		bool drawRef          = 1, //draw Ref (for ratio only
-    bool drawBs = 1,
-		const char* inputDir  = "dataSource", //inptu txt files
-		const char* outputDir = "figs")// where the output figures will be
-		{
-      bool drawThm = (!drawBs);
-      bool drawlhcb         = 1;
+            bool bDoDebug         = 0, //  figure out if things are read properly
+            bool whichPlot        = 1, //0 is x-sec, 1 is for ratio
+            bool drawRef          = 1, //draw Ref (for ratio only
+            bool drawBPBs = 1,
+            bool drawBs = 0,
+            const char* inputDir  = "dataSource", //inptu txt files
+            const char* outputDir = "figs")// where the output figures will be
+{
+  unsigned mask = drawBs | (drawBPBs << 1);
+  if (mask > 3) return;
+
+  bool drawThm = (!drawBPBs);
+  bool drawlhcb         = 1;
+
+  if (mask == 2) {
+    xLow = 3;
+  }
 		gSystem->mkdir(Form("./%s/png",outputDir), kTRUE);
 		gSystem->mkdir(Form("./%s/pdf",outputDir), kTRUE);
 
@@ -85,9 +97,13 @@ void plotPt(bool bSavePlots       = 1,
 		setTDRStyle();
 
     if (drawBs) {
-      yLow = 0.3;
+      // yLow = 0.0;
       yHigh = 1.7;
-      drawLight = 0;
+    }
+    if (drawBPBs) {
+      // yLow = 0.0;
+      yHigh = 1.7;
+      drawLight = 1;
     }
 
 
@@ -345,6 +361,25 @@ void plotPt(bool bSavePlots       = 1,
 
 
 
+    int bplmarker = kAzure - 1;
+    int bplbox = kAzure + 7;
+
+    int bsmarker = kRed + 1;
+    int bsbox = kRed - 7;
+
+    int chmarker = kYellow + 1;
+    int chbox = kYellow - 9;
+
+    int d0marker = kGreen + 2;
+    int d0box = kGreen - 5;
+
+    // if (!drawBPBs) {
+    //   bplmarker = kGreen + 3;
+    //   bplbox = kGreen - 9;
+
+    //   bsmarker = kBlue + 2;
+    //   bsbox = kBlue - 9;
+    // }
 
 		//==================
 		// // **************** marker setup
@@ -354,9 +389,9 @@ void plotPt(bool bSavePlots       = 1,
 		pgBs_lowWhite->SetMarkerStyle(markerHigh[0]);
 		pgBs_high->SetMarkerStyle(markerHigh[0]);
 
-		pgBpl_lowWhite->SetMarkerStyle(markerHigh[1]);
-		pgBpl_low->SetMarkerStyle(markerLow[1]);
-		pgBpl_high->SetMarkerStyle(markerHigh[1]);
+		pgBpl_lowWhite->SetMarkerStyle(markerHigh[0]);
+		pgBpl_low->SetMarkerStyle(markerLow[0]);
+		pgBpl_high->SetMarkerStyle(markerHigh[0]);
 			
 
 		pgRatio_low->SetMarkerStyle(markerRatio[0]);
@@ -386,36 +421,34 @@ void plotPt(bool bSavePlots       = 1,
 		pgBs_lowWhite->SetMarkerColor(kWhite);
 		pgBpl_lowWhite->SetMarkerColor(kWhite);
 	
-		pgBs_low->SetMarkerColor(kBlue+2);
-		pgBs_high->SetMarkerColor(kBlue+2);
-
 		//cout << "Color = " << TColor::GetColor("#C32148") << endl; 
 
 //		pgBs_low->SetMarkerColor(924);
 		pgBpl_low->SetMarkerColor(colorLow[1]);
 		pgBpl_high->SetMarkerColor(colorHigh[1]);
-    if (!drawBs) {
-      pgBpl_low->SetMarkerColor(kAzure-1);
-      pgBpl_high->SetMarkerColor(kAzure-1);
-    } else {
-      pgBpl_low->SetMarkerColor(kGreen+3);
-      pgBpl_high->SetMarkerColor(kGreen+3);
-    }
+
+    pgBpl_low->SetMarkerColor(bplmarker);
+    pgBpl_high->SetMarkerColor(bplmarker);
+
+    pgBs_low->SetMarkerColor(bsmarker);
+    pgBs_high->SetMarkerColor(bsmarker);
 
 		pgRatio_lowWhite->SetMarkerColor(kWhite);
 		pgRatio_low->SetMarkerColor(kRed + 2);
 		pgRatio_high->SetMarkerColor(kRed + 2);
 
 		// line color
-		pgBs_low->SetLineColor(colorLow[0]);
-		pgBs_high->SetLineColor(colorHigh[0]);
-		pgBs_low->SetLineColor(kBlue+2);	
-		pgBs_high->SetLineColor(kBlue+2);
+		// pgBs_low->SetLineColor(colorLow[0]);
+		// pgBs_high->SetLineColor(colorHigh[0]);
+		pgBs_lowWhite->SetLineColor(bsmarker);
+		pgBs_low->SetLineColor(bsmarker);
+		pgBs_high->SetLineColor(bsmarker);
 
-		pgBpl_low->SetLineColor(colorLow[1]);
-		pgBpl_high->SetLineColor(colorHigh[1]);
-		pgBpl_low->SetLineColor(kGreen+3);
-		pgBpl_high->SetLineColor(kGreen+3);
+    // pgBpl_low->SetLineColor(colorLow[1]);
+    // pgBpl_high->SetLineColor(colorHigh[1]);
+    pgBpl_lowWhite->SetLineColor(bplmarker);
+    pgBpl_low->SetLineColor(bplmarker);
+    pgBpl_high->SetLineColor(bplmarker);
 
 
 		pgRatio_lowWhite->SetLineColor(kRed + 2);
@@ -424,15 +457,11 @@ void plotPt(bool bSavePlots       = 1,
 
 
 		// systematic boxes
-		pgBs_syst_low->SetFillColorAlpha(kBlue-9,0.5);
-		pgBs_syst_high->SetFillColorAlpha(kBlue-9,0.5);
-    if (!drawBs) {
-      pgBpl_syst_low->SetFillColorAlpha(kAzure+7,0.5);
-      pgBpl_syst_high->SetFillColorAlpha(kAzure+7,0.5);
-    } else {
-      pgBpl_syst_low->SetFillColorAlpha(kGreen-9,0.5);
-      pgBpl_syst_high->SetFillColorAlpha(kGreen-9,0.5);
-    }
+		pgBs_syst_low->SetFillColorAlpha(bsbox, 0.5);
+		pgBs_syst_high->SetFillColorAlpha(bsbox, 0.5);
+
+    pgBpl_syst_low->SetFillColorAlpha(bplbox, 0.5);
+    pgBpl_syst_high->SetFillColorAlpha(bplbox, 0.5);
 
 		pgRatio_syst_low->SetFillColorAlpha(colorRatio[0],0.2);
 		pgRatio_lowWhite->SetFillColor(kWhite);
@@ -558,9 +587,43 @@ void plotPt(bool bSavePlots       = 1,
 
 		// // ##################################################### x-sec canvas
 		TCanvas *pc1 = new TCanvas("pc1","pc1");
-		f4->SetLineStyle(2);
-		f4->Draw();// axis
+    pc1->SetLogx();
+		// hDummy->SetLineStyle(2);
+    // hDummy->SetAxisRange(yLow,yHigh,"y");
+    //hDummy->GetYaxis()->SetRangeUser(yLow, yHigh);
+		// hDummy->Draw();// axis
 		//pc1->SetBottomMargin(0.10);
+    TH1F* hDummy = new TH1F("dummy", "dummy", 100, xLow, xHigh);
+    hDummy->GetYaxis()->SetRangeUser(yLow, yHigh);
+		hDummy->GetYaxis()->SetTitle(yAxName[whichPlot]);
+		hDummy->GetXaxis()->SetTitle(xAxName[0]);
+		hDummy->GetXaxis()->CenterTitle(kTRUE);
+		hDummy->GetYaxis()->CenterTitle();
+		if(whichPlot==1){
+			hDummy->GetYaxis()->SetTitleSize(0.06*0.83);
+			hDummy->GetXaxis()->SetTitleSize(0.06*0.83);
+		
+			hDummy->GetYaxis()->SetTitleOffset(1.40);
+			hDummy->GetXaxis()->SetTitleOffset(1.20);
+
+
+		}
+
+		if(whichPlot==0){
+			hDummy->GetYaxis()->SetTitleSize(0.06*0.80);
+			hDummy->GetYaxis()->SetTitleOffset(1.5);
+			hDummy->GetXaxis()->SetTitleOffset(1.05);
+			hDummy->GetXaxis()->SetTitleSize(f4->GetXaxis()->GetTitleSize() * 0.77);
+			hDummy->GetXaxis()->SetTitleOffset(1.18);
+
+			hDummy->GetXaxis()->SetTitleSize(0.06*0.83);  //Unify Textsize
+			hDummy->GetYaxis()->SetTitleSize(0.06*0.83);
+			hDummy->GetYaxis()->SetTitleOffset(1.40);
+			hDummy->GetXaxis()->SetTitleOffset(1.20);
+
+			cout << "Offset = " << hDummy->GetYaxis()->GetTitleOffset() << endl;
+		}
+    hDummy->Draw();
 	
 	//	cout << "pc1->GetBottomMargin() = " << pc1->GetBottomMargin() << endl;
 	
@@ -601,10 +664,10 @@ void plotPt(bool bSavePlots       = 1,
                              d0RaaSyst->GetBinContent(i + 1), d0RaaSyst->GetBinContent(i + 1));
     }
 
-		gd0Syst->SetFillColorAlpha(kRed-9,0.5);
-		gd0Syst->SetLineColor(kRed-9);
-		gd0->SetLineColor(kRed+2);
-		gd0->SetMarkerColor(kRed+2);
+		gd0Syst->SetFillColorAlpha(d0box,0.5);
+		gd0Syst->SetLineColor(d0box);
+		gd0->SetLineColor(d0marker);
+		gd0->SetMarkerColor(d0marker);
 
     auto gch = (TGraphAsymmErrors*) pgBpl_high->Clone();
     auto gchSyst = (TGraphAsymmErrors*) pgBpl_syst_high->Clone();
@@ -620,16 +683,17 @@ void plotPt(bool bSavePlots       = 1,
                              chRaaSyst->GetBinContent(i + 1), chRaaSyst->GetBinContent(i + 1));
     }
 
-		gchSyst->SetFillColorAlpha(kYellow-9,0.5);
-		gchSyst->SetLineColor(kYellow-9);
-		gch->SetLineColor(kYellow+2);
-		gch->SetMarkerColor(kYellow+2);
+		gchSyst->SetFillColorAlpha(chbox, 0.5);
+		gchSyst->SetLineColor(chbox);
+		gch->SetLineColor(chmarker);
+		gch->SetMarkerColor(chmarker);
 
+    double thmColorAlpha = 0.4;
 		if(whichPlot==0)// x-section
 		{
       TLegend *legendThm=new TLegend(0.18,0.64,0.60,0.915,"");
       TLegend *legendAds=new TLegend(0.71,0.64,0.95,0.78,"");
-      if(drawThm){
+      if(drawThm && !drawBs){
         adjustLegend(legendThm);
         adjustLegend(legendAds);
         plotTheory();
@@ -643,9 +707,9 @@ void plotPt(bool bSavePlots       = 1,
         gThmDummy3->SetLineColor(0);
         gThmDummy4->SetLineColor(0);
         gThmDummy5->SetLineColor(0);
-        gThmDummy3->SetFillColorAlpha(kYellow+2,0.5);
-        gThmDummy4->SetFillColorAlpha(kViolet-8,0.5);
-        gThmDummy5->SetFillColorAlpha(kGreen-2,0.5);
+        gThmDummy3->SetFillColorAlpha(kYellow+2, thmColorAlpha);
+        gThmDummy4->SetFillColorAlpha(kViolet-8, thmColorAlpha);
+        gThmDummy5->SetFillColorAlpha(kGreen-2, thmColorAlpha);
         gThmDummy1->SetLineWidth(8.);
         gThmDummy2->SetLineWidth(8.);
         gThmDummy2->SetLineStyle(6);
@@ -661,17 +725,35 @@ void plotPt(bool bSavePlots       = 1,
         //legendAds->SetHeader("AdS/CFT HH");
         //TLegendEntry *ent_thm4 = legendAds->AddEntry(gThmDummy4,"D(p)","f");
         //TLegendEntry *ent_thm5 = legendAds->AddEntry(gThmDummy5,"D = const","f");
-        ent_thm1->SetTextSize(0.038);
-        ent_thm2->SetTextSize(0.038);
-        ent_thm3->SetTextSize(0.038);
-        ent_thm4->SetTextSize(0.038);
-        ent_thm5->SetTextSize(0.038);
-      }
-      if(drawThm) {
+        ent_thm1->SetTextSize(0.028);
+        ent_thm2->SetTextSize(0.028);
+        ent_thm3->SetTextSize(0.028);
+        ent_thm4->SetTextSize(0.028);
+        ent_thm5->SetTextSize(0.028);
+
         legendThm->Draw();
         //legendAds->Draw();
+      } else if (drawThm && drawBs) {
+        float legendTextSize = 0.028;
+        TLegend *legendSigma=new TLegend(0.45,0.65,0.6,0.75);
+        adjustLegend(legendSigma);
+        plotTheory_Bs();
+        TGraphAsymmErrors* gThmDummy1 = new TGraphAsymmErrors();
+        TGraphAsymmErrors* gThmDummy2 = new TGraphAsymmErrors();
+        gThmDummy1->SetLineColor(colorTAMU_Bs);
+        gThmDummy2->SetLineColor(0);
+        gThmDummy2->SetFillColorAlpha(colorCUJET_Bs,0.5);
+        gThmDummy1->SetFillStyle(styleTAMU_Bs);
+        gThmDummy2->SetFillStyle(styleCUJET_Bs);
+        gThmDummy1->SetLineWidth(8.);
+        gThmDummy2->SetLineWidth(8.);
+        TLegendEntry *ent_thm1 = legendSigma->AddEntry(gThmDummy1,"TAMU","l");
+        TLegendEntry *ent_thm2 = legendSigma->AddEntry(gThmDummy2,"CUJET3.0","f");
+        ent_thm1->SetTextSize(legendTextSize);
+        ent_thm2->SetTextSize(legendTextSize);
+
+        legendSigma->Draw();
       }
-			//gPad->SetLogy();
 
       // D0 comparison
       if (drawLight) {
@@ -685,8 +767,8 @@ void plotPt(bool bSavePlots       = 1,
       if (drawBs) {
         pgBs_syst_high->SetLineWidth(1);
 
-        pgBs_syst_high->Draw("5same");
-        pgBs_syst_low->Draw("5same");
+        pgBs_syst_high->Draw("2same");
+        pgBs_syst_low->Draw("2same");
         //	pgBs_low->SetMarkerStyle(24);
         pgBs_lowWhite->Draw("P");
         pgBs_low->Draw("P");
@@ -694,17 +776,18 @@ void plotPt(bool bSavePlots       = 1,
         pgBs_lowWhite->Draw("P");
       }
 
-      pgBpl_syst_low->Draw("5same");
-      pgBpl_syst_high->Draw("5same");
+      if (mask != 1) {
+        pgBpl_syst_low->Draw("2same");
+        pgBpl_syst_high->Draw("2same");
 
-			
-			pgBpl_lowWhite->Draw("P");
-			pgBpl_low->Draw("P");
+        pgBpl_lowWhite->Draw("P");
+        pgBpl_low->Draw("P");
 
-			pgBpl_high->Draw("P");
-			pgBpl_lowWhite->Draw("P");
+        pgBpl_high->Draw("P");
+        pgBpl_lowWhite->Draw("P");
+      }
 
-			TLine * Unity = new TLine(5,1,xHigh,1);
+			TLine * Unity = new TLine(xLow,1,xHigh,1);
 			Unity->SetLineWidth(2);
 			Unity->SetLineStyle(2);
 			Unity->SetLineColor(1);
@@ -742,13 +825,18 @@ void plotPt(bool bSavePlots       = 1,
 			lat->SetTextSize(ltxSetTextSize4); //Enlarge Labels
 
 			cout << "ltxSetTextSize4 = " << ltxSetTextSize4 << endl;
-			lat->DrawLatex(xsec_ltxText1_xStart + 0.30,xsec_ltxText1_yStart - 0.30+ 0.037,Form("global uncertainty: #pm %.1f%%",glbSystUpBp));
+			lat->DrawLatex(xsec_ltxText1_xStart + 0.30,xsec_ltxText1_yStart - 0.30+ 0.010,Form("global uncertainty: #pm %.1f%%",glbSystUpBp));
 
       if (drawThm) {
-        double ShiftX = 0.05;
-        double ShiftY = 0.13;
-        double ysep = 0.035;
+        // double shiftX = 0.05;
+        // double shiftY = 0.13;
+        // double ysep = 0.035;
+        // double yoffset = 0.005;
+        double shiftX = 0.10;
+        double shiftY = -0.03;
+        double ysep = 0.04;
         double yoffset = 0.005;
+        double xsep = 0.19;
 
         TLatex bold;
         bold.SetNDC();
@@ -769,52 +857,44 @@ void plotPt(bool bSavePlots       = 1,
         latex.SetTextAlign(11);
         latex.SetTextSize(ltxSetTextSize2);
 
-        TLegend *legb = new TLegend(legXsec_xLowStart + ShiftX + 0.02,
-                                    legXsec_y + 0.13 + yoffset * 4 - ysep * 0,
-                                    legXsec_xLowEnd+ShiftX-0.10+0.06,
-                                    legXsec_y + 0.13 - yoffset - ysep * 2,
+        TLegend *legb = new TLegend(legXsec_xLowStart + shiftX + 0.05,
+                                    legXsec_y + shiftY + 0.13 + yoffset * 4 - ysep * 0,
+                                    legXsec_xLowEnd + shiftX-0.10,
+                                    legXsec_y + shiftY + 0.13 - yoffset - ysep * 2,
                                     "                    ","brNDC");
         legb->SetBorderSize(0);
         legb->SetTextSize(ltxSetTextSize2);
         legb->SetTextFont(42);
         legb->AddEntry(pgBpl_low,"1.5 < |y| < 2.4","p");
         legb->AddEntry(pgBpl_high,"|y| < 2.4 ","p");
-        legb->Draw();
 
-        TLegend *legd = new TLegend(legXsec_xLowStart + ShiftX + 0.02,
-                                    legXsec_y + 0.13 + yoffset * 4 - ysep * 3,
-                                    legXsec_xLowEnd+ShiftX-0.10+0.06,
-                                    legXsec_y + 0.13 - yoffset - ysep * 4,
+        TLegend *legbs = new TLegend(legXsec_xLowStart + shiftX + 0.05,
+                                    legXsec_y + shiftY + 0.13 + yoffset * 4 - ysep * 3,
+                                    legXsec_xLowEnd + shiftX-0.10,
+                                    legXsec_y + shiftY + 0.13 - yoffset - ysep * 5,
                                     "                    ","brNDC");
-        legd->SetBorderSize(0);
-        legd->SetTextSize(ltxSetTextSize2);
-        legd->SetTextFont(42);
-        legd->AddEntry(gd0, "|y| < 1 ","p");
-        legd->Draw();
+        legbs->SetBorderSize(0);
+        legbs->SetTextSize(ltxSetTextSize2);
+        legbs->SetTextFont(42);
+        legbs->AddEntry(pgBs_low,"1.5 < |y| < 2.4","p");
+        legbs->AddEntry(pgBs_high,"|y| < 2.4 ","p");
 
-        TLegend *legh = new TLegend(legXsec_xLowStart + ShiftX + 0.02,
-                                    legXsec_y + 0.13 + yoffset * 4 - ysep * 5,
-                                    legXsec_xLowEnd+ShiftX-0.10+0.06,
-                                    legXsec_y + 0.13 - yoffset - ysep * 6,
-                                    "                    ","brNDC");
-        legh->SetBorderSize(0);
-        legh->SetTextSize(ltxSetTextSize2);
-        legh->SetTextFont(42);
-        legh->AddEntry(gch, "|#eta| < 1 ","p");
-        legh->Draw();
-
-        latex.DrawLatex(legXsec_xLowStart+ShiftX+0.02 + 0.009,
-                        legXsec_y + 0.13, "#bf{B^{+}}, Cent. 0-90%");
-        latex.DrawLatex(legXsec_xLowStart+ShiftX+0.02 + 0.009,
-                        legXsec_y + 0.13 - ysep * 3, "#bf{D^{0}}, Cent. 0-100%");
-        latex.DrawLatex(legXsec_xLowStart+ShiftX+0.02 + 0.009,
-                        legXsec_y + 0.13 - ysep * 5, "#bf{h^{+}}, Cent. 0-100%");
+        if (!drawBs) {
+          legb->Draw();
+          latex.DrawLatex(legXsec_xLowStart + shiftX + 0.04 + 0.009,
+                          legXsec_y + shiftY + 0.13, "#bf{B^{+}}, Cent. 0-90%");
+        } else {
+          legbs->Draw();
+          latex.DrawLatex(legXsec_xLowStart + shiftX + 0.04 + 0.009,
+                          legXsec_y + shiftY + 0.13 - ysep * 3, "#bf{B^{0}_{s}}, Cent. 0-90%");
+        }
 
       } else {
-        double shiftX = 0.05;
+        double shiftX = 0.10;
         double shiftY = -0.03;
         double ysep = 0.04;
         double yoffset = 0.005;
+        double xsep = 0.19;
 
         TLatex latex;
         latex.SetNDC();
@@ -825,9 +905,9 @@ void plotPt(bool bSavePlots       = 1,
         latex.SetTextAlign(11);
         latex.SetTextSize(ltxSetTextSize2);
 
-        TLegend *legb = new TLegend(legXsec_xLowStart + shiftX + 0.02,
+        TLegend *legb = new TLegend(legXsec_xLowStart + shiftX + 0.05,
                                     legXsec_y + shiftY + 0.13 + yoffset * 4 - ysep * 0,
-                                    legXsec_xLowEnd+shiftX-0.10+0.06,
+                                    legXsec_xLowEnd + shiftX-0.10,
                                     legXsec_y + shiftY + 0.13 - yoffset - ysep * 2,
                                     "                    ","brNDC");
         legb->SetBorderSize(0);
@@ -837,9 +917,9 @@ void plotPt(bool bSavePlots       = 1,
         legb->AddEntry(pgBpl_high,"|y| < 2.4 ","p");
         legb->Draw();
 
-        TLegend *legbs = new TLegend(legXsec_xLowStart + shiftX + 0.02,
+        TLegend *legbs = new TLegend(legXsec_xLowStart + shiftX + 0.05,
                                     legXsec_y + shiftY + 0.13 + yoffset * 4 - ysep * 3,
-                                    legXsec_xLowEnd+shiftX-0.10+0.06,
+                                    legXsec_xLowEnd + shiftX-0.10,
                                     legXsec_y + shiftY + 0.13 - yoffset - ysep * 5,
                                     "                    ","brNDC");
         legbs->SetBorderSize(0);
@@ -847,12 +927,42 @@ void plotPt(bool bSavePlots       = 1,
         legbs->SetTextFont(42);
         legbs->AddEntry(pgBs_low,"1.5 < |y| < 2.4","p");
         legbs->AddEntry(pgBs_high,"|y| < 2.4 ","p");
-        legbs->Draw();
+        if (drawBs) {
+          legbs->Draw();
+        }
 
-        latex.DrawLatex(legXsec_xLowStart+shiftX+0.02 + 0.009,
+        TLegend *legd = new TLegend(legXsec_xLowStart + shiftX  - xsep,
+                                    legXsec_y + shiftY + 0.13 + yoffset * 4 - ysep * 0,
+                                    legXsec_xLowEnd + shiftX - xsep - 0.20,
+                                    legXsec_y +  shiftY + 0.13 - yoffset - ysep * 1,
+                                    "                    ","brNDC");
+        legd->SetBorderSize(0);
+        legd->SetTextSize(ltxSetTextSize2);
+        legd->SetTextFont(42);
+        legd->AddEntry(gd0, "|y| < 1 ","p");
+        legd->Draw();
+
+        TLegend *legh = new TLegend(legXsec_xLowStart + shiftX - xsep,
+                                    legXsec_y + shiftY + 0.13 + yoffset * 4 - ysep * 2,
+                                    legXsec_xLowEnd + shiftX - xsep - 0.20,
+                                    legXsec_y + shiftY + 0.13 - yoffset - ysep * 3,
+                                    "                    ","brNDC");
+        legh->SetBorderSize(0);
+        legh->SetTextSize(ltxSetTextSize2);
+        legh->SetTextFont(42);
+        legh->AddEntry(gch, "|#eta| < 1 ","p");
+        legh->Draw();
+
+        latex.DrawLatex(legXsec_xLowStart + shiftX + 0.04 + 0.009,
                         legXsec_y + shiftY + 0.13, "#bf{B^{+}}, Cent. 0-90%");
-        latex.DrawLatex(legXsec_xLowStart+shiftX+0.02 + 0.009,
-                        legXsec_y + shiftY + 0.13 - ysep * 3, "#bf{B^{0}_{s}}, Cent. 0-90%");
+        if (drawBs) {
+          latex.DrawLatex(legXsec_xLowStart + shiftX + 0.04 + 0.009,
+                          legXsec_y + shiftY + 0.13 - ysep * 3, "#bf{B^{0}_{s}}, Cent. 0-90%");
+        }
+        latex.DrawLatex(legXsec_xLowStart + shiftX - xsep,
+                        legXsec_y + shiftY + 0.13 - ysep * 0, "#bf{D^{0}}, Cent. 0-100%");
+        latex.DrawLatex(legXsec_xLowStart + shiftX - xsep,
+                        legXsec_y + shiftY + 0.13 - ysep * 2, "#bf{h^{+}}, Cent. 0-100%");
       }
 
 
@@ -928,8 +1038,8 @@ void plotPt(bool bSavePlots       = 1,
 		{
 			if (whichPlot==0)
 			{
-				pc1->SaveAs(Form("%s/pdf/BRAA_vsPt_%s.pdf",outputDir, pname.at(drawBs).c_str()));
-				pc1->SaveAs(Form("%s/png/BRAA_vsPt_%s.png",outputDir, pname.at(drawBs).c_str()));
+				pc1->SaveAs(Form("%s/pdf/BRAA_vsPt_%s.pdf",outputDir, pname.at(mask).c_str()));
+				pc1->SaveAs(Form("%s/png/BRAA_vsPt_%s.png",outputDir, pname.at(mask).c_str()));
 			}else{
 				pc1->SaveAs(Form("%s/pdf/ratio_vsPt_ref%d_%d.pdf",outputDir,drawRef,drawlhcb));
 				pc1->SaveAs(Form("%s/png/ratio_vsPt_ref%d_%d.png",outputDir,drawRef,drawlhcb));

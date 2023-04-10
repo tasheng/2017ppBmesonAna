@@ -135,30 +135,31 @@ paperPlots () {
     pushd MakeFinalPlots/NominalPlots/CrossSection
     root -b -l -q plotPt.C'(1,1,0,1,1)'
     cd ../RAA
-    root -b -l -q plotPt.C'(1,1,0,1,1)'
+    root -b -l -q plotPt.C'(1,1,0,1,1,0)'
+    root -b -l -q plotPt.C'(1,1,0,1,1,1)'
+    root -b -l -q plotPt.C'(1,1,0,1,0,0)'
+    root -b -l -q plotPt.C'(1,1,0,1,0,1)'
     popd
 }
 
 #UNCOMMENT ACORDINGLY
 #(Run by THIS ORDER!)
 
-yield
-wait
+# yield
+# # wait
 
-sync_with_main
+# sync_with_main
 
-bpEff &
-bsEff &
-wait
+# bpEff &
+# bsEff &
+# wait
 
-#syst
-#wait
-
-#nominal
+# nominal
+# syst
 
 # bpStat&
 # bsStat&
 # wait
 
-#comp
-#paperPlots
+comp
+paperPlots
