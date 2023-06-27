@@ -3,10 +3,10 @@
 sync_with_main () {
     mkdir -p BP/EffAna/BDTWeights/
     mkdir -p Bs/EffAna/BDTWeights/
-    rsync -a ../braa_nohbhe_trk/BP/EffAna/BDTWeights/BPw.root BP/EffAna/BDTWeights/BPw.root
-    rsync -a ../braa_nohbhe_trk/Bs/EffAna/BDTWeights/Bsw.root Bs/EffAna/BDTWeights/Bsw.root
-    rsync -a ../braa_nohbhe_trk/NewBptStudies/ResultFile/BptWeight_BP.root NewBptStudies/ResultFile/BptWeight_BP.root
-    rsync -a ../braa_nohbhe_trk/NewBptStudies/ResultFile/BptWeight_Bs.root NewBptStudies/ResultFile/BptWeight_Bs.root
+    rsync -a ../2017ppBmesonAna/BP/EffAna/BDTWeights/BPw.root BP/EffAna/BDTWeights/BPw.root
+    rsync -a ../2017ppBmesonAna/Bs/EffAna/BDTWeights/Bsw.root Bs/EffAna/BDTWeights/Bsw.root
+    rsync -a ../2017ppBmesonAna/NewBptStudies/ResultFile/BptWeight_BP.root NewBptStudies/ResultFile/BptWeight_BP.root
+    rsync -a ../2017ppBmesonAna/NewBptStudies/ResultFile/BptWeight_Bs.root NewBptStudies/ResultFile/BptWeight_Bs.root
 }
 
 maketnp () {
@@ -27,9 +27,17 @@ bptshape () {
     root -q -b -l ReweightBpt.C'(0)' &
     root -q -b -l ReweightBpt.C'(1)' &
     wait
-    popd
 }
 
+yield () {
+    ## yield extraction
+    pushd henri2022
+    # roofitB.C contains 2 By cuts
+    bash bpdoRoofit.sh &
+    bash bsdoRoofit.sh &
+    wait
+    popd
+}
 
 yield () {
     ## yield extraction
@@ -42,31 +50,35 @@ yield () {
 }
 
 bpEff () {
+    ## eff correction (2d map)
+    # this is everything from yield to syst, other than MC syst
     pushd BP/EffAna
-    echo "Takes BPw.root as input"
+    # about 1hr
+    # takes unskimmed MC sample as input
+    echo "Takes BPw.root as input. Make sure it is up to date"
     ls -l BDTWeights/BPw.root
-    # root -b -l -q MCEff.C'(1,0)' > eff.log # >> bpsyst2d.root
+    root -b -l -q MCEff.C'(1,0)' 
     # CrossSectionAna.C contains 1 By cuts
     root -b -l -q CrossSectionAna.C'(1)'
-
     # root -b -l -q CrossSectionAnaMult.C'(1)'
     # >> BP/EffAna/FinalFiles/BPPPCorrYieldPT.root
     popd
 }
 
+
 bsEff () {
     pushd Bs/EffAna
+    # about 1hr
     echo "Takes Bsw.root as input"
     ls -l BDTWeights/Bsw.root
-        # about 1hr
-    root -b -l -q MCEff.C'(1,0)' > eff.log
-    wait
-    root -b -l -q CrossSectionAna.C'(1)'
+    root -b -l -q MCEff.C'(1,0)' 
 
+    root -b -l -q CrossSectionAna.C'(1)'
     # root -b -l -q CrossSectionAnaMult.C'(1)'
     # >> Bs/EffAna/FinalFiles/BsPPCorrYieldPT.root
     popd
 }
+
 
 nominal () {
     # central value
@@ -116,15 +128,20 @@ bsStat() {
 comp () {
     # get pdf variation errors
     python master.py
-    # Get pre-selection error
-    python comppre.py
-    # comparison plot again
+
+	    # Get pre-selection error
+	#     python comppre.py
+ 
+   # comparison plot again
     pushd BsBPFinalResults/Comparisons/Fiducial/
     # << BP/EffAna/FinalFiles/BPPPCorrYieldPT.root
-    root -b -l -q BPComparison.C
-    root -b -l -q BsComparison.C
-    python syst_table.py
+  
+# root -b -l -q BPComparison.C
+   # root -b -l -q BsComparison.C
+
+#    python syst_table.py
     cd ../../RAA/
+
     root -b -l -q BPRAA.C
     root -b -l -q BsRAA.C
     popd
@@ -141,25 +158,29 @@ paperPlots () {
     root -b -l -q plotPt.C'(1,1,0,1,0,1)'
     popd
 }
+# maketnp
 
-#UNCOMMENT ACORDINGLY
-#(Run by THIS ORDER!)
+#bptshape
 
-# yield
-# # wait
 
-# sync_with_main
 
-# bpEff &
-# bsEff &
+#yield
 # wait
 
-# nominal
-# syst
+#sync_with_main
+
+#bpEff &
+#bsEff &
+#wait
+
+
+#syst
+#nominal
+
 
 # bpStat&
 # bsStat&
 # wait
 
 comp
-paperPlots
+#paperPlots
