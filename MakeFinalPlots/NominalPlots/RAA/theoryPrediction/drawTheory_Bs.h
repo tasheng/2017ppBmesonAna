@@ -13,6 +13,18 @@ void plotTheory_Bs(double xThreshold = 10)
 	Float_t temp;
 	Float_t aCx[n],aCy[n],aCyl[n],aCyh[n];
 	Float_t bCx[n],bCy[n],bCyl[n],bCyh[n];
+  // Magdalena
+  TGraph* gMagdalenaB5TeV = new TGraph("theoryPrediction/theorypre/Magdalena.dat");
+  gMagdalenaB5TeV->SetName("gMagdalenaB5TeV");
+  //gMagdalenaB5TeV->SetLineColor(kGreen+4); //CWRv8
+  gMagdalenaB5TeV->SetLineColor(kRed-4);
+  gMagdalenaB5TeV->SetLineWidth(8);
+  gMagdalenaB5TeV->SetLineStyle(6);
+  //gMagdalenaB5TeV->SetFillColor(kGreen+4);
+  //gMagdalenaB5TeV->SetFillStyle(3004);
+  //gMagdalenaB5TeV->Draw("f same");
+  gMagdalenaB5TeV->Draw("c same");
+
 	// TAMU
 	ifstream getdata_tamu("theoryPrediction/theorypre_Bs/TAMU_20180509.txt");
 	if(!getdata_tamu.is_open()) {
