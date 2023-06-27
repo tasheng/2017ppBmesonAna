@@ -69,6 +69,12 @@ const map<int, string> pname = {
 bool drawLight = 0;
 void adjustLegend(TLegend* l);
 
+// Variadic template function to calculate the root mean square
+template<typename ...Args>
+double rms(Args ...args) {
+  double sum = (TMath::Power(args, 2) + ...);
+  return std::sqrt(sum / sizeof...(args));
+}
 
 void plotPt(bool bSavePlots       = 1,
             bool bDoDebug         = 0, //  figure out if things are read properly
@@ -85,9 +91,6 @@ void plotPt(bool bSavePlots       = 1,
   bool drawThm = (!drawBPBs);
   bool drawlhcb         = 1;
 
-  if (mask == 2) {
-    xLow = 3;
-  }
 		gSystem->mkdir(Form("./%s/png",outputDir), kTRUE);
 		gSystem->mkdir(Form("./%s/pdf",outputDir), kTRUE);
 
@@ -105,6 +108,21 @@ void plotPt(bool bSavePlots       = 1,
       yHigh = 1.7;
       drawLight = 1;
     }
+    if (mask == 2) {
+      xLow = 0.5;
+      xHigh = 600;
+      yHigh = 1.5;
+    }
+
+    double hollowBoxWidth = 0.2;
+    // double bin_bpl_glob = xLow + hollowBoxWidth * 1;
+    // double bin_ch_glob = xLow + hollowBoxWidth * 3;
+    // double bin_d0_glob = xLow + hollowBoxWidth * 5;
+    double bin_bpl_glob = xLow + hollowBoxWidth * 1;
+    double bin_ch_glob = xLow + TMath::Exp(0.1);
+    double bin_ch_glob_width = TMath::Exp(0.1);
+    double bin_d0_glob = xLow + TMath::Exp(0.3);
+    double bin_d0_glob_wdith = xLow + TMath::Exp(0.3);
 
 
 		//samples:
@@ -361,17 +379,21 @@ void plotPt(bool bSavePlots       = 1,
 
 
 
-    int bplmarker = kAzure - 1;
-    int bplbox = kAzure + 7;
+    // int bplmarker = kAzure - 1;
+    // int bplbox = kAzure + 7;
+    int bplmarker = TColor::GetColor("#0033CC");
+    // int bplbox = TColor::GetColor("#80CCFF");
+    int bplbox = TColor::GetColor("#0099FF");
+    // TColor(0, 128/255.0, 204/255.0, 255/255.0);
 
     int bsmarker = kRed + 1;
     int bsbox = kRed - 7;
 
-    int chmarker = kYellow + 1;
-    int chbox = kYellow - 9;
+    int chmarker = kBlack;
+    int chbox = TColor::GetColor("#FFCC00");
 
-    int d0marker = kGreen + 2;
-    int d0box = kGreen - 5;
+    int d0marker = TColor::GetColor("#006600");
+    int d0box = TColor::GetColor("#99ff99");
 
     // if (!drawBPBs) {
     //   bplmarker = kGreen + 3;
@@ -457,8 +479,8 @@ void plotPt(bool bSavePlots       = 1,
 
 
 		// systematic boxes
-		pgBs_syst_low->SetFillColorAlpha(bsbox, 0.5);
-		pgBs_syst_high->SetFillColorAlpha(bsbox, 0.5);
+		pgBs_syst_low->SetFillColorAlpha(bsbox, 0.6);
+		pgBs_syst_high->SetFillColorAlpha(bsbox, 0.6);
 
     pgBpl_syst_low->SetFillColorAlpha(bplbox, 0.5);
     pgBpl_syst_high->SetFillColorAlpha(bplbox, 0.5);
@@ -632,10 +654,10 @@ void plotPt(bool bSavePlots       = 1,
 		CMS_lumi(pc1,19011,0);
 
 		//Added to fix//
-		pgBs_syst_high->SetLineColor(kBlue-9);
-		pgBs_syst_low->SetLineColor(kBlue-9);
-		pgBpl_syst_high->SetLineColor(kGreen-9);
-		pgBpl_syst_low->SetLineColor(kGreen-9);
+		pgBs_syst_high->SetLineColor(bsmarker);
+		pgBs_syst_low->SetLineColor(bsmarker);
+		pgBpl_syst_high->SetLineColor(bplmarker);
+		pgBpl_syst_low->SetLineColor(bplmarker);
 
     // D0 comparison
     TFile fd0("dataSource/HEPData-ins1616207-v1-Table_1.root");
@@ -665,7 +687,7 @@ void plotPt(bool bSavePlots       = 1,
     }
 
 		gd0Syst->SetFillColorAlpha(d0box,0.5);
-		gd0Syst->SetLineColor(d0box);
+		gd0Syst->SetLineColor(d0marker);
 		gd0->SetLineColor(d0marker);
 		gd0->SetMarkerColor(d0marker);
 
@@ -683,10 +705,30 @@ void plotPt(bool bSavePlots       = 1,
                              chRaaSyst->GetBinContent(i + 1), chRaaSyst->GetBinContent(i + 1));
     }
 
-		gchSyst->SetFillColorAlpha(chbox, 0.5);
+		gchSyst->SetFillColorAlpha(chbox, 1);
 		gchSyst->SetLineColor(chbox);
 		gch->SetLineColor(chmarker);
 		gch->SetMarkerColor(chmarker);
+
+
+    // Global uncertainty as bars around 1
+    int nBinsOne = 1;
+    // first column of hepdata ins1496050
+    double ych_uncert_up = rms(0.008291, 0.010094) / 0.360505;
+    double ych_uncert_down = rms(0.008291, 0.012257) / 0.360505;
+    double yd0_uncert_up = 4.1/100;
+    double yd0_uncert_down = 4.6/100;
+
+    double glob_shift = TMath::Log(xLow);
+    TBox* bpl_glob = new TBox(TMath::Exp(0.0 + glob_shift), 1 - glbSystUpBp / 100,
+                             TMath::Exp(0.2 + glob_shift), 1 + glbSystUpBp / 100);
+    bpl_glob->SetFillColorAlpha(bplbox, 0.5);
+    TBox* ch_glob = new TBox(TMath::Exp(0.2 + glob_shift), 1 - ych_uncert_down,
+                             TMath::Exp(0.4 + glob_shift), 1 + ych_uncert_up);
+    ch_glob->SetFillColorAlpha(chbox, 1);
+    TBox* d0_glob = new TBox(TMath::Exp(0.4 + glob_shift), 1 - yd0_uncert_down,
+                             TMath::Exp(0.6 + glob_shift), 1 + yd0_uncert_up);
+    d0_glob->SetFillColorAlpha(d0box, 0.5);
 
     double thmColorAlpha = 0.4;
 		if(whichPlot==0)// x-section
@@ -717,7 +759,7 @@ void plotPt(bool bSavePlots       = 1,
         gThmDummy4->SetFillStyle(3352);
         gThmDummy5->SetFillStyle(3325);
         TLegendEntry *ent_thm1 = legendThm->AddEntry(gThmDummy1,"TAMU","l");
-        TLegendEntry *ent_thm2 = legendThm->AddEntry(gThmDummy2,"Djordjevic","l");
+        TLegendEntry *ent_thm2 = legendThm->AddEntry(gThmDummy2,"DREENA-A","l");
         TLegendEntry *ent_thm3 = legendThm->AddEntry(gThmDummy3,"CUJET3.0","f");
         TLegendEntry *ent_thm4 = legendThm->AddEntry(gThmDummy4,"AdS/CFT HH D(p)","f");
         //TLegendEntry *ent_thm5 = legendThm->AddEntry(gThmDummy5,"AdS/CFT HH D = const","f");
@@ -740,6 +782,7 @@ void plotPt(bool bSavePlots       = 1,
         plotTheory_Bs();
         TGraphAsymmErrors* gThmDummy1 = new TGraphAsymmErrors();
         TGraphAsymmErrors* gThmDummy2 = new TGraphAsymmErrors();
+        TGraphAsymmErrors* gThmDummy3 = new TGraphAsymmErrors();
         gThmDummy1->SetLineColor(colorTAMU_Bs);
         gThmDummy2->SetLineColor(0);
         gThmDummy2->SetFillColorAlpha(colorCUJET_Bs,0.5);
@@ -747,28 +790,37 @@ void plotPt(bool bSavePlots       = 1,
         gThmDummy2->SetFillStyle(styleCUJET_Bs);
         gThmDummy1->SetLineWidth(8.);
         gThmDummy2->SetLineWidth(8.);
+        // Djordjevic
+        gThmDummy3->SetLineColor(kRed-4);
+        gThmDummy3->SetLineWidth(8.);
+        gThmDummy3->SetLineStyle(6);
         TLegendEntry *ent_thm1 = legendSigma->AddEntry(gThmDummy1,"TAMU","l");
         TLegendEntry *ent_thm2 = legendSigma->AddEntry(gThmDummy2,"CUJET3.0","f");
+        TLegendEntry *ent_thm3 = legendSigma->AddEntry(gThmDummy3,"DREENA-A","l");
         ent_thm1->SetTextSize(legendTextSize);
         ent_thm2->SetTextSize(legendTextSize);
+        ent_thm3->SetTextSize(legendTextSize);
 
         legendSigma->Draw();
       }
 
       // D0 comparison
       if (drawLight) {
+        gchSyst->Draw("2");
+        gch->Draw("P");
         gd0Syst->Draw("5");
         gd0->Draw("P");
-        gchSyst->Draw("5");
-        gch->Draw("P");
+        bpl_glob->Draw();
+        ch_glob->Draw();
+        d0_glob->Draw();
       }
 
 
       if (drawBs) {
         pgBs_syst_high->SetLineWidth(1);
 
-        pgBs_syst_high->Draw("2same");
-        pgBs_syst_low->Draw("2same");
+        pgBs_syst_high->Draw("5same");
+        pgBs_syst_low->Draw("5same");
         //	pgBs_low->SetMarkerStyle(24);
         pgBs_lowWhite->Draw("P");
         pgBs_low->Draw("P");
@@ -777,8 +829,8 @@ void plotPt(bool bSavePlots       = 1,
       }
 
       if (mask != 1) {
-        pgBpl_syst_low->Draw("2same");
-        pgBpl_syst_high->Draw("2same");
+        pgBpl_syst_low->Draw("5same");
+        pgBpl_syst_high->Draw("5same");
 
         pgBpl_lowWhite->Draw("P");
         pgBpl_low->Draw("P");
@@ -825,7 +877,10 @@ void plotPt(bool bSavePlots       = 1,
 			lat->SetTextSize(ltxSetTextSize4); //Enlarge Labels
 
 			cout << "ltxSetTextSize4 = " << ltxSetTextSize4 << endl;
-			lat->DrawLatex(xsec_ltxText1_xStart + 0.30,xsec_ltxText1_yStart - 0.30+ 0.010,Form("global uncertainty: #pm %.1f%%",glbSystUpBp));
+			// lat->DrawLatex(xsec_ltxText1_xStart + 0.30,xsec_ltxText1_yStart - 0.30+ 0.010,Form("global uncertainty: #pm %.1f%%",glbSystUpBp));
+			lat->DrawLatex(xsec_ltxText1_xStart + 0.30,
+                     xsec_ltxText1_yStart - 0.30+ 0.010,
+                     "T_{AA} + lumi uncertainty");
 
       if (drawThm) {
         // double shiftX = 0.05;
