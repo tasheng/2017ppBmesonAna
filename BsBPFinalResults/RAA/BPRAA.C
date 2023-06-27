@@ -490,7 +490,10 @@ void BPRAA(){
 
 	fout->Close();
 
-  double lumiUncertainty = TMath::Sqrt(TMath::Power(0.019, 2) + TMath::Power(0.015, 2));
+  double lumiUncertainty = TMath::Sqrt(TMath::Power(0.019, 2) // pp lumi
+                                       + TMath::Power(0.0126, 2) // PbPb N_MB
+                                       + TMath::Power(0.022, 2) // PbPb T_AA
+                                       );
   std::vector<float> globUncert(NBins, lumiUncertainty);
   // summary of errors (in ratio, not percent)
   // std::vector<int> ptbins = {5, 7, 10, 15, 20, 30, 50, 60};
