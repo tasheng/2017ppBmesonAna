@@ -160,7 +160,7 @@ void BPComparison(){
 	float BPXSecPPYSystDownScaled[NBins];
 
   // percent error
-	float BPTrackingSyst[NBins] = {[0 ... NBins - 1] = 5};
+	float BPTrackingSyst[NBins] = {[0 ... NBins - 1] = 2.4};
 	float BPMCDataSyst[NBins];
 	float BPPDFSyst[NBins];
 	float BPTrackSelSyst[NBins];
@@ -443,8 +443,8 @@ void BPComparison(){
 	BPPPCrossGraph2DHigh->SetMarkerSize(1);
 	BPPPCrossGraph2DHigh->SetMarkerColor(kOrange+1);
 
-    //	TFile * finFONLL = new TFile("FONLLs/forTzuAn/fonllOutput_pp_Bplus_5p03TeV_y2p4.root");
-	TFile * finFONLL = new TFile("FONLLs/BPFONLL.root");
+    	TFile * finFONLL = new TFile("FONLLs/forTzuAn/fonllOutput_pp_Bplus_5p03TeV_y2p4.root");
+	// TFile * finFONLL = new TFile("FONLLs/BPFONLL.root");
 	finFONLL->cd();
 	TGraphAsymmErrors *BPFONLL = (TGraphAsymmErrors*) finFONLL->Get("gaeSigmaBplus");
 	BPFONLL->SetLineColor(kRed+2);

@@ -137,7 +137,7 @@ void BPRAA(){
 	float BPXSecPPYSystDown[NBins];
 
   // percent error
-	float BPTrackingSyst[NBins] = {[0 ... NBins - 1] = 5};
+	float BPTrackingSyst[NBins] = {[0 ... NBins - 1] = 2.4};
 	float BPMCDataSyst[NBins];
 	float BPPDFSyst[NBins];
 	float BPTrackSelSyst[NBins];

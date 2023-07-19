@@ -190,7 +190,7 @@ void BsComparison(){
 
 
   // percent error
-	float BsTrackingSyst[NBins] = {[0 ... NBins - 1] = 10};
+	float BsTrackingSyst[NBins] = {[0 ... NBins - 1] = 4.8};
 	float BsMCDataSyst[NBins];
 	float BsPtShapeSyst[NBins];
 	float BsPDFSyst[NBins];
