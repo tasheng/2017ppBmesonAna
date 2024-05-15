@@ -140,6 +140,36 @@ def get_tracking_syst(outfile, out_table):
     fout = r.TFile(outfile, "recreate")
     g_bp.Write()
     g_bs.Write()
+    # eff window variation
+    # by hand
+    bkgeff_bp = np.array([
+        1.0147858,
+        1.0280860,
+        1.0084136,
+        1.0041453,
+        1.0046080,
+        1.0018285,
+        0.98906765])
+    bkgeff_bs = np.array([
+        1.0107071,
+        1.0226660,
+        1.0028253,
+        1.0038176])
+    bkgeff_bp = np.abs(1 - bkgeff_bp) * 100
+    bkgeff_bs = np.abs(1 - bkgeff_bs) * 100
+
+    g_bkgeff_bp = g_bp.Clone('bp_bkgeff_error')
+    g_bkgeff_bs = g_bs.Clone('bs_bkgeff_error')
+
+    for i in range(len(bkgeff_bp)):
+        g_bkgeff_bp.SetPointY(i, bkgeff_bp[i])
+    for i in range(len(bkgeff_bs)):
+        g_bkgeff_bs.SetPointY(i, bkgeff_bs[i])
+    g_bkgeff_bp.Write()
+    g_bkgeff_bs.Write()
+    for i in range(len(bkgeff_bp)):
+        print('bkg eff error: ', g_bkgeff_bp.GetPointY(i))
+
     fout.Close()
     with open(out_table, 'w') as fout:
         fout.write('\\PBp track selection systematics\n')

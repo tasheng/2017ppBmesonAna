@@ -37,7 +37,9 @@ bpEff () {
     echo "Takes BPw.root as input"
     ls -l BDTWeights/BPw.root
         # about 2hr
-    root -b -l -q MCEff.C'(1,0)' > eff.log # >> bpsyst2d.root
+    if [ "$1" == "1" ]; then
+        root -b -l -q MCEffCor.C+'(1,0)' > eff.log # >> bpsyst2d.root
+    fi
     wait
     root -b -l -q CrossSectionAna.C'(1)'
 
@@ -51,7 +53,9 @@ bsEff () {
     echo "Takes Bsw.root as input"
     ls -l BDTWeights/Bsw.root
         # about 1hr
-    root -b -l -q MCEff.C'(1,0)' > eff.log
+    if [ "$1" == "1" ]; then
+        root -b -l -q MCEff.C+'(1,0)' > eff.log # >> bpsyst2d.root
+    fi
     wait
     root -b -l -q CrossSectionAna.C'(1)'
 
@@ -109,13 +113,14 @@ comp () {
     # get pdf variation errors
     python master.py
     # Get pre-selection error
-    python comppre.py
+    # python comppre.py
+    python preeff.py |& tee presel_table.txt
     # comparison plot again
     pushd BsBPFinalResults/Comparisons/Fiducial/
     # << BP/EffAna/FinalFiles/BPPPCorrYieldPT.root
     root -b -l -q BPComparison.C
     root -b -l -q BsComparison.C
-    python syst_table.py
+    python syst_table.py |& tee syst_table.txt
     cd ../../RAA/
     root -b -l -q BPRAA.C
     root -b -l -q BsRAA.C
@@ -134,23 +139,32 @@ paperPlots () {
 #UNCOMMENT ACORDINGLY
 #(Run by THIS ORDER!)
 
-bptshape
+while true; do
+    read -p "Update 2D maps?" yn
+    case $yn in
+        [Yy]* ) map=1; break;;
+        [Nn]* ) map=0; break;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
 
-yield
+# bptshape
+
+# yield
+# wait
+
+bpEff $map &
+bsEff $map &
 wait
 
-bpEff &
-bsEff &
+syst
 wait
 
-#syst
-#wait
-
-#nominal
+nominal
 
 # bpStat&
 # bsStat&
 # wait
 
-#comp
-#paperPlots
+comp
+paperPlots

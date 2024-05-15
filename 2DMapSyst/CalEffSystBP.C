@@ -19,6 +19,8 @@ using namespace std;
 using std::cout;
 using std::endl;
 
+bool preselvar = false;
+
 void CalEffSystBP(){
 
 	const int NBins = 7;
@@ -78,6 +80,8 @@ void CalEffSystBP(){
 	Float_t BEffInvTnPDown[NCand];
 	Float_t BEffInvBDT[NCand];
 	Float_t BEffInvBpt[NCand];
+	Float_t BEffInvBsvpvSig[NCand];
+	Float_t BEffInvBchi2cl[NCand];
 
 
 	/*
@@ -142,6 +146,8 @@ void CalEffSystBP(){
 	double SumCountsTnPDownSyst[NBins];
 	double SumCountsBDTSyst[NBins];
 	double SumCountsBptSyst[NBins];
+	double SumCountsBsvpvSigSyst[NBins];
+	double SumCountsBchi2clSyst[NBins];
 
 	//	double CorrectionFactor[NBins];
 
@@ -275,6 +281,8 @@ void CalEffSystBP(){
 		SumCountsTnPDownSyst[i] = 0;
 		SumCountsBDTSyst[i] = 0;
 		SumCountsBptSyst[i] = 0;
+		SumCountsBsvpvSigSyst[i] = 0;
+		SumCountsBchi2clSyst[i] = 0;
 
 
 
@@ -352,12 +360,15 @@ void CalEffSystBP(){
 	double tnpabssystup;
 	double tnpabssystdown;
 
-	TFile * finSyst2D = new TFile("../BP/EffAna/NewEff2DMaps/BPSyst2D.root");
+	// TFile * finSyst2D = new TFile("../BP/EffAna/NewEff2DMaps/BPSyst2D.root");
+	TFile * finSyst2D = new TFile("../BP/EffAna/CorEff2DMaps/BPSyst2D.root");
 	TH2D * invEff2D = (TH2D *) finSyst2D->Get("invEff2D");
 	TH2D * invEff2DTnPSystUp = (TH2D *) finSyst2D->Get("invEff2DTnPSystUp");
 	TH2D * invEff2DTnPSystDown = (TH2D *) finSyst2D->Get("invEff2DTnPSystDown");
 	TH2D * invEff2DBDTSyst = (TH2D *) finSyst2D->Get("invEff2DBDTSyst");
 	TH2D * invEff2DBptSyst = (TH2D *) finSyst2D->Get("invEff2DBptSyst");
+	TH2D * invEff2DBsvpvSigSyst = (TH2D *) finSyst2D->Get("invEff2DBsvpvSigSyst");
+	TH2D * invEff2DBchi2clSyst = (TH2D *) finSyst2D->Get("invEff2DBchi2clSyst");
 
 
 	int XBin;
@@ -377,7 +388,9 @@ void CalEffSystBP(){
 
 				//	if((BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08  && ((BptNew[j] > 7 && BptNew[j] < 10 && ByNew[j] > 1.5 )||(BptNew[j] > 10)) && (Bmu1Type > -0.1 && Bmu2Type > -0.1)))
 				// if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08 &&  TMath::Abs(ByNew[j]) < 2.4  && ((BptNew[j] > 5 && BptNew[j] < 10 && abs(ByNew[j]) > 1.5 )||(BptNew[j] > 10)))
-				if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] && TMath::Abs(BmassNew[j] - 5.27932) < 0.08 &&  TMath::Abs(ByNew[j]) < 2.4  && ((BptNew[j] > 5 && BptNew[j] < 10 && abs(ByNew[j]) > 1.5)||(BptNew[j] > 10)))
+        if(BptNew[j] > ptBins[k] && BptNew[j] < ptBins[k+1] &&
+           TMath::Abs(BmassNew[j] - 5.27932) < 0.08 &&  TMath::Abs(ByNew[j]) < 2.4  &&
+           ((BptNew[j] > 5 && BptNew[j] < 10 && abs(ByNew[j]) > 1.5)||(BptNew[j] > 10)))
 				{
 
 
@@ -398,6 +411,10 @@ void CalEffSystBP(){
 					BEffInvTnPDown[j] = invEff2DTnPSystDown->GetBinContent(XBin,YBin);
 					BEffInvBDT[j] = invEff2DBDTSyst->GetBinContent(XBin,YBin);
 					BEffInvBpt[j] = invEff2DBptSyst->GetBinContent(XBin,YBin);
+          if (preselvar) {
+            BEffInvBsvpvSig[j] = invEff2DBsvpvSigSyst->GetBinContent(XBin,YBin);
+            BEffInvBchi2cl[j] = invEff2DBchi2clSyst->GetBinContent(XBin,YBin);
+          }
 
 
 					if(BEffInv[j] > 0){
@@ -420,6 +437,8 @@ void CalEffSystBP(){
 
 						SumCountsBDTSyst[k] = BEffInvBDT[j] + SumCountsBDTSyst[k];
 						SumCountsBptSyst[k] = BEffInvBpt[j] + SumCountsBptSyst[k];
+						SumCountsBsvpvSigSyst[k] = BEffInvBsvpvSig[j] + SumCountsBsvpvSigSyst[k];
+						SumCountsBchi2clSyst[k] = BEffInvBchi2cl[j] + SumCountsBchi2clSyst[k];
 
 			
 						Counts[k] = Counts[k] + 1;
@@ -444,6 +463,8 @@ void CalEffSystBP(){
 	double EffTnPDown[NBins];
 	double EffBDT[NBins];
 	double EffBpt[NBins];
+	double EffBsvpvSig[NBins];
+	double EffBchi2cl[NBins];
 
 
 	for(int i = 0; i < NBins; i++){
@@ -468,6 +489,8 @@ void CalEffSystBP(){
 		EffTnPDown[i] = SumCountsTnPDownSyst[i]/Counts[i];
 		EffBDT[i] = SumCountsBDTSyst[i]/Counts[i];
 		EffBpt[i] = SumCountsBptSyst[i]/Counts[i];
+		EffBsvpvSig[i] = SumCountsBsvpvSigSyst[i]/Counts[i];
+		EffBchi2cl[i] = SumCountsBchi2clSyst[i]/Counts[i];
 
 	}
 
@@ -519,6 +542,9 @@ void CalEffSystBP(){
 	Eff2DBptHis->GetXaxis()->SetTitleOffset(1.2);	
 	Eff2DBptHis->GetYaxis()->SetTitleOffset(1.5);
 
+  TH1D* Eff2DBsvpvSigHis = (TH1D*) Eff2DBptHis->Clone("Eff2DBsvpvSigHis");
+  TH1D* Eff2DBchi2clHis = (TH1D*) Eff2DBptHis->Clone("Eff2DBchi2clHis");
+
 
 	for(int i = 0; i < NBins; i++){
 
@@ -533,6 +559,11 @@ void CalEffSystBP(){
 		Eff2DBptHis->SetBinContent(i+1, EffBpt[i]);		
 		Eff2DBptHis->SetBinError(i+1, NewEffErr[i]);
 
+		Eff2DBsvpvSigHis->SetBinContent(i+1, EffBsvpvSig[i]);
+		Eff2DBsvpvSigHis->SetBinError(i+1, NewEffErr[i]);
+		Eff2DBchi2clHis->SetBinContent(i+1, EffBchi2cl[i]);
+		Eff2DBchi2clHis->SetBinError(i+1, NewEffErr[i]);
+
 	}
 	
 	gSystem->mkdir("OutFiles", true);
@@ -544,6 +575,10 @@ void CalEffSystBP(){
 	Eff2DTnPDownSystHis->Write();
 	Eff2DBDTHis->Write();
 	Eff2DBptHis->Write();
+  if (preselvar) {
+    Eff2DBsvpvSigHis->Write();
+    Eff2DBchi2clHis->Write();
+  }
 
 	fout->Close();
 

@@ -12,6 +12,7 @@
 #include "TRandom.h"
 #include <iostream>
 #include <fstream>
+#include <TCanvas.h>
 
 
 using namespace std;
@@ -50,6 +51,8 @@ void PlotEffSyst2D(int Opt){
 	TH1D * Eff1DHisTnPDown = (TH1D * ) fin->Get("Eff2DTnPDownSystHis");
 	TH1D * Eff1DHisBpt = (TH1D * ) fin->Get("Eff2DBptHis");
 	TH1D * Eff1DHisBDT = (TH1D * ) fin->Get("Eff2DBDTHis");
+	TH1D * EffHisBsvpvSig = (TH1D * ) fin->Get("Eff2DBsvpvSigHis");
+	TH1D * EffHisBchi2cl = (TH1D * ) fin->Get("Eff2DBchi2clHis");
 
   TFile fout(outFile, "recreate");
 
@@ -153,6 +156,11 @@ void PlotEffSyst2D(int Opt){
 	BDTSyst->SetMarkerColor(kBlack);	
 	BDTSyst->Reset();
 
+  TH1D* BsvpvSigSyst = (TH1D*) BDTSyst->Clone("BsvpvSigSyst");
+	BsvpvSigSyst->GetYaxis()->SetTitle("BsvpvSig presel Discrepancy Systematic Uncertainties (%)");
+  TH1D* Bchi2clSyst = (TH1D*) BDTSyst->Clone("Bchi2clSyst");
+	Bchi2clSyst->GetYaxis()->SetTitle("Bchi2cl presel Discrepancy Systematic Uncertainties (%)");
+
 	c->cd();
 
 
@@ -179,12 +187,37 @@ void PlotEffSyst2D(int Opt){
 	for(int i = 0; i < Eff1DHisTnPUp->GetNbinsX(); i++){
 
 		SystValue = abs(Eff1DHisBDT->GetBinContent(i+1) -  Eff1DHis->GetBinContent(i+1) )/Eff1DHis->GetBinContent(i+1) * 100;
+    if ((Opt == 0 && i == 6) || (Opt == 1 && i == 3)) {
+      SystValue = 0;
+    }
 		BDTSyst->SetBinContent(i+1,SystValue);
 		BDTSyst->SetBinError(i+1,0.001);
 		cout << "BDT Syst: " << SystValue << endl;
-    	cout << SystValue << "\n";
+
+    if (EffHisBsvpvSig) {
+      SystValue = abs(EffHisBsvpvSig->GetBinContent(i+1) -  Eff1DHis->GetBinContent(i+1) )/Eff1DHis->GetBinContent(i+1) * 100;
+      BsvpvSigSyst->SetBinContent(i+1,SystValue);
+      BsvpvSigSyst->SetBinError(i+1,0.001);
+      BsvpvSigSyst->Draw("ep");
+      c->SaveAs(Form("SystPlots/%s/Pt/BsvpvSigMCDataSystRatio.png",BmesonName.Data()));
+    }
+
+    if (EffHisBchi2cl) {
+      SystValue = abs(EffHisBchi2cl->GetBinContent(i+1) -  Eff1DHis->GetBinContent(i+1) )/Eff1DHis->GetBinContent(i+1) * 100;
+      Bchi2clSyst->SetBinContent(i+1,SystValue);
+      Bchi2clSyst->SetBinError(i+1,0.001);
+      Bchi2clSyst->Draw("ep");
+      c->SaveAs(Form("SystPlots/%s/Pt/Bchi2clMCDataSystRatio.png",BmesonName.Data()));
+    }
 
 	}
+
+  // Use presel variables for Bs 20-50
+  if (Opt == 1) {
+    double preselSyst = TMath::Sqrt(TMath::Power(BsvpvSigSyst->GetBinContent(4), 2) +
+                            TMath::Power(Bchi2clSyst->GetBinContent(4), 2));
+    BDTSyst->SetBinContent(4, preselSyst);
+  }
 
 
 

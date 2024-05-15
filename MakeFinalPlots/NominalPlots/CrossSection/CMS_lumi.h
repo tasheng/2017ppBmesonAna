@@ -11,15 +11,16 @@
 TString cmsText     = "CMS";
 float cmsTextFont   = 61;  // default is helvetic-bold
 
-bool writeExtraText = true;//false;
+// bool writeExtraText = true;//false;
+bool writeExtraText = false;
 TString extraText   = "Preliminary";
 float extraTextFont = 52;  // default is helvetica-italics
 
 // text sizes and text offsets with respect to the top frame
 // in unit of the top margin size
-float lumiTextSize     = 0.40 * (1 + 0.20);
-float lumiTextOffset   = 0.28;
-float cmsTextSize      = 0.55;
+float lumiTextSize     = 0.60;
+float lumiTextOffset   = 0.18;
+float cmsTextSize      = 0.60;
 float cmsTextOffset    = 0.01;  // in case of ticks
 
 float relPosX    = 0.045;
@@ -32,7 +33,7 @@ float extraOverCmsTextSize  = 0.76;
 TString lumi_13TeV = "20.1 fb^{-1}";
 TString lumi_8TeV  = "19.7 fb^{-1}";
 TString lumi_7TeV  = "5.1 fb^{-1}";
-TString lumi_5TeV  = " (302.3 pb^{-1})";
+TString lumi_5TeV  = "302.3 pb^{-1}";
 
 
 

@@ -9,12 +9,15 @@
 #include <TGraph.h>
 #include "TMultiGraph.h"
 #include "TGraphErrors.h"
-#include<stdio.h>
+#include <stdio.h>
 
+
+template<typename... Targs>
+void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotName,  Targs... options);
 void read_samples(RooWorkspace& w, std::vector<TString>, TString fName, TString treeName, TString sample);
 
 // PDF VARIATION FOR SYST STUDIES
-int syst_study=1;
+int syst_study=0;
 
 // VALIDATION STUDIES
 int val=0;
@@ -155,8 +158,6 @@ cout << endl << endl;
 	TFile* inf = new TFile(inputdata.Data());
 	TTree* skimtree_new = (TTree*)inf->Get(tree);
 	TFile* infMC = new TFile(inputmc.Data());
-	cout << inputdata.Data() << endl;
-	cout << inputmc.Data() << endl;
 	TTree* skimtreeMC_new = (TTree*)infMC->Get(tree);
 	TH1D* h;
 	TH1D* hMC;
@@ -218,6 +219,7 @@ cout << endl << endl;
 	if(isMC) _isMC = "mcAsData";
 	TString _isPbPb = "pp";
 
+
 	dsMC = new RooDataSet(Form("dsMC%d",_count),"",skimtreeMC_new,RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
 	ds = new RooDataSet(Form("ds%d",_count),"",skimtree_new,RooArgSet(*mass, *pt, *y, *nMult, *trackSelection));
 
@@ -227,7 +229,7 @@ cout << endl << endl;
 	else if (tree == "ntphi"){background = {"1st", "2nd", "mass_range"};}
 	std::vector<std::string> signal = {"3gauss", "fixed", "gauss_cb"};
 	//MODELS for syst studies
-
+	
 	std::vector<std::vector<double>> background_syst;
 	std::vector<std::vector<double>> signal_syst;
 	std::vector<std::vector<double>> general_syst;
@@ -263,9 +265,26 @@ cout << endl << endl;
 	// FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp
 	//Fit the J/psi pi MC sample
    	//The shapes of J/psi pi peak is determined
+	//The relative yield between signal and J/psi pi is fixed
 	if(npfit != "1"){
 
 		//PDF MODELS PDF MODELS PDF MODELS
+		//inclusive MC signal Model
+		RooRealVar* meannp = 0;
+		RooRealVar* sigma1np = 0;
+		RooProduct* sigma2np;
+		RooRealVar* ratio_sigma12np = 0;
+		RooRealVar* cofs_b_np = 0;
+		meannp = new RooRealVar("meannp","meannp",5.281,5.24,5.32);
+		sigma1np = new RooRealVar("sigma1np","sigma1np",0.02,0.01,0.03);
+		ratio_sigma12np = new RooRealVar("ratio_sigma12np","ratio_sigma12np", 2.4, 0.1, 5);
+		sigma2np = new RooProduct("sigma2np", "sigma2np", RooArgList(*sigma1np, *ratio_sigma12np));
+		cofs_b_np = new RooRealVar("cofs_b_np", "cofs_b_np", 0.5, 0., 1.);
+		RooGaussian* signal1_b_np = new RooGaussian("signal1_b_np","signal_gauss1_b_np",*mass,*meannp,*sigma1np);
+		RooGaussian* signal2_b_np = new RooGaussian("signal2_b_np","signal_gauss2_b_np",*mass,*meannp,*sigma2np); 
+		RooAddPdf* signalnp = new RooAddPdf("signalnp", "signalnp", RooArgList(*signal1_b_np,*signal2_b_np),*cofs_b_np);
+		//inclusive MC signal Model
+
 		//inclusive MC jpsipi Model
 		RooRealVar* m_jpsipi_fraction2 = 0;
 		RooRealVar* m_jpsipi_mean1 = 0;
@@ -285,14 +304,16 @@ cout << endl << endl;
 
 		// PREPARE DATA SETS
 		std::vector<TString> jpsi_vars = {"By", "Bpt", "Bgen","BDT_pt_5_7", "BDT_pt_7_10", "BDT_pt_10_15","BDT_pt_15_20", "BDT_pt_20_50"};
-		read_samples(*ws, jpsi_vars, jpsiFile.Data(), "ntKp", "jpsinp");
+		read_samples(*ws, jpsi_vars, jpsiFile, "ntKp", "jpsinp");
+		
 		RooDataSet* full_data_MC = (RooDataSet*) ws->data("jpsinp");
 		full_data_MC = (RooDataSet*)full_data_MC->reduce("(BDT_pt_5_7 > 0.08 && Bpt >= 5 && Bpt < 7) || (BDT_pt_7_10 > 0.07 && Bpt >= 7 && Bpt < 10) || (BDT_pt_10_15 > 0.0 && Bpt >= 10 && Bpt < 15) || (BDT_pt_15_20 > 0.02 && Bpt >= 15 && Bpt < 20) || (BDT_pt_20_50 > 0.04 && Bpt >= 20 && Bpt < 50) || (Bpt >= 20 && Bpt < 50) ");
 		full_data_MC = (RooDataSet*)full_data_MC->reduce("(Bpt < 10 &&  abs(By) > 1.5 ) || (Bpt > 10)");
 		
-		// FORM PEAKING Background BINS
+		// FORM INCLUSIVE SIGNAL AND PEAKING Background BINS
+		RooDataSet* ds_sig = (RooDataSet*) full_data_MC->reduce("Bgen == 23333");
 		RooDataSet* fullds_JPSI_shape_fix = (RooDataSet*)full_data_MC->reduce("Bgen == 23335");
-		// FORM PEAKING Background BINS
+		// FORM INCLUSIVE SIGNAL AND PEAKING Background BINS
 		// PREPARE DATA SETS
 
 		//[START] FIX SHAPE (J/Psi pi) 
@@ -302,11 +323,32 @@ cout << endl << endl;
 		mass->setRange("bjpsipi", 5.2, 5.9);
 		auto jpsipi_result = jpsipi_ext.fitTo(*fullds_JPSI_shape_fix, Range("bjpsipi"), Save(), Extended());
 		// FIT
-		plot_mcfit(*ws, &jpsipi_ext, fullds_JPSI_shape_fix, "./results/BP/InclusiveMC_JPsipi_fit.pdf", NormRange("bjpsipi"), DrawOption("LF"), FillStyle(3008), FillColor(kMagenta+1), LineStyle(1), LineColor(kMagenta+1), LineWidth(1)); 
+		plot_mcfit(*ws, &jpsipi_ext, fullds_JPSI_shape_fix, "./results/BP/InclusiveMC_JPsipi_fit.pdf", NormRange("bjpsipi"), DrawOption("LF"), FillStyle(3008), FillColor(kMagenta+10), LineStyle(1), LineColor(kMagenta+10), LineWidth(1)); 
 		ws->import(*jpsipi);
 		fix_parameters(*ws, "jpsipi" );
 		//[END] FIX SHAPE (J/Psi pi) 
 
+		//[START] FIT inclusiveMC SIGNAL 
+  		RooRealVar n_signal_np("n_signal_np", "n_signal_np", 1000, 0., 150000); 
+		RooExtendPdf signal_ext("signal_ext", "extended signal pdf", *signalnp, n_signal_np);
+		// FIT
+		mass->setRange("bmc", 5.18, 5.38);
+		auto signal_result = signal_ext.fitTo(*ds_sig, Range("bmc"), Save(), Extended());
+		// FIT
+		plot_mcfit(*ws, &signal_ext, ds_sig, "./results/BP/InclusiveMC_Signal_fit.pdf",  Range("bmc"), LineColor(kRed),LineStyle(1), LineWidth(2));		ws->import(*signalnp);
+		fix_parameters(*ws, "signalnp");
+		//[END] FIT inclusiveMC SIGNAL 
+
+		// Fix the ratio of jpsipi to signal
+		RooRealVar jpsipi_to_signal_ratio("jpsipi_to_signal_ratio", "jpsipi_to_signal_ratio",0.05, 0, 1);
+		jpsipi_to_signal_ratio.setVal(0.0384);   		// from PDG 										
+		//jpsipi_to_signal_ratio.setVal(n_jpsipi_ext.getVal() / n_signal_np.getVal());              // from the inclusive bin analysis
+		//double jpsipi_to_signal_ratio_UNC = sqrt(pow( n_jpsipi_ext.getVal() / n_signal_np.getVal() ,2) )*sqrt( pow(n_jpsipi_ext.getError()/n_jpsipi_ext.getVal() ,2) + pow(n_signal_np.getError()/ n_signal_np.getVal() ,2));  		
+		//cout << "jpsipi_to_signal_ratio_unc" << jpsipi_to_signal_ratio.getVal()<<" +/- " << jpsipi_to_signal_ratio_UNC <<  endl;
+
+  		jpsipi_to_signal_ratio.setConstant();
+		ws->import(jpsipi_to_signal_ratio);
+		// Fix the ratio of jpsipi to signal
 						}
 	// FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp FIT MCnp
 
@@ -451,6 +493,7 @@ cout << endl << endl;
 		modelMC->plotOn(frameMC_chi2);
 		RooChi2Var chi2(Form("chi2%d",_count),"chi2",*model,*dh);
 		double Mychi2 = chi2.getVal()/(nbinsmasshisto - f->floatParsFinal().getSize()); //normalised chi square
+    int ndof = (nbinsmasshisto - f->floatParsFinal().getSize());
 		Double_t XI_PROB ;
 		XI_PROB = TMath::Prob(chi2.getVal(), (nbinsmasshisto - f->floatParsFinal().getSize()) ); // P(chi2)
 		std::cout << "normalised Chi square value is (number of free param. " << f->floatParsFinal().getSize() << " ): " << Mychi2 << endl;
@@ -501,23 +544,26 @@ cout << endl << endl;
 	if(varExp=="Bpt"){
       //for the paper run these
       if (drawLegend) {
-        tex_pt = new TLatex(0.21,0.75,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
-        tex_y = new TLatex(0.21,0.6,"p_{T} > 10 GeV/c : |y| < 2.4");
-        tex_y2 = new TLatex(0.21,0.55,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4");
-        tex_y1 = new TLatex(0.21,0.6,"1.5 < |y| < 2.4");
-        tex_y11 =new TLatex(0.21,0.6,"|y| < 2.4");
-        tex_nMult = new TLatex(0.21,0.67,"0 < nTrks < 100");
-		yield_val = new TLatex(0.21,0.7,Form("Y_{S} = %d #pm %d",yieldI, yieldErrI));
-		chi_square = new TLatex(0.21,0.65,Form("#chi^{2}/ndf = %.2f",Mychi2));
+        // tex_pt = new TLatex(0.21,0.75,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
+        tex_pt = new TLatex(0.62,0.51,Form("%d < #it{p}_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
+        tex_y = new TLatex(0.62,0.35,"#it{p}_{T} > 10 GeV/c : |#it{y}| < 2.4");
+        tex_y2 = new TLatex(0.62,0.3,"#it{p}_{T} < 10 GeV/c : 1.5 < |#it{y}| < 2.4");
+        tex_y1 = new TLatex(0.62,0.44,"1.5 < |#it{y}| < 2.4");
+        tex_y11 =new TLatex(0.62,0.44,"|#it{y}| < 2.4");
+        tex_nMult = new TLatex(0.62,0.42,"0 < nTrks < 100");
+		// yield_val = new TLatex(0.70,0.7,Form("Y_{S} = %d #pm %d",yieldI, yieldErrI));
+        // chi_square = new TLatex(0.62,0.44,Form("#chi^{2}/dof = %.1f/%i",
+        //                                        chi2.getVal(), ndof));
       } else {
         //for the AN run these
-        tex_pt = new TLatex(0.65,0.8,Form("%d < p_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
-        tex_y = new TLatex(0.65,0.74,"p_{T} > 10 GeV/c : |y| < 2.4");
-        tex_y2 = new TLatex(0.65,0.68,"p_{T} < 10 GeV/c : 1.5 < |y| < 2.4");
-        tex_y1 = new TLatex(0.65,0.74,"1.5 < |y| < 2.4");
-        tex_y11 = new TLatex(0.65,0.74,"|y| < 2.4");
+        tex_pt = new TLatex(0.65,0.8,Form("%d < #it{p}_{T} < %d GeV/c",(int)_ptBins[i],(int)_ptBins[i+1]));
+        tex_y = new TLatex(0.65,0.74,"#it{p}_{T} > 10 GeV/c : |#it{y}| < 2.4");
+        tex_y2 = new TLatex(0.65,0.68,"p_{T} < 10 GeV/c : 1.5 < |#it{y}| < 2.4");
+        tex_y1 = new TLatex(0.65,0.74,"1.5 < |#it{y}| < 2.4");
+        tex_y11 = new TLatex(0.65,0.74,"|#it{y}| < 2.4");
         tex_nMult = new TLatex(0.21,0.62,"0 < nTrks < 100");
-		chi_square=new TLatex(0.21,0.7,Form("#chi^{2}/ndf = %.2f",Mychi2));
+        chi_square=new TLatex(0.21,0.7,Form("#chi^{2}/dof = %.1f/%i",
+                                               chi2.getVal(), ndof));
       }
 		}
 
@@ -527,7 +573,7 @@ if(varExp=="By"){
         tex_pt = new TLatex(0.55,0.4,"0 < p_{T} < 100 GeV/c");
         tex_y = new TLatex(0.55,0.34,Form("%d < y < %d ",(int)_ptBins[i],(int)_ptBins[i+1]));
         tex_nMult = new TLatex(0.21,0.62,"0 < nTrks < 100");
-		chi_square=new TLatex(0.21,0.62,Form("#chi^{2}/ndf = %.2f",Mychi2));
+		// chi_square=new TLatex(0.21,0.62,Form("#chi^{2}/ndf = %.2f",Mychi2));
       } else {
         //fr the AN run these
         tex_pt = new TLatex(0.55,0.8,"0 < p_{T} < 100 GeV/c");
@@ -553,40 +599,40 @@ if(varExp=="nMult"){
 	}
 		tex_pt->SetNDC();
 		tex_pt->SetTextFont(42);
-		tex_pt->SetTextSize(0.025);
+		tex_pt->SetTextSize(0.045);
 		tex_pt->SetLineWidth(2);
 		tex_pt->Draw();
 		tex_nMult->SetNDC();
 		tex_nMult->SetTextFont(42);
-		tex_nMult->SetTextSize(0.025);
+		tex_nMult->SetTextSize(0.045);
 		tex_nMult->SetLineWidth(2);
 		tex_y->SetNDC();
 		tex_y->SetTextFont(42);
-		tex_y->SetTextSize(0.025);
+		tex_y->SetTextSize(0.032);
 		tex_y->SetLineWidth(2);
 		chi_square->SetNDC();
 		chi_square->SetTextFont(42);
-		chi_square->SetTextSize(0.025);
+		chi_square->SetTextSize(0.045);
 		chi_square->SetLineWidth(2);
 		chi_square->Draw();
 		yield_val->SetNDC();
 		yield_val->SetTextFont(42);
-		yield_val->SetTextSize(0.025);
+		yield_val->SetTextSize(0.045);
 		yield_val->SetLineWidth(2);
 		yield_val->Draw();
 
 	if (varExp=="Bpt"){
 		tex_y1->SetNDC();
 		tex_y1->SetTextFont(42);
-		tex_y1->SetTextSize(0.025);
+		tex_y1->SetTextSize(0.045);
 		tex_y1->SetLineWidth(2);
 		tex_y11->SetNDC();
 		tex_y11->SetTextFont(42);
-		tex_y11->SetTextSize(0.025);
+		tex_y11->SetTextSize(0.045);
 		tex_y11->SetLineWidth(2);
 		tex_y2->SetNDC();
 		tex_y2->SetTextFont(42);
-		tex_y2->SetTextSize(0.025);
+		tex_y2->SetTextSize(0.045);
 		tex_y2->SetLineWidth(2);
 
 		if(_ptBins[i] >= 10){tex_y11->Draw();}
@@ -598,14 +644,14 @@ if(varExp=="nMult"){
 	} 
 	else{tex_y->Draw();}
 
-	//CMS_lumi(c,19011,0);
+	CMS_lumi(c,19011,0);
 	//c->Update();
 	TLatex* texB = new TLatex(0.5,0.5,"");
-	if(tree=="ntphi"){ texB = new TLatex(0.21,0.85, "B^{0}_{s}");}
-	if(tree=="ntKp"){ texB = new TLatex(0.21,0.85, "B^{#pm}");}
+	if(tree=="ntphi"){ texB = new TLatex(0.22,0.83, "B^{0}_{s}");}
+	if(tree=="ntKp"){ texB = new TLatex(0.22,0.83, "B^{+}");}
 	texB->SetNDC();
 	texB->SetTextFont(62);
-	texB->SetTextSize(0.04);
+	texB->SetTextSize(0.06);
 	texB->SetLineWidth(2);
 	texB->Draw();
 
@@ -654,13 +700,13 @@ if(varExp=="nMult"){
 					yield_val  = new TLatex(0.21,0.7,Form("Y_{S} = %d #pm %d",int(round(fitYield_b_sys->getVal())), int(round(fitYield_b_sys->getError()))));
 					yield_val->SetNDC();
 					yield_val->SetTextFont(42);
-					yield_val->SetTextSize(0.025);
+					yield_val->SetTextSize(0.028);
 					yield_val->SetLineWidth(2);
 					yield_val->Draw();
 					chi_back = new TLatex(0.21,0.65,Form("#chi^{2}/ndf = %.2f ",Mychi2_back));
 					chi_back->SetNDC();
 					chi_back->SetTextFont(42);
-					chi_back->SetTextSize(0.025);
+					chi_back->SetTextSize(0.028);
 					chi_back->SetLineWidth(2);
 					chi_back->Draw();
 					if (varExp=="Bpt"){
@@ -670,7 +716,7 @@ if(varExp=="nMult"){
 							tex_y2->Draw();}
 						else{tex_y1->Draw();}
 					}else{tex_y->Draw();}
-					//CMS_lumi(c,19011,0);
+					CMS_lumi(c,19011,0);
 					//c->Update();
 					c->SaveAs(Form("%s/%s_%s_%s_%d_%d_%s_cutY%d_", outplotf.Data(), _isMC.Data(), _isPbPb.Data(), varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],background[j].c_str(), doubly)+tree+".pdf");
 				
@@ -697,16 +743,16 @@ if(varExp=="nMult"){
 				texB->Draw();
 				tex_pt->Draw();
 				RooRealVar* fitYield_b_sig = static_cast<RooRealVar*>(f_signal->floatParsFinal().at(f_signal->floatParsFinal().index(Form("nsig%d_%s",_count, signal[j].c_str()))));
-				yield_val  = new TLatex(0.21,0.7,Form("Y_{S} = %d #pm %d", int(round(fitYield_b_sig->getVal())), int(round(fitYield_b_sig->getError()))));
+				yield_val  = new TLatex(0.21,0.61,Form("Y_{S} = %d #pm %d", int(round(fitYield_b_sig->getVal())), int(round(fitYield_b_sig->getError()))));
 				yield_val->SetNDC();
 				yield_val->SetTextFont(42);
-				yield_val->SetTextSize(0.025);
+				yield_val->SetTextSize(0.04);
 				yield_val->SetLineWidth(2);
 				yield_val->Draw();
-				chi_sig=new TLatex(0.21, 0.65, Form("#chi^{2}/ndf = %.2f ", Mychi2_sig));
+				chi_sig=new TLatex(0.21, 0.54, Form("#chi^{2}/ndf = %.2f ", Mychi2_sig));
 				chi_sig->SetNDC();
 				chi_sig->SetTextFont(42);
-				chi_sig->SetTextSize(0.025);
+				chi_sig->SetTextSize(0.04);
 				chi_sig->SetLineWidth(2);
 				chi_sig->Draw();
 				if (varExp=="Bpt"){
@@ -716,10 +762,10 @@ if(varExp=="nMult"){
 							tex_y2->Draw();}
 					else{tex_y1->Draw();}
 				} else{tex_y->Draw();}
-				//CMS_lumi(c,19011,0);
+				CMS_lumi(c,19011,0);
 				//c->Update();
 
-				if (signal[j] != "fixed") {cMC->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),varExp.Data(), (int)_ptBins[i], (int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");}
+				cMC->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),"mc",_isPbPb.Data(),varExp.Data(), (int)_ptBins[i], (int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");
 				c->SaveAs(Form("%s%s/%s_%s_%s_%d_%d_%s_cutY%d_",outplotf.Data(),_prefix.Data(),_isMC.Data(),_isPbPb.Data(),varExp.Data(),(int)_ptBins[i],(int)_ptBins[i+1],signal[j].c_str(), doubly)+tree+".pdf");
 				modelcurve_signal = frame->getCurve(Form("model%d_%s",_count,signal[j].c_str()));
 				RooRealVar* fitYield_signal = static_cast<RooRealVar*>(f_signal->floatParsFinal().at(f_signal->floatParsFinal().index(Form("nsig%d_%s",_count,signal[j].c_str()))));
@@ -882,6 +928,8 @@ if(varExp=="nMult"){
   	legsig->SetTextSize(0);
 	legsig->Draw();
 	c_sig->SaveAs(Form("./results/tables/signal_systematics_plot_%s_%s.png",tree.Data(),varExp.Data())); 
+
+	
 
 	TCanvas* c_gen= new TCanvas();
 	TLegend* legen=new TLegend(0.7,0.8,0.9,0.9);
@@ -1363,6 +1411,53 @@ c_chi2_backsum.SaveAs(pathc_chi2_backsum);
 }	
 //chi2 plot part ends
 
+}
+
+
+template<typename... Targs>
+void plot_mcfit(RooWorkspace& w, RooAbsPdf* model, RooDataSet* ds, TString plotName, Targs... options) {
+  
+  TCanvas* can_mc= new TCanvas("can_mc","",700,700);
+  can_mc->cd();
+  TPad *p1 = new TPad("p1","p1",0.,0.215,1.,1);
+  p1->SetBorderMode(1); 
+  p1->SetFrameBorderMode(0); 
+  p1->SetBorderSize(2);
+  p1->SetBottomMargin(0.10);
+  p1->Draw(); 
+  p1->cd();
+
+  RooRealVar Bmass = *(w.var("Bmass"));
+  RooPlot* massframe = Bmass.frame(Title(" "));
+  massframe->GetYaxis()->SetTitle(TString::Format("Events / (%g MeV/c^{2})",(Bmass.getMax()-Bmass.getMin())/100*1000));
+  massframe->GetXaxis()->SetTitle("#it{m}_{J/#psi #pi^{+}} (GeV/c^{2})");
+  massframe->GetXaxis()->CenterTitle();
+  massframe->GetYaxis()->SetTitleOffset(1.5);
+  massframe->GetXaxis()->SetTitleOffset(1.2);
+  massframe->GetYaxis()->SetTitleSize(0.035);
+  massframe->GetYaxis()->SetTitleFont(42);
+  massframe->GetXaxis()->SetLabelFont(42);
+  massframe->GetYaxis()->SetLabelFont(42);
+  massframe->GetXaxis()->SetLabelSize(0.035);
+  massframe->GetYaxis()->SetLabelSize(0.035);	
+  massframe->GetXaxis()->SetRangeUser(5.15,5.45);
+  if (plotName == "./results/BP/InclusiveMC_JPsipi_fit.pdf") {massframe->GetXaxis()->SetRangeUser(5,6);}
+  ds->plotOn(massframe, Name("dsjpp") , MarkerSize(0.5), MarkerStyle(8), LineColor(1), LineWidth(1));
+  model->plotOn(massframe, RooFit::Name("MCFit"), options...);
+  model->paramOn(massframe, Layout(0.62, 0.89, 0.75), "", Format("NEU", AutoPrecision(1)) ) ;
+  massframe->getAttText()->SetTextSize(0.025);
+  massframe->getAttFill()->SetFillStyle(0);
+  massframe->getAttLine()->SetLineWidth(0);
+  massframe->Draw();
+  TLegend *leg_jpp = new TLegend(0.75,0.8,0.89,0.89,NULL,"brNDC");
+  leg_jpp->SetBorderSize(0);
+  leg_jpp->SetTextSize(0.025);     
+  leg_jpp->SetTextFont(42);
+  leg_jpp->SetFillStyle(0);
+  leg_jpp->AddEntry(massframe->findObject("dsjpp"), " MC","p");
+  leg_jpp->AddEntry(massframe->findObject("MCFit")," Peaking Bkg. PDF","f");
+  leg_jpp->Draw();
+  can_mc->SaveAs(plotName);
 }
 
 void read_samples(RooWorkspace& w, std::vector<TString> label, TString fName, TString treeName, TString sample){

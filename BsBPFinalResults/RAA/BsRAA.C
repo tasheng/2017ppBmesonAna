@@ -114,6 +114,7 @@ void BsRAA(){
   TString trackSelErrorFile = "../../syst_track_sel.root";
   TFile fTrackSelError(trackSelErrorFile);
   TGraph* trackSelSyst = (TGraph *) fTrackSelError.Get("bs_track_sel_error");
+  TGraph* bkgEffSyst = (TGraph *) fTrackSelError.Get("bs_bkgeff_error");
 
   // percent error
 	float BsTrackingSyst[NBins] = {[0 ... NBins - 1] = 4.8};
@@ -121,6 +122,7 @@ void BsRAA(){
 	float BsPtShapeSyst[NBins];
 	float BsPDFSyst[NBins];
 	float BsTrackSelSyst[NBins];
+	float BsBkgEffSyst[NBins];
 	float BsTnPSystDown[NBins];
 	float BsTnPSystUp[NBins];
 
@@ -132,6 +134,7 @@ void BsRAA(){
     BsTnPSystUp[ibin] = BsTnPSystDown[ibin];
     BsPDFSyst[ibin] = pdfSyst->GetY()[ibin];
     BsTrackSelSyst[ibin] = trackSelSyst->GetY()[ibin];
+    BsBkgEffSyst[ibin] = bkgEffSyst->GetY()[ibin];
   }
 
   // RMS of all the errors
@@ -141,6 +144,7 @@ void BsRAA(){
 	for(int i = 0; i < NBins; i++){
 		BsTotalSystDownRatio[i] = TMath::Sqrt(TMath::Power(BsTrackingSyst[i], 2) + TMath::Power(BsMCDataSyst[i], 2) +
                                           TMath::Power(BsPDFSyst[i], 2) + TMath::Power(BsTrackSelSyst[i], 2) +
+                                          TMath::Power(BsBkgEffSyst[i], 2) +
                                           TMath::Power(BsPtShapeSyst[i], 2) + TMath::Power(BsTnPSystDown[i], 2)) / 100;
 	}
 

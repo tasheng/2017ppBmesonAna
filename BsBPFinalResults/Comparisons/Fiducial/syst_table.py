@@ -11,7 +11,6 @@ BserrorFile = "../../../2DMapSyst/OutFiles/BsError2D.root";
 BspdfErrorFile = "../../../bs_pdf.root";
 BsoutFile = "Bssyst.org";
 
-
 sep = ' | '
 # suf = r' \\'
 suf = sep
@@ -20,7 +19,7 @@ pre = sep
 pp_tracking_error = 2.4
 
 def get_line(name, array):
-    return pre + sep.join([name] + ['{:.3f}'.format(e) for e in array]) + suf + '\n'
+    return pre + sep.join([name] + ['{:.2g}'.format(e) for e in array]) + suf + '\n'
 def make_table(meson, errf, pdff, tracking_error, outFile):
     fError = r.TFile(errf);
     fPdfError = r.TFile(pdff);
@@ -35,6 +34,7 @@ def make_table(meson, errf, pdff, tracking_error, outFile):
 
     pdfSyst = fPdfError.Get(meson + "_error");
     trkSyst = fTrkError.Get(meson + "_track_sel_error");
+    bkgeffSyst = fTrkError.Get(meson + "_bkgeff_error");
 
     tnp = np.array([TnPSyst.GetBinContent(i) for i in range(1, nBins + 1)])
     bpt = np.array([BptSyst.GetBinContent(i) for i in range(1, nBins + 1)])
@@ -42,8 +42,9 @@ def make_table(meson, errf, pdff, tracking_error, outFile):
     tracking = np.full(nBins, tracking_error)
     pdf = np.array(pdfSyst.GetY())
     trk_sel = np.array(trkSyst.GetY())
+    bkgeff = np.array(bkgeffSyst.GetY())
 
-    total = np.sqrt(np.sum([e**2 for e in [bpt, tnp, mcdata, tracking, trk_sel, pdf]], axis=0))
+    total = np.sqrt(np.sum([e**2 for e in [bpt, tnp, mcdata, tracking, trk_sel, bkgeff, pdf]], axis=0))
 
     bdt = np.array([BDTSyst.GetBinContent(i) for i in range(1, nBins + 1)])
     pre = np.array([PreSyst.GetBinContent(i) for i in range(1, nBins + 1)])
@@ -54,7 +55,8 @@ def make_table(meson, errf, pdff, tracking_error, outFile):
         f.write(get_line("Data-MC discrepancy", mcdata))
         f.write(get_line(r"\pt shape", bpt))
         f.write(get_line("PDF variation", pdf))
-        f.write(get_line("TnP systematics", tnp))
+        f.write(get_line("Muon efficiency", tnp))
+        f.write(get_line("Data averaging of efficiency", bkgeff))
         f.write(get_line("Sum", total))
         f.write('\n\n')
         f.write(get_line("BDT syst.", bdt))

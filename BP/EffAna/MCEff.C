@@ -31,7 +31,7 @@ bool reweightPtOnY = true;
 
 void  MCEff(int DoTnP, int Rescale){
 	gSystem->mkdir( "Syst" , true);
-	gSystem->mkdir( "NewEff2DMaps" , true);
+	gSystem->mkdir( "CorEff2DMaps" , true);
 	gSystem->mkdir( "1DEffPlots" , true);
 	gSystem->mkdir( "TnPHis" , true);
 	gSystem->mkdir( "MuonInfoPlots" , true);
@@ -67,7 +67,8 @@ void  MCEff(int DoTnP, int Rescale){
 	TString BDT3Name = "BDT_pt_7_10";
 	TString BDT4Name = "BDT_pt_10_15";
 	TString BDT5Name = "BDT_pt_15_20";
-	TString BDT6Name = "BDT_pt_20_50";
+	// TString BDT6Name = "BDT_pt_20_60";
+	TString BDT6Name = "BDT_pt_20_60";
 //	TString BDT7Name = "BDT_pt_2_3";
 //	TString BDT8Name = "BDT_pt_1_2";
 
@@ -77,7 +78,8 @@ void  MCEff(int DoTnP, int Rescale){
 	 BDT3Name = "BDT_pt_New_7_10";
 	 BDT4Name = "BDT_pt_New_10_15";
 	 BDT5Name = "BDT_pt_New_15_20";
-	 BDT6Name = "BDT_pt_New_20_50";
+	 // BDT6Name = "BDT_pt_New_20_60";
+	 BDT6Name = "BDT_pt_New_20_60";
 //	 BDT7Name = "BDT_pt_New_2_3";
 //	 BDT8Name = "BDT_pt_New_1_2";
 
@@ -180,7 +182,7 @@ void  MCEff(int DoTnP, int Rescale){
 	Double_t BDT_pt_7_10[NCand];
 	Double_t BDT_pt_10_15[NCand];
 	Double_t BDT_pt_15_20[NCand];
-	Double_t BDT_pt_20_50[NCand];
+	Double_t BDT_pt_20_60[NCand];
 //	Double_t BDT_pt_2_3[NCand];
 //	Double_t BDT_pt_2_3[NCand];
 //	Double_t BDT_pt_1_2[NCand];
@@ -287,7 +289,7 @@ void  MCEff(int DoTnP, int Rescale){
 	BDT3->SetBranchAddress("BDT_pt_7_10",BDT_pt_7_10);
 	BDT4->SetBranchAddress("BDT_pt_10_15",BDT_pt_10_15);
 	BDT5->SetBranchAddress("BDT_pt_15_20",BDT_pt_15_20);
-	BDT6->SetBranchAddress("BDT_pt_20_50",BDT_pt_20_50);
+	BDT6->SetBranchAddress("BDT_pt_20_60",BDT_pt_20_60);
 //	BDT7->SetBranchAddress("BDT_pt_2_3",BDT_pt_2_3);
 
 //	BDT7->SetBranchAddress("BDT_pt_2_3",BDT_pt_2_3);
@@ -301,7 +303,7 @@ void  MCEff(int DoTnP, int Rescale){
 	BDT3->SetBranchAddress("BDT_pt_New_7_10",BDT_pt_7_10);
 	BDT4->SetBranchAddress("BDT_pt_New_10_15",BDT_pt_10_15);
 	BDT5->SetBranchAddress("BDT_pt_New_15_20",BDT_pt_15_20);
-	BDT6->SetBranchAddress("BDT_pt_New_20_50",BDT_pt_20_50);
+	BDT6->SetBranchAddress("BDT_pt_New_20_60",BDT_pt_20_60);
 //	BDT7->SetBranchAddress("BDT_pt_New_2_3",BDT_pt_2_3);
 //	BDT8->SetBranchAddress("BDT_pt_New_1_2",BDT_pt_1_2);
 
@@ -654,9 +656,24 @@ void  MCEff(int DoTnP, int Rescale){
 	TH1D * weights_BDT_pt_7_10 = (TH1D * ) finBDTWeight->Get("weights_BDT_pt_7_10");
 	TH1D * weights_BDT_pt_10_15 = (TH1D * ) finBDTWeight->Get("weights_BDT_pt_10_15");
 	TH1D * weights_BDT_pt_15_20 = (TH1D * ) finBDTWeight->Get("weights_BDT_pt_15_20");
-	TH1D * weights_BDT_pt_20_50 = (TH1D * ) finBDTWeight->Get("weights_BDT_pt_20_50");
+	TH1D * weights_BDT_pt_20_60 = (TH1D * ) finBDTWeight->Get("weights_BDT_pt_20_60");
 
-	
+	// TFile * finPreSelWeight = new TFile("BDTWeights/BPprew.root");
+  // std::vector<TH1D*> weight_Bchi2cl;
+  // std::vector<TH1D*> weight_BsvpvSig;
+  // for (auto i = 0; i < nptPreselBins; ++i) {
+  //   auto bchi2clStr =
+  //     TString::Format("weights_Bchi2cl_pt_%d_%d", ptPreselBin[i], ptPreselBin[i + 1]);
+  //   weight_Bchi2cl.push_back(finPreselWeight->Get<TH1D>(bchi2clStr));
+  //   auto bsvpvsigStr =
+  //     TString::Format("weights_BsvpvSig_pt_%d_%d", ptPreselBin[i], ptPreselBin[i + 1]);
+  //   weight_BsvpvSig.push_back(finPreselWeight->Get<TH1D>(bsvpvsigStr));
+  // }
+
+  // cout << weight_Bchi2cl[0].GetMaximum() << "\n";
+
+  // return;
+
 	TH1D * Eff1DRECOHisBpt = new TH1D("Eff1DRECOHisBpt","",NPtBins1D,PtBin1D);
 
 	Eff1DRECOHisBpt->GetXaxis()->SetTitle("p_{T} (GeV/c)");
@@ -927,13 +944,13 @@ void  MCEff(int DoTnP, int Rescale){
 	TString outfileName;
 
 	if(Rescale == 0){
-		if(DoTnP == 0) outfileName = "NewEff2DMaps/EffFineNoTnP.root";
-		if(DoTnP == 1) outfileName = "NewEff2DMaps/EffFineBDT.root";
+		if(DoTnP == 0) outfileName = "CorEff2DMaps/EffFineNoTnP.root";
+		if(DoTnP == 1) outfileName = "CorEff2DMaps/EffFineBDT.root";
 	}
 	
 	if(Rescale == 1){
 
-		if(DoTnP == 1) outfileName = "NewEff2DMaps/EffFineBDTNew.root";
+		if(DoTnP == 1) outfileName = "CorEff2DMaps/EffFineBDTNew.root";
 	}
 
 	TFile * fout = new TFile(outfileName.Data(),"RECREATE");
@@ -978,7 +995,7 @@ void  MCEff(int DoTnP, int Rescale){
                       || (Bpt[j] > 7 && Bpt[j] < 10 && BDT_pt_7_10[j] > 0.07)
                       || (Bpt[j] > 10 && Bpt[j] < 15 && BDT_pt_10_15[j] > 0)
                       || (Bpt[j] > 15 && Bpt[j] < 20 && BDT_pt_15_20[j] > 0.02)
-                      || (Bpt[j] > 20 && Bpt[j] < 50 && BDT_pt_20_50[j] > 0.04)
+                      || (Bpt[j] > 20 && Bpt[j] < 50 && BDT_pt_20_60[j] > 0.04)
                       || (Bpt[j] > 50 && Bpt[j] < 60));
 
       bool preselection = (pPAprimaryVertexFilter == 1
@@ -1225,13 +1242,13 @@ void  MCEff(int DoTnP, int Rescale){
 				
 				}
 				
-				if(Bpt[j] < 50 && Bpt[j] > 20){
-					BDTWeightBin = weights_BDT_pt_20_50->GetXaxis()->FindBin(BDT_pt_20_50[j]);
-					BDTWeight = weights_BDT_pt_20_50->GetBinContent(BDTWeightBin);
+				if(Bpt[j] < 60 && Bpt[j] > 20){
+					BDTWeightBin = weights_BDT_pt_20_60->GetXaxis()->FindBin(BDT_pt_20_60[j]);
+					BDTWeight = weights_BDT_pt_20_60->GetBinContent(BDTWeightBin);
 
 				}
 
-				if(Bpt[j] < 60 && Bpt[j] > 50) BDTWeight = 1;
+				// if(Bpt[j] < 60 && Bpt[j] > 50) BDTWeight = 1;
 
 				
 				Eff1DRECOHisBDT->Fill(Bpt[j],TotalWeight * BDTWeight);
@@ -1990,7 +2007,7 @@ void  MCEff(int DoTnP, int Rescale){
 
 
 
-		TFile * foutSyst = new TFile("NewEff2DMaps/BPSyst.root","RECREATE");
+		TFile * foutSyst = new TFile("CorEff2DMaps/BPSyst.root","RECREATE");
 		foutSyst->cd();
 		Eff1DHis->Write();
 		Eff1DHisTnPUp->Write();
@@ -2003,11 +2020,14 @@ void  MCEff(int DoTnP, int Rescale){
 		Eff1DHisTnPDownMult->Write();
 		Eff1DHisBptMult->Write();
 		Eff1DHisBDTMult->Write();
+
+    Sel1DHis->Write();
+    Acc1DHis->Write();
 		foutSyst->Close();
 
 
 
-		TFile * foutSyst2D = new TFile("NewEff2DMaps/BPSyst2D.root","RECREATE");
+		TFile * foutSyst2D = new TFile("CorEff2DMaps/BPSyst2D.root","RECREATE");
 
 		invEff2D->Write();
 		invEff2DTnPSystUp->Write();

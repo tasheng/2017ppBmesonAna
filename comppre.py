@@ -1,5 +1,6 @@
 import sys
 import ROOT as r
+import numpy as np
 
 # if 'can' not in locals():
 #     can = r.TCanvas('can', 'can')
@@ -88,12 +89,66 @@ for bind, btype in enumerate(btypes):
     print('inverse efficiency')
     comp(effs)
     print('corrected yield')
-    comp(yds, update=True)
+    # comp(yds, update=True)
+    comp(yds, update=False)
     fio.cd()
     hMCData.Write()
     hPre.Write()
     fio.Write()
     fio.Close()
+
+    def table(ylist, elist, clist):
+        binlist = range(1, raws[0].GetNbinsX() + 1)
+        ynom = np.array([ ylist[0].GetBinContent(ib) for ib in binlist])
+        ypre = np.array([ ylist[1].GetBinContent(ib) for ib in binlist])
+        enom = np.array([ elist[0].GetBinContent(ib) for ib in binlist])
+        epre = np.array([ elist[1].GetBinContent(ib) for ib in binlist])
+        cnom = np.array([ clist[0].GetBinContent(ib) for ib in binlist])
+        cpre = np.array([ clist[1].GetBinContent(ib) for ib in binlist])
+        ynom_err = np.array([ ylist[0].GetBinError(ib) for ib in binlist])
+        ypre_err = np.array([ ylist[0].GetBinError(ib) for ib in binlist])
+        enom_err = np.array([ elist[0].GetBinError(ib) for ib in binlist])
+        epre_err = np.array([ elist[0].GetBinError(ib) for ib in binlist])
+        # cnom_err = np.array([ clist[0].GetBinError(ib) for ib in binlist])
+        # cpre_err = np.array([ clist[0].GetBinError(ib) for ib in binlist])
+        ynom_err /= ynom
+        ypre_err /= ypre
+        enom_err /= enom
+        epre_err /= epre
+        # cnom_err /= cnom
+        # cpre_err /= cpre
+
+        title = ['loose raw yield', 'error',
+                 'nominal raw yield', 'error',
+                 'loose inverse eff.', 'error',
+                 'nominal inverse eff.', 'error',
+                 'loose corrected yield',
+                 'nominal corrected yield',
+                 'difference'
+                 ]
+
+        numlist = [ypre, ypre_err,
+                   ynom, ynom_err,
+                   epre, epre_err,
+                   enom, enom_err,
+                   cpre, cnom, (cpre - cnom) / cnom
+                   ]
+        percent = [0, 1,
+                   0, 1,
+                   0, 1,
+                   0, 1,
+                   0, 0, 1]
+        for ti, nu, per in zip(title, numlist, percent):
+            linestr = ['{s:>24}'.format(s=ti)] + ['{n:>7.2f}'.format(n = x) for x in nu]
+            if ti.rfind('corrected') > 0:
+                linestr[1:] = ['{n:>7.0f}'.format(n = x) for x in nu]
+            if per:
+                linestr = ['{s:>24}'.format(s=ti)] + \
+                    ['{n:>5.1f}\\%'.format(n = x * 100) for x in nu]
+            line = ' & '.join(linestr) +  ' \\\\'
+            print(line)
+    table(raws, effs, yds)
+
 
 
 

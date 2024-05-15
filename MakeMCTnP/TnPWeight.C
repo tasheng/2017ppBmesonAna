@@ -32,9 +32,13 @@ void TnPWeight(int Opt){
 	//	infile = "../UnskimmedSamples/OfficialMC/BPMC.root";
 		// infile = "../../bmva/TMVA/BP/sample/BPMC_5_60.root";
 		// infile = "../../dat/BP_MC_all.root";
-		infile = "/data3/tasheng/presel/output/BP_MC_BDTs_nom_tnp.root";
+		// infile = "/data3/tasheng/presel/output/BP_MC_BDTs_nom.root";
+		// TreeName = "Bfinder/ntKp";
+		// outfile = "BPTnPInfo.root";
+		// infile = "/data3/tasheng/presel/output/BP_MC_BDTs_nom.root";
+		infile = "/data3/tasheng/presel/output/BP_MC_BDTs_copy_dls3d.root";
 		TreeName = "Bfinder/ntKp";
-		outfile = "BPTnPInfo.root";
+		outfile = "BPTnPInfo_copy_dls3d.root";
 
 	}
 	if(Opt == 1){
@@ -42,7 +46,7 @@ void TnPWeight(int Opt){
 		// infile = "../UnskimmedSamples/OfficialMC/BsMC.root";
 		// infile = "../../bmva/TMVA/Bs/sample/BsMC_7_50.root";
 		// infile = "../../dat/Bs_MC_all.root";
-		infile = "/data3/tasheng/presel/output/Bs_MC_BDTs_nom_tnp.root";
+		infile = "/data3/tasheng/presel/output/Bs_MC_BDTs_nom.root";
 		TreeName = "Bfinder/ntphi";
 		//	outfile = "BsTnPInfo.root";
 		outfile = "BsTnPInfo.root";

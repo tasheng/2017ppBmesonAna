@@ -14,11 +14,11 @@ double boxWidth = 2.;
 
 // arrays of yields, errors, etc
 // Labeling
-  const char* bType[2] = {"B^{+}","B_{s}^{0}"};
+const char* bType[2] = {"B^{+}","B_{s}^{0}"};
 
-  const char* xAxName[] = {"p_{T} (GeV/c)"};
-//  const char* yAxName[] = {"1/T_{AA}dN/dp_{T} (pb c/GeV)", "B^{0}_{s}/B^{+} yield ratio"};
-   const char* yAxName[] = {"d #sigma_{pp}/d p_{T} (pb c/GeV)", "R_{AA} = #frac{1}{TAA} #frac{dN_{PbPb}/dp_{T}}{d #sigma_{pp}/d p_{T}}"};
+const char* xAxName[] = {"#it{p}_{T} (GeV/c)"};
+//  const char* yAxName[] = {"1/T_{AA}dN/d#it{p}_{T} (pb c/GeV)", "B^{0}_{s}/B^{+} yield ratio"};
+   const char* yAxName[] = {"d #sigma_{pp}/d #it{p}_{T} (pb c/GeV)", "R_{AA} = #frac{1}{TAA} #frac{dN_{PbPb}/d#it{p}_{T}}{d #sigma_{pp}/d #it{p}_{T}}"};
 
 
 // numbers
@@ -73,7 +73,7 @@ double bpl_low_xErrL[nBinsLowNew],bpl_low_xErrH[nBinsHighNew];
 Int_t colorLow[2]   = {TColor::GetColor("#4F42B5"), TColor::GetColor("#299617")};
 Int_t colorHigh[2]  = {TColor::GetColor("#4F42B5"), TColor::GetColor("#299617")};
 
-Int_t markerLow[2]  = {24, 25};
+Int_t markerLow[2]  = {71, 72};
 Int_t markerHigh[2] = {20, 21};
 
 double markerSizeLow[2]  = {1.2, 1.2};
@@ -88,14 +88,14 @@ double markerSizeRatio[2] = {1.9, 1.9};
 
 //---------------------------- text
 
-double ltxSetTextSize1 = 0.06;//legend entries
-double ltxSetTextSize2 = 0.035 * 0.80;//legend entry
+double ltxSetTextSize1 = 0.08;//legend entries
+double ltxSetTextSize2 = 0.055 * 1;//legend entry
 double ltxSetTextSize3 = 0.035; //legend entry
-double ltxSetTextSize4 = 0.042; //Enlarge Label
+double ltxSetTextSize4 = 0.065; //Enlarge Label
 
 
 // xsec specific
-double legXsec_xLowStart= 0.65;
+double legXsec_xLowStart= 0.45;
 double legXsec_y= 0.75;
 double legXsec_xLowEnd = 0.92;
 

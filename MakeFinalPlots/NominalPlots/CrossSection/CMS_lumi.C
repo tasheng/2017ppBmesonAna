@@ -81,9 +81,7 @@ CMS_lumi( TPad* pad, int iPeriod, int iPosX )
    // lumiText += lumi_5TeV;
   //  lumiText += " Cent. 10-60\%";
    // lumiText2 += "PbPb #sqrt{s_{NN}} = 5.02 TeV";
-      lumiText2 += "pp 5.02 TeV";
-
-      lumiText2 += lumi_5TeV;
+    lumiText2 += "pp " + lumi_5TeV + " (5.02 TeV)";
   }
 
   cout << lumiText << endl;

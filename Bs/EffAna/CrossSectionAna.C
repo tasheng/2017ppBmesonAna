@@ -586,6 +586,11 @@ void CrossSectionAna(int DoTnP){
 	}
 
 	//return;
+  cout << invAcc2D->GetName() << "\n";
+	for(int i = 0; i < NBins; i++){
+    // cout << setprecision(3);
+    cout << "eff = " << NewEff[i] << ", 1/eff = "  << 1 / NewEff[i] << ", error ratio: " << NewEffErr[i]/NewEff[i]<< "\n";
+  }
 
 	hInvEff->SetMaximum(NewEff[0]*1.5);
 	TCanvas *c = new TCanvas("c","c",600,600);
@@ -858,6 +863,9 @@ CorrDiffHisBin
 
 		cout << "RawCount = " << RawCount << "  RawCountErr = " << RawCountErr << " Eff1D[i] =   " << Eff1D[i] << "  Eff1DErr[i] =  " << Eff1DErr[i] << endl; 
 
+		cout << "Eff1D[i] = " << Eff1D[i] << "    NewEff[i] = " <<  NewEff[i]  << endl; 
+		cout << " Eff1D[i] =   " << 1.0/Eff1D[i] << "  NewEff[i] =  " << NewEff[i] << endl; 
+    cout << "ratio:" << 1.0 / Eff1D[i] / NewEff[i] << "\n";
 
 //		CorrYieldDiff[i] = (RawCount *  Eff1D[i])/(BRchain*2* lumi);
 //		CorrYieldDiffErr[i] = TMath::Sqrt((RawCountErr *  Eff1D[i]) *(RawCountErr  *  Eff1D[i]) + (RawCount *  Eff1DErr[i]) * (RawCount  *  Eff1DErr[i]))/(BRchain*2* lumi);

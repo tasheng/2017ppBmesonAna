@@ -1,5 +1,5 @@
 DOANALYSISPbPb_ROOFIT_BINNED_PT_BS=1
-DOANALYSISPbPb_ROOFIT_FULL_BS=2
+DOANALYSISPbPb_ROOFIT_FULL_BS=0
 DOANALYSISPbPb_ROOFIT_BINNED_PT_BS_TRK=0
 DOANALYSISPbPb_ROOFIT_BINNED_MULT_BS=0
 DOANALYSISPbPb_ROOFIT_BINNED_Y_BS=0
@@ -65,7 +65,7 @@ rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
 fi
 
 if [ $DOANALYSISPbPb_ROOFIT_BINNED_PT_BS  -eq 1  ]; then
-root -b  -q 'roofitB.C+('0','\"ntphi\"','0','1','0','\"$INPUTDATAPbPbCANDWISE_BS\"','\"$INPUTMCPbPbCANDWISE_BS\"','\"Bpt\"','\"$TRGPbPb\"','\"$CUTPbPb\"','\"$SELGENPbPb\"','$ISMCPbPb','1','$ISDOWEIGHTPbPb','\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_PT\"','\"results/Bs/Bpt\"','\"$NPROOFIT_PbPb\"','0')'
+root -b  -q 'roofitB.C('0','\"ntphi\"','0','1','0','\"$INPUTDATAPbPbCANDWISE_BS\"','\"$INPUTMCPbPbCANDWISE_BS\"','\"Bpt\"','\"$TRGPbPb\"','\"$CUTPbPb\"','\"$SELGENPbPb\"','$ISMCPbPb','1','$ISDOWEIGHTPbPb','\"$OUTPUTFILEPbPbSAVEHIST_ROOFIT_BS_BINNED_PT\"','\"results/Bs/Bpt\"','\"$NPROOFIT_PbPb\"','0')'
 
 rm roofitB_C.d roofitB_C_ACLiC_dict_rdict.pcm roofitB_C.so
 fi

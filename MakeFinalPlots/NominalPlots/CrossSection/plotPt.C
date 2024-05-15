@@ -363,11 +363,11 @@ void plotPt(bool bSavePlots       = 1,
 
 		// marker size
 		pgBs_low->SetMarkerSize(markerSizeLow[0]);
-		pgBs_lowWhite->SetMarkerSize(markerSizeLow[0]);
+		pgBs_lowWhite->SetMarkerSize(markerSizeLow[0] * 0.8);
 		
 		pgBs_high->SetMarkerSize(markerSizeHigh[0]);
 
-		pgBpl_lowWhite->SetMarkerSize(markerSizeLow[1]*0.86);
+		pgBpl_lowWhite->SetMarkerSize(markerSizeLow[1]*0.8);
 		pgBpl_low->SetMarkerSize(markerSizeLow[1]);
 		pgBpl_high->SetMarkerSize(markerSizeHigh[1]);
 
@@ -408,6 +408,7 @@ void plotPt(bool bSavePlots       = 1,
 		pgBpl_high->SetLineColor(colorHigh[1]);
 		pgBpl_low->SetLineColor(kGreen+3);
 		pgBpl_high->SetLineColor(kGreen+3);
+		pgBpl_low->SetLineColor(kGreen+3);
 
 
 		pgRatio_lowWhite->SetLineColor(kRed + 2);
@@ -693,6 +694,7 @@ void makePlot(int mes,
   gRatioBs_Fon_high.SetLineColor(kRed+2);
   gRatioBs_Fon_low.SetLineWidth(2);
   gRatioBs_Fon_high.SetLineWidth(2);
+  gRatioBs_Fon_low.SetFillStyle(0);
   // gRatioBs_Fon_low.SetFillColorAlpha(kRed+2, 0.5);
   // gRatioBs_Fon_high.SetFillColorAlpha(kRed+2, 0.5);
 
@@ -714,14 +716,14 @@ void makePlot(int mes,
 
 
   // TCanvas * cRatio = new TCanvas("cRatio","cRatio",800, 1200);
-  TPad * dataPad = new TPad("MyPad1","",0,0.3,1, 0.96);
+  TPad * dataPad = new TPad("MyPad1","",0,0.32,1, 0.96);
   dataPad->SetBottomMargin(0);
   dataPad->SetLogy();
   dataPad->Draw();
 
-  TPad * ratioPad = new TPad("MyPad2","",0,0.0,1,0.3);
+  TPad * ratioPad = new TPad("MyPad2","",0,0.0,1,0.32);
   ratioPad->SetTopMargin(0);
-  ratioPad->SetBottomMargin(0.3);
+  ratioPad->SetBottomMargin(0.35);
   ratioPad->Draw();
 
 
@@ -759,17 +761,19 @@ void makePlot(int mes,
     f4->GetXaxis()->SetTitleOffset(1.20);
   }
   if(whichPlot==0){
-    f4->GetYaxis()->SetTitleSize(0.06*0.80);
-    f4->GetYaxis()->SetTitleOffset(1.5);
-    f4->GetXaxis()->SetTitleOffset(1.05);
-    f4->GetXaxis()->SetTitleSize(f4->GetXaxis()->GetTitleSize() * 0.77);
-    f4->GetXaxis()->SetTitleOffset(1.18);
+    // f4->GetYaxis()->SetTitleSize(0.08*0.83);
+    // f4->GetYaxis()->SetTitleOffset(0.55);
+    // f4->GetXaxis()->SetTitleOffset(1.05);
+    // f4->GetXaxis()->SetTitleSize(f4->GetXaxis()->GetTitleSize() * 0.9);
+    // f4->GetXaxis()->SetTitleOffset(1.18);
 
-    f4->GetXaxis()->SetTitleSize(0.06*0.83);  //Unify Textsize
-    f4->GetYaxis()->SetTitleSize(0.06*0.83);
-    f4->GetYaxis()->SetTitleOffset(1.40);
+    f4->GetXaxis()->SetTitleSize(0.08);  //Unify Textsize
+    f4->GetYaxis()->SetTitleSize(0.08);
+    f4->GetYaxis()->SetTitleOffset(0.95);
     f4->GetXaxis()->SetTitleOffset(1.20);
 
+    f4->GetYaxis()->SetLabelSize(0.08);
+    f4->GetXaxis()->SetLabelSize(0.08);
     cout << "Offset = " << f4->GetYaxis()->GetTitleOffset() << endl;
 
 
@@ -801,22 +805,36 @@ void makePlot(int mes,
   gSystLow->Draw("5");
   gLow->Draw("P");
   gLowWhite->Draw("P");
+
+  TFile fout(Form("%s/png/xsec_vsPt_Bs.root", outputDir.Data()), "recreate");
+  gSystHigh->SetName("gSystHigh");
+  gSystHigh->Write();
+  gHigh->SetName("gHigh");
+  gHigh->Write();
+  gSystLow->SetName("gSystLow");
+  gSystLow->Write();
+  gLow->SetName("gLow");
+  gLow->Write();
+  gLowWhite->SetName("gLowWhite");
+  gLowWhite->Write();
+  fout.Close();
+
   if (mes == 0) {
     // pgBs_lowWhite->Draw("Psame");
-    lat->DrawLatex(xsec_ltxText1_xStart + 0.02,xsec_ltxText1_yStart-0.65+0.037,Form("B_{s}^{0} global uncertainty: #pm %.1f%%",glbSystUpBs));
+    lat->DrawLatex(xsec_ltxText1_xStart + 0.02,xsec_ltxText1_yStart-0.70+0.037,Form("Global uncertainty: #pm %.1f%%",glbSystUpBs));
   } else {
-    lat->DrawLatex(xsec_ltxText1_xStart + 0.02,xsec_ltxText1_yStart-0.70 + 0.037,Form("B^{+} global uncertainty: #pm %.1f%%",glbSystUpBp));
+    lat->DrawLatex(xsec_ltxText1_xStart + 0.02,xsec_ltxText1_yStart-0.70 + 0.037,Form("Global uncertainty: #pm %.1f%%",glbSystUpBp));
 
   }
 
 
-  double ShiftX = 0.05;
+  double ShiftX = 0.01;
   double ShiftY = 0.13;
 
   lat->SetTextSize(0.05);
   lat->SetTextSize(0.05 * ltxSetTextSize4/ltxSetTextSize2);  //Enlarge Labels
       
-  lat->SetTextSize(0.048 * 1.15);  //Enlarge Labels
+  lat->SetTextSize(ltxSetTextSize4 * 1.5);  //Enlarge Labels
   if (mes == 0) {
     lat->DrawLatex(legXsec_xLowStart+ShiftX+0.02 + 0.009,legXsec_y + 0.07,"#bf{B_{s}^{0}}"); //Enlarge Label
   } else {
@@ -830,20 +848,23 @@ void makePlot(int mes,
   lat->SetTextSize(ltxSetTextSize2 * 1.3);
   lat->SetTextSize(ltxSetTextSize4); //Enlarge Labels
 
-  lat->DrawLatex(legXsec_xLowStart-0.18-0.02,legXsec_y+0.062-ShiftY + 0.08,"1.5 < |y| < 2.4"); //Enlarge Label + Shift up
-  lat->DrawLatex(legXsec_xLowStart-0.13-0.02,legXsec_y+0.017-ShiftY + 0.08,"|y| < 2.4 "); //Enlarge Label + Shift up
+  // lat->DrawLatex(legXsec_xLowStart-0.18-0.02,legXsec_y+0.062-ShiftY + 0.08,"1.5 < |y| < 2.4"); //Enlarge Label + Shift up
+  // lat->DrawLatex(legXsec_xLowStart-0.13-0.02,legXsec_y+0.017-ShiftY + 0.08,"|y| < 2.4 "); //Enlarge Label + Shift up
 
 
 
 
-  TLegend *legXSec = new TLegend(legXsec_xLowStart + ShiftX + 0.04,legXsec_y-ShiftY + 0.08,legXsec_xLowEnd+ShiftX-0.10+0.06,legXsec_y+0.15-ShiftY + 0.08,"                    ","brNDC");
+  TLegend *legXSec = new TLegend(legXsec_xLowStart + ShiftX,
+                                 legXsec_y-ShiftY,
+                                 legXsec_xLowEnd+ShiftX+0.02,
+                                 legXsec_y+0.15-ShiftY + 0.08,"                    ","brNDC");
     
   legXSec->SetBorderSize(0);
 
   cout << "legXsec_xLowStart + ShiftX + 0.04 = " << legXsec_xLowStart + ShiftX + 0.04 << endl;
   cout << "legXsec_y+0.15-ShiftY + 0.08 = " << legXsec_y+0.15-ShiftY + 0.08 << endl;
   cout << "legXsec_y-ShiftY + 0.08 = " << legXsec_y-ShiftY + 0.08 << endl;
-  legXSec->SetTextSize(ltxSetTextSize2);
+  legXSec->SetTextSize(ltxSetTextSize4);
   legXSec->SetLineColor(1);
   legXSec->SetLineStyle(1);
   legXSec->SetLineWidth(1);
@@ -853,13 +874,13 @@ void makePlot(int mes,
   legXSec->SetNColumns(2);
   legXSec->SetColumnSeparation(0.0);
   //legXSec->AddEntry(pgBs_low,"1.5 < |y| < 2.4","p");
-  legXSec->AddEntry(gLow,"Data","p");
+  legXSec->AddEntry(gLow,"1.5 < |y| < 2.4","p");
   // legXSec->SetTextFont(42);
   // legXSec->AddEntry(pgBpl_low," ","p");
   legXSec->AddEntry(BsFONLL,"FONLL","f");
   // legXSec->AddEntry(pgBpl_low," ","");
   //legXSec->AddEntry(pgBs_high,"|y| < 2.4","p");
-  legXSec->AddEntry(gHigh," ","p");
+  legXSec->AddEntry(gHigh,"|y| < 2.4","p");
   legXSec->SetTextFont(42);
   legXSec->AddEntry(gHigh," ","");
 
@@ -884,17 +905,17 @@ void makePlot(int mes,
   double rRange = 0.55;
   TF1 fRatio("fRatio","1", xmin, xmax);
   fRatio.GetYaxis()->SetRangeUser(1 - rRange, 1 + rRange);
-  fRatio.GetYaxis()->SetTitle("Data / FONLL");
+  fRatio.GetYaxis()->SetTitle("Data/FONLL");
   fRatio.GetXaxis()->SetTitle(xAxName[0]);
   fRatio.GetXaxis()->CenterTitle();
   fRatio.GetYaxis()->CenterTitle();
-  fRatio.GetXaxis()->SetTitleSize(0.1);  //Unify Textsize
-  fRatio.GetXaxis()->SetTitleOffset(1.2);
-  fRatio.GetYaxis()->SetTitleSize(0.1);
-  fRatio.GetYaxis()->SetTitleOffset(0.68);
+  fRatio.GetXaxis()->SetTitleSize(0.15);  //Unify Textsize
+  fRatio.GetXaxis()->SetTitleOffset(1.05);
+  fRatio.GetYaxis()->SetTitleSize(0.12);
+  fRatio.GetYaxis()->SetTitleOffset(0.64);
 
-  fRatio.GetYaxis()->SetLabelSize(0.10);
-  fRatio.GetXaxis()->SetLabelSize(0.10);
+  fRatio.GetYaxis()->SetLabelSize(0.13);
+  fRatio.GetXaxis()->SetLabelSize(0.15);
 
 
   // HisEmpty4->Draw();
@@ -909,10 +930,11 @@ void makePlot(int mes,
   gRatioBs_high.Draw("ep");
 
   auto gRatio_white = (TGraphAsymmErrors*) gRatioBs_low.Clone();
-  gRatio_white->SetMarkerSize(markerSizeRatio[0]);
-  gRatio_white->SetMarkerSize(markerSizeLow[1]*0.86);
+  gRatio_white->SetMarkerStyle(markerHigh[mes]);
+  // gRatio_white->SetMarkerSize(markerSizeRatio[0]);
+  gRatio_white->SetMarkerSize(markerSizeLow[1]*0.7);
   gRatio_white->SetMarkerColor(kWhite);
-  // gRatio_white->Draw("P");
+  gRatio_white->Draw("P");
 
   TLine * UnityLine = new TLine(xmin, 1, xmax, 1);
   UnityLine->SetLineWidth(2);
@@ -932,9 +954,11 @@ void makePlot(int mes,
   if (mes == 0) {
     pc1->SaveAs(Form("%s/pdf/xsec_vsPt_Bs.pdf", outputDir.Data()));
     pc1->SaveAs(Form("%s/png/xsec_vsPt_Bs.png", outputDir.Data()));
+    pc1->SaveAs(Form("%s/png/xsec_vsPt_Bs.C", outputDir.Data()));
   } else {
     pc1->SaveAs(Form("%s/pdf/xsec_vsPt_BP.pdf", outputDir.Data()));
     pc1->SaveAs(Form("%s/png/xsec_vsPt_BP.png", outputDir.Data()));
+    pc1->SaveAs(Form("%s/png/xsec_vsPt_BP.C", outputDir.Data()));
   }
 
 }

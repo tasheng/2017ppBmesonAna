@@ -153,6 +153,7 @@ void BPComparison(){
   TString trackSelErrorFile = "../../../syst_track_sel.root";
   TFile fTrackSelError(trackSelErrorFile);
   TGraph* trackSelSyst = (TGraph *) fTrackSelError.Get("bp_track_sel_error");
+  TGraph* bkgEffSyst = (TGraph *) fTrackSelError.Get("bp_bkgeff_error");
 
 	float BPXSecPPYSystUp[NBins];
 	float BPXSecPPYSystDown[NBins];
@@ -164,6 +165,7 @@ void BPComparison(){
 	float BPMCDataSyst[NBins];
 	float BPPDFSyst[NBins];
 	float BPTrackSelSyst[NBins];
+	float BPBkgEffSyst[NBins];
 	float BPPtShapeSyst[NBins];
 	float BPTnPSystDown[NBins];
 	float BPTnPSystUp[NBins];
@@ -177,12 +179,14 @@ void BPComparison(){
     BPTnPSystUp[ibin] = BPTnPSystDown[ibin];
     BPPDFSyst[ibin] = pdfSyst->GetY()[ibin];
     BPTrackSelSyst[ibin] = trackSelSyst->GetY()[ibin];
+    BPBkgEffSyst[ibin] = bkgEffSyst->GetY()[ibin];
     cout << "i:" << ibin <<
       ", MC/data:" << BPMCDataSyst[ibin] <<
       ", pt shape:" << BPPtShapeSyst[ibin] <<
       ", tnp:" << BPTnPSystDown[ibin] <<
       ", PDF:" << BPPDFSyst[ibin] <<
       ", track sel:" << BPTrackSelSyst[ibin] <<
+      ", bkgeff:" << BPBkgEffSyst[ibin] <<
       "\n";
   }
 
@@ -193,9 +197,11 @@ void BPComparison(){
 	for(int i = 0; i < NBins; i++){
 		BPTotalSystDownRatio[i] = TMath::Sqrt(TMath::Power(BPTrackingSyst[i], 2) + TMath::Power(BPMCDataSyst[i], 2) +
                                           TMath::Power(BPPDFSyst[i], 2) + TMath::Power(BPTrackSelSyst[i], 2) +
+                                          TMath::Power(BPBkgEffSyst[i], 2) +
                                           TMath::Power(BPPtShapeSyst[i], 2) + TMath::Power(BPTnPSystDown[i], 2)) / 100;
     BPTotalSystUpRatio[i] = TMath::Sqrt(TMath::Power(BPTrackingSyst[i], 2) + TMath::Power(BPMCDataSyst[i], 2) +
                                         TMath::Power(BPPDFSyst[i], 2) + TMath::Power(BPTrackSelSyst[i], 2) +
+                                        TMath::Power(BPBkgEffSyst[i], 2) +
                                         TMath::Power(BPPtShapeSyst[i], 2) + TMath::Power(BPTnPSystUp[i], 2)) / 100;
 	}
 
@@ -228,8 +234,8 @@ void BPComparison(){
 
 	//Setup the Syst
 	TH2D * HisEmpty = new TH2D("HisEmpty","",100,5,60,100,100.0,2000000);
-	HisEmpty->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
-	HisEmpty->GetYaxis()->SetTitle("d#sigma/dp_{T} (pb c/GeV)");
+	HisEmpty->GetXaxis()->SetTitle("B^{+} #it{p}_{T} (GeV/c)");
+	HisEmpty->GetYaxis()->SetTitle("d#sigma/d#it{p}_{T} (pb c/GeV)");
 	HisEmpty->GetXaxis()->CenterTitle();
 	HisEmpty->GetYaxis()->CenterTitle();
 	HisEmpty->GetYaxis()->SetTitleOffset(1.8);
@@ -402,8 +408,8 @@ void BPComparison(){
 
 
 	TH2D * HisEmpty2 = new TH2D("HisEmpty2","",100,5,60,100,100.0,30000000);
-	HisEmpty2->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
-	HisEmpty2->GetYaxis()->SetTitle("d#sigma/d p_{T} (pb c/GeV)");
+	HisEmpty2->GetXaxis()->SetTitle("B^{+} #it{p}_{T} (GeV/c)");
+	HisEmpty2->GetYaxis()->SetTitle("d#sigma/d #it{p}_{T} (pb c/GeV)");
 	HisEmpty2->GetXaxis()->CenterTitle();
 	HisEmpty2->GetYaxis()->CenterTitle();
 	HisEmpty2->SetTitle("B^{+} Cross Section With Fiducial Region");
@@ -557,7 +563,7 @@ void BPComparison(){
 
 
 	TH2D * HisEmpty3 = new TH2D("HisEmpty3","",100,5,60,100,0,2);
-	HisEmpty3->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+	HisEmpty3->GetXaxis()->SetTitle("B^{+} #it{p}_{T} (GeV/c)");
 	HisEmpty3->GetYaxis()->SetTitle("2017/2015 Data");
 	HisEmpty3->GetXaxis()->CenterTitle();
 	HisEmpty3->GetYaxis()->CenterTitle();
@@ -660,7 +666,7 @@ void BPComparison(){
 
 
 	TH2D * HisEmpty4 = new TH2D("HisEmpty4","",100,5,60,100,0,2);
-	HisEmpty4->GetXaxis()->SetTitle("B^{+} p_{T} (GeV/c)");
+	HisEmpty4->GetXaxis()->SetTitle("B^{+} #it{p}_{T} (GeV/c)");
 	HisEmpty4->GetYaxis()->SetTitle("2017 Data/FONLL");
 	HisEmpty4->GetXaxis()->CenterTitle();
 	HisEmpty4->GetYaxis()->CenterTitle();

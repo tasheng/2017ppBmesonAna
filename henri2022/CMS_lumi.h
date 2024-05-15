@@ -11,7 +11,8 @@
 TString cmsText     = "CMS";
 float cmsTextFont   = 61;  // default is helvetic-bold
 
-bool writeExtraText = true;//false;
+// bool writeExtraText = true;//false;
+bool writeExtraText = false;
 TString extraText   = "Preliminary";
 float extraTextFont = 52;  // default is helvetica-italics
 
@@ -32,7 +33,7 @@ float extraOverCmsTextSize  = 0.76;
 TString lumi_13TeV = "20.1 fb^{-1}";
 TString lumi_8TeV  = "19.7 fb^{-1}";
 TString lumi_7TeV  = "5.1 fb^{-1}";
-TString lumi_5TeV  = "(302.3 pb^{-1})";
+TString lumi_5TeV  = "302.3 pb^{-1}";
 
 
 

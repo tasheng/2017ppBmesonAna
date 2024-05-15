@@ -371,11 +371,14 @@ void CrossSectionAna(int DoTnP){
 
 	TFile * fin1DEff;
 
-	if(DoTnP == 0) fin1DEff = new TFile("NewEff2DMaps/EffFineNoTnP.root");
-	if(DoTnP == 1) fin1DEff = new TFile("NewEff2DMaps/EffFineBDT.root");
+	if(DoTnP == 0) fin1DEff = new TFile("CorEff2DMaps/EffFineNoTnP.root");
+	if(DoTnP == 1) fin1DEff = new TFile("CorEff2DMaps/EffFineBDT.root");
+	// if(DoTnP == 1) fin1DEff = new TFile("NewEff2DMaps/EffFineBDT.root");
 	
 	fin1DEff->cd();
 
+	// TH2D * invAcc2D = (TH2D *) fin1DEff->Get("invEff2D");
+	// TH2D * invAcc2D = (TH2D *) fin1DEff->Get("invEffonly2D");
 	TH2D * invAcc2D = (TH2D *) fin1DEff->Get("invEff2D");
 	TH2D * invEffTrkTight = (TH2D *) fin1DEff->Get("invEffTrkTight");
 	TH2D * invEffTrkLoose = (TH2D *) fin1DEff->Get("invEffTrkLoose");
@@ -607,24 +610,30 @@ void CrossSectionAna(int DoTnP){
 
 
 
+
 		//NewEffErr[i] = 0; //Remove Error on Efficiency Correction//
 		cout << "CountTight =  " <<  CountsTight[i] << "   NewEffTight = " << NewEffTight[i] << "\n";
 		cout << "-----------------------------------------------------------------------------------------------" << endl;
 	}
 
+  cout << invAcc2D->GetName() << "\n";
+	for(int i = 0; i < NBins; i++){
+    // cout << setprecision(3);
+    cout << "eff = " << NewEff[i] << ", 1/eff = "  << 1 / NewEff[i] << ", error ratio: " << NewEffErr[i]/NewEff[i]<< "\n";
+  }
 
-	for(int i = 0 ; i < NBins; i++){
+	// for(int i = 0 ; i < NBins; i++){
 
-		cout << "--------------------------------------------------  Eff Systematics Uncertainties  -----------------------------------------------" << endl;
+	// 	cout << "--------------------------------------------------  Eff Systematics Uncertainties  -----------------------------------------------" << endl;
 
 
-		cout << "i = " << i << "    NewEffUp =   "  << NewEffUp[i]  <<    "    NewEffDown =   " <<  NewEffDown[i] << endl;
+	// 	cout << "i = " << i << "    NewEffUp =   "  << NewEffUp[i]  <<    "    NewEffDown =   " <<  NewEffDown[i] << endl;
 
-		cout << "i = " << i << "    SystUp =   "  << (NewEffUp[i] - NewEff[i])/ NewEff[i] <<    "    NewEffDown =   " << (NewEff[i] - NewEffDown[i])/NewEff[i] << endl;
-		cout << "-----------------------------------------------------------------------------------------------------------------------------------" << endl;
-	}
+	// 	cout << "i = " << i << "    SystUp =   "  << (NewEffUp[i] - NewEff[i])/ NewEff[i] <<    "    NewEffDown =   " << (NewEff[i] - NewEffDown[i])/NewEff[i] << endl;
+	// 	cout << "-----------------------------------------------------------------------------------------------------------------------------------" << endl;
+	// }
 
-	//return;
+	// return;
 
 	hInvEff->SetMaximum(NewEff[0]*1.5);
 	TCanvas *c = new TCanvas("c","c",600,600);
@@ -749,8 +758,10 @@ void CrossSectionAna(int DoTnP){
 		Eff1D[i] = Eff1DHis->GetBinContent(i+1);
 		Eff1DErr[i] = Eff1DHis->GetBinError(i+1);
 
-		//cout << "Eff1D[i] = " << Eff1D[i] << "    NewEff[i] = " <<  NewEff[i]  << endl; 
+		cout << "Eff1D[i] = " << Eff1D[i] << "    NewEff[i] = " <<  NewEff[i]  << endl; 
 		cout << " Eff1D[i] =   " << 1.0/Eff1D[i] << "  NewEff[i] =  " << NewEff[i] << endl; 
+    cout << "ratio:" << 1.0 / Eff1D[i] / NewEff[i] << "\n";
+
 
 
 //		CorrYieldDiff[i] = (RawCount *  Eff1D[i])/(BRchain*2* lumi);
