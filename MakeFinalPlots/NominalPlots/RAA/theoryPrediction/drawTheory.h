@@ -44,9 +44,11 @@ void plotTheory(bool addpostPRL = false, double xThreshold = 10)
   gCUJETB5TeV->SetLineColor(kRed-4);
   //gCUJETB5TeV->SetFillColor(kRed-4); //CWRv8
   //gCUJETB5TeV->SetFillColorAlpha(kRed-4, 0.5); //CWRv8
-  gCUJETB5TeV->SetFillColor(kYellow+2);
-  gCUJETB5TeV->SetFillColorAlpha(kYellow+2, 0.5);
-  gCUJETB5TeV->SetFillStyle(3344);
+  // gCUJETB5TeV->SetFillColor(kYellow+2);
+  // gCUJETB5TeV->SetFillColorAlpha(kYellow+2, 0.5);
+  gCUJETB5TeV->SetFillColorAlpha(kYellow+2, 0.4);
+  // gCUJETB5TeV->SetFillStyle(3344);
+  gCUJETB5TeV->SetFillStyle(1001);
   gCUJETB5TeV->Draw("3 same");
   /*
   TGraph* gCUJETB5TeV = new TGraph(nbin,aCx,aCy);
@@ -89,10 +91,12 @@ void plotTheory(bool addpostPRL = false, double xThreshold = 10)
     }
   TGraphErrors* gADSCFT1B5TeV = new TGraphErrors(nbin, aADSCFT1B5TeVx, aADSCFT1B5TeVy, aADSCFT1B5TeVxe, aADSCFT1B5TeVye);
   gADSCFT1B5TeV->SetName("gADSCFT1B5TeV");
-  gADSCFT1B5TeV->SetLineColor(kGreen-2);
-  gADSCFT1B5TeV->SetFillColor(kGreen-2);
-  gADSCFT1B5TeV->SetFillColorAlpha(kGreen-2,0.5);
-  gADSCFT1B5TeV->SetFillStyle(3325);
+  gADSCFT1B5TeV->SetLineColor(kViolet-2);
+  // gADSCFT1B5TeV->SetFillColor(kViolet-2);
+  // gADSCFT1B5TeV->SetFillColorAlpha(kViolet-2,0.5);
+  gADSCFT1B5TeV->SetFillColorAlpha(kViolet-2,0.4);
+  // gADSCFT1B5TeV->SetFillStyle(3325);
+  gADSCFT1B5TeV->SetFillStyle(1001);
   gADSCFT1B5TeV->Draw("4 same");
 
   // AdS/CFT Dynamic
@@ -123,10 +127,11 @@ void plotTheory(bool addpostPRL = false, double xThreshold = 10)
     }
   TGraphErrors* gADSCFT2B5TeV = new TGraphErrors(nbin, aADSCFT2B5TeVx, aADSCFT2B5TeVy, aADSCFT2B5TeVxe, aADSCFT2B5TeVye);
   gADSCFT2B5TeV->SetName("gADSCFT2B5TeV");
-  gADSCFT2B5TeV->SetLineColor(kViolet-8);
-  gADSCFT2B5TeV->SetFillColor(kViolet-8);
-  gADSCFT2B5TeV->SetFillColorAlpha(kViolet-8,0.5);
-  gADSCFT2B5TeV->SetFillStyle(3352);
+  gADSCFT2B5TeV->SetLineColor(kGreen-8);
+  // gADSCFT2B5TeV->SetFillColor(kGreen-8);
+  gADSCFT2B5TeV->SetFillColorAlpha(kGreen-8,0.4);
+  // gADSCFT2B5TeV->SetFillStyle(3352);
+  gADSCFT2B5TeV->SetFillStyle(1001);
   gADSCFT2B5TeV->Draw("3 same");
 
   // Magdalena
@@ -167,8 +172,8 @@ void plotTheory(bool addpostPRL = false, double xThreshold = 10)
   gTAMUB5TeV->SetName("gTAMUB5TeV");
   //gTAMUB5TeV->SetLineColor(kViolet-6);
   //gTAMUB5TeV->SetFillColor(kViolet-6);
-  gTAMUB5TeV->SetLineColor(kOrange+8);
-  gTAMUB5TeV->SetFillColor(kOrange+8);
+  gTAMUB5TeV->SetLineColor(kViolet+1);
+  gTAMUB5TeV->SetFillColor(kViolet+1);
   gTAMUB5TeV->SetFillStyle(1001);
   gTAMUB5TeV->Draw("3 same");
   //gTAMUB5TeV->Draw("4 same");

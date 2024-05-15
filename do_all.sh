@@ -57,7 +57,7 @@ bpEff () {
     # takes unskimmed MC sample as input
     echo "Takes BPw.root as input. Make sure it is up to date"
     ls -l BDTWeights/BPw.root
-    root -b -l -q MCEff.C'(1,0)' 
+    # root -b -l -q MCEff.C+'(1,0)' 
     # CrossSectionAna.C contains 1 By cuts
     root -b -l -q CrossSectionAna.C'(1)'
     # root -b -l -q CrossSectionAnaMult.C'(1)'
@@ -71,7 +71,7 @@ bsEff () {
     # about 1hr
     echo "Takes Bsw.root as input"
     ls -l BDTWeights/Bsw.root
-    root -b -l -q MCEff.C'(1,0)' 
+    # root -b -l -q MCEff.C+'(1,0)' 
 
     root -b -l -q CrossSectionAna.C'(1)'
     # root -b -l -q CrossSectionAnaMult.C'(1)'
@@ -92,8 +92,8 @@ nominal () {
     cd Comparisons/Fiducial
     root -b -l -q BPComparison.C
     root -b -l -q BsComparison.C
-    root -b -l -q BPNewFidNoScale.C
-    root -b -l -q BsNewFidNoScale.C
+    # root -b -l -q BPNewFidNoScale.C
+    # root -b -l -q BsNewFidNoScale.C
     cd ../../..
 }
 
@@ -131,15 +131,16 @@ comp () {
 
 	    # Get pre-selection error
 	#     python comppre.py
+    python preeff.py |& tee presel_table.txt
  
    # comparison plot again
     pushd BsBPFinalResults/Comparisons/Fiducial/
     # << BP/EffAna/FinalFiles/BPPPCorrYieldPT.root
   
-# root -b -l -q BPComparison.C
-   # root -b -l -q BsComparison.C
+    root -b -l -q BPComparison.C
+    root -b -l -q BsComparison.C
 
-#    python syst_table.py
+   python syst_table.py
     cd ../../RAA/
 
     root -b -l -q BPRAA.C
@@ -156,6 +157,7 @@ paperPlots () {
     root -b -l -q plotPt.C'(1,1,0,1,1,1)'
     root -b -l -q plotPt.C'(1,1,0,1,0,0)'
     root -b -l -q plotPt.C'(1,1,0,1,0,1)'
+    root -b -l -q plotPt.C'(1,1,0,1,1,1,1)'
     popd
 }
 # maketnp
@@ -169,13 +171,13 @@ paperPlots () {
 
 #sync_with_main
 
-#bpEff &
-#bsEff &
-#wait
+bpEff &
+bsEff &
+wait
 
 
-#syst
-#nominal
+syst
+nominal
 
 
 # bpStat&
@@ -183,4 +185,4 @@ paperPlots () {
 # wait
 
 comp
-#paperPlots
+paperPlots

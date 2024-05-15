@@ -150,7 +150,10 @@ void BPComparison(){
 	TH1D * TnPSyst = (TH1D *) fError.Get("TnPSyst");
 	TH1D * BptSyst = (TH1D *) fError.Get("BptSyst");
 	TH1D * MCDataSyst = (TH1D *) fError.Get("MCDataSyst");
-  if (!MCDataSyst) MCDataSyst = (TH1D *) fError.Get("BDTSyst");
+  if (!MCDataSyst) {
+    cout << "can't find " << "\n";
+    MCDataSyst = (TH1D *) fError.Get("BDTSyst"); 
+  }
 
   TString pdfErrorFile = "../../../bp_pdf.root";
   TFile fPdfError(pdfErrorFile);

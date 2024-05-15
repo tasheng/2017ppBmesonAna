@@ -45,7 +45,7 @@ void  MCEff(int DoTnP, int Rescale){
 	int ptmax = 50;
 
 	TString infile;
-	infile = "/data3/tasheng/presel/output/BP_MC_BDTs_nom_tnp.root";
+	infile = "/data3/tasheng/presel/output/_BP_MC_BDTs_nom_tnp.root";
 
 	TFile * fin = new TFile(infile.Data());
 

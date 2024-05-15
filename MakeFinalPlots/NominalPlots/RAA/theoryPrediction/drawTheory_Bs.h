@@ -1,10 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include "TGraph.h"
-Color_t colorTAMU_Bs = kOrange+8;
+Color_t colorTAMU_Bs = kViolet+1;
 Style_t styleTAMU_Bs = 1001;
 Color_t colorCUJET_Bs = kYellow+2;
-Style_t styleCUJET_Bs = 3344;
+// Style_t styleCUJET_Bs = 3344;
+Style_t styleCUJET_Bs = 1001;
 using namespace std;
 void plotTheory_Bs(double xThreshold = 10)
 {
@@ -86,7 +87,7 @@ void plotTheory_Bs(double xThreshold = 10)
 	gStyle->SetHatchesLineWidth(3);
 //	gCUJETB5TeV->SetLineColor(kRed-4);
 	gCUJETB5TeV->SetFillColor(colorCUJET_Bs);
-	gCUJETB5TeV->SetFillColorAlpha(colorCUJET_Bs, 0.5);
+	gCUJETB5TeV->SetFillColorAlpha(colorCUJET_Bs, 0.4);
 	gCUJETB5TeV->SetFillStyle(styleCUJET_Bs);
 	gCUJETB5TeV->Draw("3 same");
 

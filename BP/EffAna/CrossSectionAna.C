@@ -349,6 +349,7 @@ void CrossSectionAna(int DoTnP){
             cout << "[Warning] 0 inverse efficiency for pT "
                  << BptNew[j] << ", y " << ByNew[j] << "\n";
           }
+
         }
       }
 
@@ -517,6 +518,11 @@ void CrossSectionAna(int DoTnP){
 	}
 
 	//return;
+  cout << invAcc2D->GetName() << "\n";
+	for(int i = 0; i < NBins; i++){
+    // cout << setprecision(3);
+    cout << "eff = " << NewEff[i] << ", 1/eff = "  << 1 / NewEff[i] << ", error ratio: " << NewEffErr[i]/NewEff[i]<< "\n";
+  }
 
 	hInvEff->SetMaximum(NewEff[0]*1.5);
 	TCanvas *c = new TCanvas("c","c",600,600);

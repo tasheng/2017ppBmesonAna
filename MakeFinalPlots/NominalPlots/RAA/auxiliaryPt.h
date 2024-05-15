@@ -16,9 +16,9 @@ double boxWidth = 2.;
 // Labeling
   const char* bType[2] = {"B^{+}","B_{s}^{0}"};
 
-  const char* xAxName[] = {"p_{T} (GeV/c)"};
-//  const char* yAxName[] = {"1/T_{AA}dN/dp_{T} (pb c/GeV)", "B^{0}_{s}/B^{+} yield ratio"};
-   const char* yAxName[] = {"R_{AA}", "R_{AA} = #frac{1}{TAA} #frac{dN_{PbPb}/dp_{T}}{d #sigma_{pp}/d p_{T}}"};
+  const char* xAxName[] = {"#it{p}_{T} (GeV/c)"};
+//  const char* yAxName[] = {"1/T_{AA}dN/d#it{p}_{T} (pb c/GeV)", "B^{0}_{s}/B^{+} yield ratio"};
+   const char* yAxName[] = {"#it{R}_{AA}", "#it{R}_{AA} = #frac{1}{TAA} #frac{dN_{PbPb}/d#it{p}_{T}}{d #sigma_{pp}/d#it{p}_{T}}"};
 
 
 // numbers
@@ -89,7 +89,7 @@ double markerSizeRatio[2] = {1.9, 1.9};
 //---------------------------- text
 
 double ltxSetTextSize1 = 0.06;//legend entries
-double ltxSetTextSize2 = 0.035 * 0.80;//legend entry
+double ltxSetTextSize2 = 0.04 * 0.95;//legend entry
 double ltxSetTextSize3 = 0.035; //legend entry
 double ltxSetTextSize4 = 0.042; //Enlarge Label
 
